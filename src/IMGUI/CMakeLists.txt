@@ -1,0 +1,13 @@
+set(sources
+	${sources}
+	IMGUI/imconfig.h
+	IMGUI/imgui.cpp
+	IMGUI/imgui.h
+	IMGUI/imgui_draw.cpp
+	IMGUI/imgui_internal.h
+	IMGUI/stb_rect_pack.h
+	IMGUI/stb_textedit.h
+	IMGUI/stb_truetype.h
+	IMGUI/opengl3_example/imgui_impl_glfw_gl3.cpp
+	IMGUI/opengl3_example/imgui_impl_glfw_gl3.h
+	PARENT_SCOPE)

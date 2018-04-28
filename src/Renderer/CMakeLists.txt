@@ -1,0 +1,12 @@
+set(sources
+	${sources}
+	"renderer/OpenGLRenderer.cpp"
+	"renderer/OpenGLRenderer.h"
+	"renderer/Renderer.h"
+	"renderer/Sprite.h"
+	"renderer/Sprite.cpp"
+	"renderer/Texture.h"
+	"renderer/Texture.cpp"
+	"renderer/TextureRenderData.cpp"
+	"renderer/TextureRenderData.h"
+	PARENT_SCOPE)
