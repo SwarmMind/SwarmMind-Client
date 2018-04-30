@@ -1,7 +1,7 @@
 set(sources "main.cpp")
 
 add_subdirectory(renderer)
-add_subdirectory(IMGUI)
+add_subdirectory(imgui)
 add_subdirectory(lodepng)
 
 add_executable(OpenGLEngine ${sources})

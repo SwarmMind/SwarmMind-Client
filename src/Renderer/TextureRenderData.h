@@ -16,7 +16,9 @@ public:
 	int bufferOffset;
 	GLfloat* mappedBuffer;
 	GLuint vertexBuffer;
+	GLuint secondBuffer;
 	
+	void swapBuffers();
 	void mapBuffer();
 	void unmapBuffer();
 private:

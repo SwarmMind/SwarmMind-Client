@@ -85,12 +85,12 @@ void render(GLFWwindow* window, float timeElapsed)
 		for (size_t y = 0; y < 30; y++)
 		{
 			renderer->drawSprite(x, y, 0.3, 1, 1, paprikaSprite);
-			if (x % 2)	
-			renderer->drawSprite(x, y, 0.5, 1, 1, starSprite);
+			if (x % 2)
+				renderer->drawSprite(x, y, 0.5, 1, 1, starSprite);
 		}
 	}
-	renderer->draw();
 	double elapsed = glfwGetTime() - time;
+	renderer->draw();
 	ImGui::Text("renderTime: %f", elapsed * 1000);
 
 	{
