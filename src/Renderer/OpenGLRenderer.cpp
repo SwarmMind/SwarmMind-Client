@@ -1,6 +1,6 @@
 #include <renderer/OpenGLRenderer.h>
 #define GLFW_INCLUDE_NONE
-#include <glfw/glfw3.h>
+#include <GLFW/glfw3.h>
 #include <vector>
 #include <iostream>
 #include <fstream>
@@ -8,6 +8,7 @@
 #include <renderer/Sprite.h>
 #include <renderer/Texture.h>
 #include <imgui/imgui.h>
+#include <cstring>
 
 #pragma region Shader loading
 
