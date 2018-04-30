@@ -1,4 +1,4 @@
-#include <Renderer/Texture.h>
+#include <renderer/Texture.h>
 #include <lodepng/lodepng.h>
 #include <stdexcept>
 

@@ -1,13 +1,13 @@
-#include <Renderer/OpenGLRenderer.h>
+#include <renderer/OpenGLRenderer.h>
 #define GLFW_INCLUDE_NONE
 #include <glfw/glfw3.h>
 #include <vector>
 #include <iostream>
 #include <fstream>
 #include <lodepng/lodepng.h>
-#include <Renderer/Sprite.h>
-#include <Renderer/Texture.h>
-#include <IMGUI/imgui.h>
+#include <renderer/Sprite.h>
+#include <renderer/Texture.h>
+#include <imgui/imgui.h>
 
 #pragma region Shader loading
 

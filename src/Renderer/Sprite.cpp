@@ -1,5 +1,5 @@
-#include <Renderer/Sprite.h>
-#include <Renderer/Texture.h>
+#include <renderer/Sprite.h>
+#include <renderer/Texture.h>
 
 
 Sprite::Sprite(Texture* texture, float u, float v, float uvWidth, float uvHeight)

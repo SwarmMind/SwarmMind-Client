@@ -10,12 +10,12 @@
 #include <fstream>
 #include <queue>
 
-#include <Renderer/OpenGLRenderer.h>
-#include <IMGUI/imgui.h>
-#include <IMGUI/opengl3_example/imgui_impl_glfw_gl3.h>
-#include "IMGUI/imgui_demo.cpp"
-#include "Renderer/Sprite.h"
-#include "Renderer/Texture.h"
+#include <renderer/OpenGLRenderer.h>
+#include <imgui/imgui.h>
+#include <imgui/opengl3_example/imgui_impl_glfw_gl3.h>
+#include <imgui/imgui_demo.cpp>
+#include <renderer/Sprite.h>
+#include <renderer/Texture.h>
 
 using namespace gl;
 using namespace std;

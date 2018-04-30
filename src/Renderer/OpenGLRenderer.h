@@ -1,11 +1,11 @@
 #pragma once
-#include <Renderer/Renderer.h>
+#include <renderer/Renderer.h>
 #include <string>
 #include <glbinding/gl/gl.h>
 #include <map>
 #include <unordered_map>
 #include <vector>
-#include <Renderer/TextureRenderData.h>
+#include <renderer/TextureRenderData.h>
 
 using namespace std;
 using namespace gl;
