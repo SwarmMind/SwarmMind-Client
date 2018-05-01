@@ -11,6 +11,7 @@
 #include <queue>
 
 #include <renderer/OpenGLRenderer.h>
+#include <renderer/ImGuiRenderer.h>
 #include <imgui/imgui.h>
 #include <imgui/opengl3_example/imgui_impl_glfw_gl3.h>
 #include <imgui/imgui_demo.cpp>
@@ -70,13 +71,14 @@ void update(double time)
 }
 
 OpenGLRenderer* renderer;
+ImGuiRenderer* imguiRenderer;
 Sprite* paprikaSprite;
 Sprite* starSprite;
 
 void render(GLFWwindow* window, float timeElapsed)
 {
 
-	ImGui_ImplGlfwGL3_NewFrame();
+	imguiRenderer->preRender();
 	renderer->preDraw();
 	renderer->setCamera(30, 15, 15);
 	double time = glfwGetTime();
@@ -135,9 +137,8 @@ void render(GLFWwindow* window, float timeElapsed)
 			ShowExampleAppFixedOverlay(nullptr);
 		}
 	}
-	ImGui::Render();
-	ImGui_ImplGlfwGL3_RenderDrawData(ImGui::GetDrawData());
 
+	imguiRenderer->render();
 	glfwSwapBuffers(window);
 
 }
@@ -155,12 +156,11 @@ int main(void)
 	renderer = new OpenGLRenderer(window);
 	paprikaSprite = new Sprite(new Texture("res/paprika.png"));
 	starSprite = new Sprite(new Texture("res/star.png"));
+	imguiRenderer = new ImGuiRenderer(window);
 
-	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO();
 	io.Fonts->AddFontFromFileTTF("fonts/DroidSans.ttf", 20);
 	io.FontGlobalScale = 1.0f;
-	ImGui_ImplGlfwGL3_Init(window, true);
 	ImGui::StyleColorsDark();
 
 	/* Loop until the user closes the window */
@@ -180,9 +180,7 @@ int main(void)
 	delete starSprite->texture();
 	delete starSprite;
 	delete renderer;
-
-	ImGui_ImplGlfwGL3_Shutdown();
-	ImGui::DestroyContext();
+	delete imguiRenderer;
 
 	shutdown(0);
 }
