@@ -8,7 +8,6 @@
 #include <renderer/Sprite.h>
 #include <renderer/Texture.h>
 #include <imgui/imgui.h>
-#include <cstring>
 
 #pragma region Shader loading
 
@@ -135,7 +134,7 @@ OpenGLRenderer::OpenGLRenderer(GLFWwindow* _window)
 
 	createVertexArray();
 	setVertexAttributes();
-
+	
 	glfwSetFramebufferSizeCallback(window, [](GLFWwindow* window, int width, int height) {
 		glViewport(0, 0, width, height);
 	});
@@ -211,7 +210,7 @@ void OpenGLRenderer::preDraw()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-void OpenGLRenderer::draw(bool remapBuffer /*= false*/)
+void OpenGLRenderer::draw()
 {	
 	for (auto iterator = renderData.begin(); iterator != renderData.end(); iterator++)
 	{

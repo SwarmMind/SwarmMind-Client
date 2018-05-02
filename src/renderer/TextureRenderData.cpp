@@ -1,10 +1,11 @@
 #include <renderer/TextureRenderData.h>
+#include <cstring>
 
 using namespace std;
 
 TextureRenderData::TextureRenderData()
 {
-	vertexBufferSize = 1024 * 1024;
+	vertexBufferSize = 512 * 1024;
 	glGenBuffers(1, &vertexBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
 	glBufferStorage(GL_ARRAY_BUFFER, vertexBufferSize * sizeof(GLfloat), nullptr, GL_MAP_WRITE_BIT);
@@ -20,6 +21,7 @@ TextureRenderData::TextureRenderData()
 TextureRenderData::~TextureRenderData()
 {
 	glDeleteBuffers(1, &vertexBuffer);
+	glDeleteBuffers(1, &secondBuffer);
 }
 
 bool TextureRenderData::addData(unsigned int size, GLfloat* data)

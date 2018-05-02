@@ -16,6 +16,8 @@
 #include <imgui/imgui_demo.cpp>
 #include <renderer/Sprite.h>
 #include <renderer/Texture.h>
+#include <renderer/Textures.h>
+#include <renderer/Sprites.h>
 
 using namespace gl;
 using namespace std;
@@ -72,6 +74,8 @@ void update(double time)
 OpenGLRenderer* renderer;
 Sprite* paprikaSprite;
 Sprite* starSprite;
+Sprites* sprites;
+Textures* textures;
 
 void render(GLFWwindow* window, float timeElapsed)
 {
@@ -153,8 +157,10 @@ int main(void)
 	initializeOpenGL(window);
 
 	renderer = new OpenGLRenderer(window);
-	paprikaSprite = new Sprite(new Texture("res/paprika.png"));
-	starSprite = new Sprite(new Texture("res/star.png"));
+	textures = new Textures();
+	sprites = new Sprites(*textures);
+	paprikaSprite = sprites->get(PaprikaSprite);
+	starSprite = sprites->get(StarSprite);
 
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO();
@@ -175,10 +181,8 @@ int main(void)
 		lastTime = current;
 	}
 
-	delete paprikaSprite->texture();
-	delete paprikaSprite;
-	delete starSprite->texture();
-	delete starSprite;
+	delete sprites;
+	delete textures;
 	delete renderer;
 
 	ImGui_ImplGlfwGL3_Shutdown();

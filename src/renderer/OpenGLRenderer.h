@@ -17,12 +17,12 @@ class OpenGLRenderer : public Renderer
 public:
 	OpenGLRenderer(GLFWwindow* window);
 	~OpenGLRenderer();
+	
+	void preDraw();
 
 	virtual void drawSprite(float x, float y, float z, float width, float height, Sprite* sprite) override;
 	virtual void setCamera(float x, float y, float height) override;
-
-	void preDraw();
-	void draw(bool remapBuffer = false);
+	void draw();
 
 private:
 	GLint loadProgram(string vertexShader, string fragmentShader);
@@ -31,7 +31,7 @@ private:
 
 	void createVertexArray();
 	void setVertexAttributes();
-
+	
 	unsigned int floatsPerVert;
 	GLuint vertexArrayObject;
 	GLint program;
