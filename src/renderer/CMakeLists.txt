@@ -13,4 +13,6 @@ set(sources
 	"renderer/Textures.cpp"
 	"renderer/Sprites.h"
 	"renderer/Sprites.cpp"
+	"renderer/ImGuiRenderer.cpp"
+	"renderer/ImGuiRenderer.h"
 	PARENT_SCOPE)
