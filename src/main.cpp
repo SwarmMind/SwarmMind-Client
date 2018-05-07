@@ -19,6 +19,8 @@
 #include <renderer/Texture.h>
 #include <renderer/Textures.h>
 #include <renderer/Sprites.h>
+#include <sio_client.h>
+#include <thread>
 
 using namespace gl;
 using namespace std;
@@ -56,7 +58,7 @@ void initializeOpenGL(GLFWwindow* window)
 	glbinding::setAfterCallback([](const glbinding::FunctionCall &)
 	{
 		const auto error = glGetError();
-		if (error != GL_NO_ERROR)
+		if (error != 0)
 			std::cout << "error: " << std::hex << error << std::endl;
 	});
 }
@@ -78,6 +80,8 @@ Sprite* paprikaSprite;
 Sprite* starSprite;
 Sprites* sprites;
 Textures* textures;
+
+sio::client* client;
 
 void render(GLFWwindow* window, float timeElapsed)
 {
@@ -131,7 +135,7 @@ void render(GLFWwindow* window, float timeElapsed)
 				}
 				if (buttonPressed)
 				{
-					ImGui::Text("The button is pressed");
+					client->socket()->emit("test", std::string("This is now correct!"));
 				}
 			}
 			ImGui::End();
@@ -146,6 +150,8 @@ void render(GLFWwindow* window, float timeElapsed)
 	glfwSwapBuffers(window);
 
 }
+
+
 
 int main(void)
 {
@@ -167,7 +173,18 @@ int main(void)
 	ImGuiIO& io = ImGui::GetIO();
 	io.Fonts->AddFontFromFileTTF("fonts/DroidSans.ttf", 20);
 	io.FontGlobalScale = 1.0f;
-	ImGui::StyleColorsDark();
+	ImGui::StyleColorsLight();
+
+	cout << "Main Thread: " << std::this_thread::get_id() << endl;
+
+	client = new sio::client();
+	client->set_reconnect_attempts(3);
+	client->connect("http://127.0.0.1:3000");
+
+	client->socket()->on("init", [](sio::event& _event) {
+		cout << _event.get_message()->get_string() << endl;
+		cout << "Socket IO thread: " << std::this_thread::get_id() << endl;
+	});
 
 	/* Loop until the user closes the window */
 	double lastTime = glfwGetTime();
