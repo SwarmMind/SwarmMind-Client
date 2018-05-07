@@ -45,6 +45,7 @@ For SwarmMind-developers on Unix:
     * libboost_date_time_ ... .a
     * libboost_random_ ... .a
     * libboost_system_ ... .a
+Note: on Windows, the folder structure should look the same but all files ending with .a should end with .lib
 
 ### Adding the libraries and building the SwarmMind-Client
 1. Download the repository (either by pulling from the repository or downloading the zip file).
