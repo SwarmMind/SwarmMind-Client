@@ -7,49 +7,70 @@ using namespace std;
 
 Input::Input(GLFWwindow* window)
 	: _window{window} 
-	, keyToStatus{ { Key::W, ActionStatus()}, { Key::A, ActionStatus()}, { Key::S, ActionStatus()}, { Key::D, ActionStatus()} }
-{}
+{
+	actionStatus[MoveRight] =	ActionStatus({ GLFW_KEY_D });
+	actionStatus[MoveLeft] =	ActionStatus({ GLFW_KEY_A });
+	actionStatus[MoveUp] =		ActionStatus({ GLFW_KEY_W });
+	actionStatus[MoveDown] =	ActionStatus({ GLFW_KEY_S });
+}
 
 Input::~Input() 
 {
 
 }
 
-bool Input::isActionPressed(Key keycode)
+bool Input::isActionPressed(Action action)
 {
-	if (glfwGetKey(_window, keycode) == GLFW_PRESS) 
+	return actionStatus[action].isPressed;
+}
+
+bool Input::isActionJustPressed(Action action)
+{
+	return actionStatus[action].isJustPressed;
+}
+
+bool Input::isActionJustReleased(Action action)
+{
+	return actionStatus[action].isJustReleased;
+}
+
+void Input::update(double deltaTime)
+{
+	for each (auto& actionPair in actionStatus)
 	{
-		return true;
+		this->updateAction(actionPair.first);
+	}
+}
+
+void Input::updateAction(Action action)
+{
+	ActionStatus& status = actionStatus[action];
+
+	if (isAnyKeyPressed(status.glfwKeys)) {
+		status.isJustPressed = !status.isPressed;
+		status.isPressed = true;
+		status.isJustReleased = false;
+	}
+	else {
+		status.isJustPressed = false;
+		status.isJustReleased = status.isPressed;
+		status.isPressed = false;
+	}
+}
+
+bool Input::isAnyKeyPressed(std::vector<int> glfwKeys)
+{
+	for each (int keyCode in glfwKeys)
+	{
+		if (glfwGetKey(_window, keyCode) == GLFW_PRESS)
+		{
+			return true;
+		}
 	}
 	return false;
 }
 
-void Input::updateKeyStatus()
+ActionStatus::ActionStatus(vector<int> keys) : glfwKeys{ keys }
 {
-	for each (auto key in keyToStatus) {
-		checkPressedKey(key);
-	}
-}
 
-void Input::checkPressedKey(pair<Key, ActionStatus> key)
-{
-	if (isActionPressed(key.first)) {
-		if (keyToStatus.at(key.first).isJustPressed) {
-			keyToStatus.at(key.first).isPressed = true;
-			keyToStatus.at(key.first).isJustPressed = false;
-		}
-		else {
-			keyToStatus.at(key.first).isJustPressed = true;
-		}
-	}
-	else {
-		keyToStatus.at(key.first).isPressed = false;
-		keyToStatus.at(key.first).isJustPressed = false;
-	}
 }
-
-map<Key, ActionStatus> Input::getKeyStatus()
-{
-	return keyToStatus;
-}
-
