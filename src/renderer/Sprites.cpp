@@ -8,7 +8,7 @@
 
 Sprites::Sprites(class Textures& textures)
 {
-	auto& spriteList = spriteTextures();
+	auto spriteList = spriteTextures();
 	for (auto& spriteInit : spriteList)
 	{
 		SpriteInitList initList = spriteInit.second;
@@ -32,7 +32,7 @@ Sprites::~Sprites()
 
 class Sprite* Sprites::get(SpriteEnum sprite)
 {
-	auto& iterator = sprites.find(sprite);
+	auto iterator = sprites.find(sprite);
 	if (iterator == sprites.end())
 	{
 		throw out_of_range("Sprite is not loaded!");
