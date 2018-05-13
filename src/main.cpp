@@ -19,6 +19,7 @@
 #include <renderer/Texture.h>
 #include <renderer/Textures.h>
 #include <renderer/Sprites.h>
+#include <input/Input.h>
 #include <thread>
 
 using namespace gl;
@@ -79,6 +80,7 @@ Sprite* gridSprite;
 Sprite* monsterSprite;
 Sprites* sprites;
 Textures* textures;
+Input* input;
 
 void render(GLFWwindow* window, float timeElapsed)
 {
@@ -156,6 +158,7 @@ int main(void)
 	gridSprite = sprites->get(GridBlock);
 	monsterSprite = sprites->get(Monster);
 	imguiRenderer = new ImGuiRenderer(window);
+	input = new Input(window);
 
 	ImGuiIO& io = ImGui::GetIO();
 	io.Fonts->AddFontFromFileTTF("fonts/DroidSans.ttf", 20);
@@ -171,6 +174,8 @@ int main(void)
 		double current = glfwGetTime();
 		double elapsed = current - lastTime;
 		processInputs();
+		//input handling
+		input->updateKeyStatus();
 		update(elapsed);
 		render(window, elapsed);
 		lastTime = current;

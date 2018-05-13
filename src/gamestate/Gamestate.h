@@ -12,6 +12,7 @@ public:
 
 	void update(double deltaTime);
 	void draw(Renderer& renderer);
+
 private:
 	void updateConfiguration();
 	void updateGameState();

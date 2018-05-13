@@ -5,6 +5,7 @@ add_subdirectory(imgui)
 add_subdirectory(lodepng)
 add_subdirectory(nlohmann)
 add_subdirectory(gamestate)
+add_subdirectory(input)
 
 add_executable(OpenGLEngine ${sources})
 
