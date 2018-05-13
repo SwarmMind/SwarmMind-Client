@@ -6,8 +6,7 @@ using namespace std;
 
 enum TextureEnum
 {
-	PaprikaTexture,
-	StarTexture
+	GridSpriteSheet
 };
 
 class Textures

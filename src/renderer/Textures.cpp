@@ -37,7 +37,6 @@ class Texture* Textures::get(TextureEnum texture)
 std::map<TextureEnum, string> Textures::texturePaths()
 {
 	return map<TextureEnum, string>({
-		{PaprikaTexture, "res/paprika.png"},
-		{StarTexture, "res/star.png"}
+		{GridSpriteSheet, "res/gridSpriteSheet.png"}
 	});
 }

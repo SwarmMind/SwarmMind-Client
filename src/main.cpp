@@ -19,7 +19,6 @@
 #include <renderer/Texture.h>
 #include <renderer/Textures.h>
 #include <renderer/Sprites.h>
-#include <sio_client.h>
 #include <thread>
 
 using namespace gl;
@@ -76,27 +75,24 @@ void update(double time)
 
 OpenGLRenderer* renderer;
 ImGuiRenderer* imguiRenderer;
-Sprite* paprikaSprite;
-Sprite* starSprite;
+Sprite* gridSprite;
+Sprite* monsterSprite;
 Sprites* sprites;
 Textures* textures;
-
-sio::client* client;
 
 void render(GLFWwindow* window, float timeElapsed)
 {
 
 	imguiRenderer->preRender();
 	renderer->preDraw();
-	renderer->setCamera(30, 15, 15);
 	double time = glfwGetTime();
 	for (size_t x = 0; x < 60; x++)
 	{
 		for (size_t y = 0; y < 30; y++)
 		{
-			renderer->drawSprite(x, y, 0.3, 1, 1, paprikaSprite);
+			renderer->drawSprite(x, y, 0.3, 1, 1, gridSprite);
 			if (x % 2)
-				renderer->drawSprite(x, y, 0.5, 1, 1, starSprite);
+				renderer->drawSprite(x, y, 0.5, 1, 1, monsterSprite);
 		}
 	}
 	double elapsed = glfwGetTime() - time;
@@ -105,7 +101,6 @@ void render(GLFWwindow* window, float timeElapsed)
 
 	{
 		static bool stayOpen = true;
-		static bool buttonPressed = false;
 		static float uiSize = 1.0f;
 		static std::deque<float> frameTimeQueue;
 		static int fpsAverageTime = 120;
@@ -129,14 +124,6 @@ void render(GLFWwindow* window, float timeElapsed)
 				ImGui::Text("Average FPS: %f", fps);
 				ImGui::DragFloat("UI scale", &uiSize, 0.001f, 0.f, 5.f);
 				ImGui::GetIO().FontGlobalScale = uiSize;
-				if (ImGui::Button("This is a Button"))
-				{
-					buttonPressed = true;
-				}
-				if (buttonPressed)
-				{
-					client->socket()->emit("test", std::string("This is now correct!"));
-				}
 			}
 			ImGui::End();
 		}
@@ -166,25 +153,16 @@ int main(void)
 	renderer = new OpenGLRenderer(window);
 	textures = new Textures();
 	sprites = new Sprites(*textures);
-	paprikaSprite = sprites->get(PaprikaSprite);
-	starSprite = sprites->get(StarSprite);
+	gridSprite = sprites->get(GridBlock);
+	monsterSprite = sprites->get(Monster);
 	imguiRenderer = new ImGuiRenderer(window);
 
 	ImGuiIO& io = ImGui::GetIO();
 	io.Fonts->AddFontFromFileTTF("fonts/DroidSans.ttf", 20);
 	io.FontGlobalScale = 1.0f;
-	ImGui::StyleColorsLight();
+	ImGui::StyleColorsDark();
 
-	cout << "Main Thread: " << std::this_thread::get_id() << endl;
-
-	client = new sio::client();
-	client->set_reconnect_attempts(3);
-	client->connect("http://127.0.0.1:3000");
-
-	client->socket()->on("init", [](sio::event& _event) {
-		cout << _event.get_message()->get_string() << endl;
-		cout << "Socket IO thread: " << std::this_thread::get_id() << endl;
-	});
+	renderer->setCamera(30, 15, 15);
 
 	/* Loop until the user closes the window */
 	double lastTime = glfwGetTime();

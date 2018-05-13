@@ -149,6 +149,22 @@ OpenGLRenderer::~OpenGLRenderer()
 #pragma endregion initialization
 
 #pragma region Drawing
+void OpenGLRenderer::uploadCamera()
+{
+	//Update the size every frame
+	int bufferWidth, bufferHeight;
+	glfwGetFramebufferSize(window, &bufferWidth, &bufferHeight);
+	float width = (static_cast<float>(bufferWidth) / static_cast<float>(bufferHeight)) * camera.height;
+	camera.width = width;
+
+	glUniform1f(xLocation, camera.x);
+	glUniform1f(yLocation, camera.y);
+
+	glUniform1f(widthLocation, camera.width);
+	glUniform1f(heightLocation, camera.height);
+
+}
+
 void OpenGLRenderer::drawSprite(float x, float y, float z, float width, float height, Sprite* sprite)
 {
 	unsigned int vertsPerSprite = 6;
@@ -190,21 +206,31 @@ void OpenGLRenderer::drawTexture(Texture* texture)
 	glDrawArrays(GL_TRIANGLES, 0, vertexCount);
 }
 
+/**
+	\brief set the view, the renderer should display
+	The width is calculated automatically according to the current aspect ratio
+	This command is best called before calling preDraw in the current frame, as otherwise the camera will not be updated for the current frame
+*/
 void OpenGLRenderer::setCamera(float x, float y, float height)
 {
-	glUniform1f(xLocation, x);
-	glUniform1f(yLocation, y);
-
 	int bufferWidth, bufferHeight;
 	glfwGetFramebufferSize(window, &bufferWidth, &bufferHeight);
 	float width = (static_cast<float>(bufferWidth) / static_cast<float>(bufferHeight)) * height;
-	
-	glUniform1f(widthLocation, width);
-	glUniform1f(heightLocation, height);
+
+	camera.x = x;
+	camera.y = y;
+	camera.height = height;
+	camera.width = width;
+}
+
+Camera OpenGLRenderer::getCamera()
+{
+	return camera;
 }
 
 void OpenGLRenderer::preDraw()
 {
+	this->uploadCamera();
 	glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
 	glClearDepth(0.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

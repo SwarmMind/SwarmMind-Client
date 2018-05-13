@@ -7,8 +7,9 @@ enum TextureEnum;
 
 enum SpriteEnum
 {
-	PaprikaSprite,
-	StarSprite
+	GridBlock,
+	Unit,
+	Monster
 };
 
 struct SpriteInitList {

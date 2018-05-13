@@ -3,6 +3,8 @@ set(sources "main.cpp")
 add_subdirectory(renderer)
 add_subdirectory(imgui)
 add_subdirectory(lodepng)
+add_subdirectory(nlohmann)
+add_subdirectory(gamestate)
 
 add_executable(OpenGLEngine ${sources})
 

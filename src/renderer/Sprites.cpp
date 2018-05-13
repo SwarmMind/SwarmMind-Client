@@ -46,7 +46,8 @@ class Sprite* Sprites::get(SpriteEnum sprite)
 std::map <SpriteEnum, SpriteInitList> Sprites::spriteTextures()
 {
 	return map<SpriteEnum, SpriteInitList>({
-		{PaprikaSprite, {PaprikaTexture, 0, 0, 1, 1}},
-		{StarSprite, {StarTexture, 0, 0, 1, 1}}
+		{GridBlock, {GridSpriteSheet, 0, 0.5, 0.5, 0.5}},
+		{Unit, {GridSpriteSheet, 0.5, 0.5, 0.5, 0.5}},
+		{Monster, {GridSpriteSheet, 0, 0, 0.5, 0.5}}
 	});
 }
