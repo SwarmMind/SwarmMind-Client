@@ -234,6 +234,7 @@ void OpenGLRenderer::preDraw()
 	glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
 	glClearDepth(0.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	this->renderData.clear();
 }
 
 void OpenGLRenderer::draw()

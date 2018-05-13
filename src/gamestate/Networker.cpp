@@ -8,6 +8,7 @@ Networker::Networker(std::string adress, unsigned int port /*= 3000*/)
 	: sioSocket{nullptr}
 	, initialized{false}
 	, gameState{nullptr}
+	, stateConfiguration{nullptr}
 {
 	this->sioClient.set_reconnect_attempts(this->reconnectAttempts);
 	this->sioClient.connect(string("http://") + adress + ":" + to_string(port));
@@ -87,9 +88,7 @@ nlohmann::json* Networker::getCurrentState()
 
 nlohmann::json Networker::getConfiguration()
 {
-	//lock_guard<mutex> configurationLock(configurationMutex);
-
-	configurationMutex.lock();
+	lock_guard<mutex> configurationLock(configurationMutex);
 
 	if (this->stateConfiguration == nullptr)
 	{
@@ -100,5 +99,4 @@ nlohmann::json Networker::getConfiguration()
 	{
 		return *this->stateConfiguration;
 	}
-	configurationMutex.unlock();
 }

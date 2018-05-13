@@ -20,6 +20,8 @@
 #include <renderer/Textures.h>
 #include <renderer/Sprites.h>
 #include <thread>
+#include <gamestate/Gamestate.h>
+#include <gamestate/Networker.h>
 
 using namespace gl;
 using namespace std;
@@ -68,71 +70,24 @@ void processInputs()
 	glfwPollEvents();
 }
 
-void update(double time)
-{
-
-}
-
 OpenGLRenderer* renderer;
 ImGuiRenderer* imguiRenderer;
-Sprite* gridSprite;
-Sprite* monsterSprite;
-Sprites* sprites;
-Textures* textures;
+Gamestate* gameState;
+
+void update(double time)
+{
+	gameState->update(time);
+}
 
 void render(GLFWwindow* window, float timeElapsed)
 {
 
 	imguiRenderer->preRender();
 	renderer->preDraw();
-	double time = glfwGetTime();
-	for (size_t x = 0; x < 60; x++)
-	{
-		for (size_t y = 0; y < 30; y++)
-		{
-			renderer->drawSprite(x, y, 0.3, 1, 1, gridSprite);
-			if (x % 2)
-				renderer->drawSprite(x, y, 0.5, 1, 1, monsterSprite);
-		}
-	}
-	double elapsed = glfwGetTime() - time;
+	
+	gameState->draw(*renderer);
+
 	renderer->draw();
-	ImGui::Text("renderTime: %f", elapsed * 1000);
-
-	{
-		static bool stayOpen = true;
-		static float uiSize = 1.0f;
-		static std::deque<float> frameTimeQueue;
-		static int fpsAverageTime = 120;
-
-		while (frameTimeQueue.size() >= fpsAverageTime)
-		{
-			frameTimeQueue.pop_front();
-		}
-		frameTimeQueue.push_back(timeElapsed);
-
-		if(stayOpen)
-		{
-			ImGui::Begin("My First Window", &stayOpen, ImGuiWindowFlags_AlwaysAutoResize); 
-			{
-				float fps = 0;
-				for (float frameTime : frameTimeQueue)
-				{
-					fps += frameTime;
-				}
-				fps = (float) fpsAverageTime / fps;
-				ImGui::Text("Average FPS: %f", fps);
-				ImGui::DragFloat("UI scale", &uiSize, 0.001f, 0.f, 5.f);
-				ImGui::GetIO().FontGlobalScale = uiSize;
-			}
-			ImGui::End();
-		}
-		else
-		{
-			ShowExampleAppFixedOverlay(nullptr);
-		}
-	}
-
 	imguiRenderer->render();
 	glfwSwapBuffers(window);
 
@@ -151,18 +106,17 @@ int main(void)
 	initializeOpenGL(window);
 
 	renderer = new OpenGLRenderer(window);
-	textures = new Textures();
-	sprites = new Sprites(*textures);
-	gridSprite = sprites->get(GridBlock);
-	monsterSprite = sprites->get(Monster);
 	imguiRenderer = new ImGuiRenderer(window);
+
+	Networker localHost("127.0.0.1");
+	gameState = new Gamestate(localHost);
 
 	ImGuiIO& io = ImGui::GetIO();
 	io.Fonts->AddFontFromFileTTF("fonts/DroidSans.ttf", 20);
 	io.FontGlobalScale = 1.0f;
 	ImGui::StyleColorsDark();
 
-	renderer->setCamera(30, 15, 15);
+	renderer->setCamera(15, 15, 15);
 
 	/* Loop until the user closes the window */
 	double lastTime = glfwGetTime();
@@ -176,10 +130,9 @@ int main(void)
 		lastTime = current;
 	}
 
-	delete sprites;
-	delete textures;
 	delete renderer;
 	delete imguiRenderer;
+	delete gameState;
 
 	shutdown(0);
 }

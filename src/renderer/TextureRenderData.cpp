@@ -20,6 +20,7 @@ TextureRenderData::TextureRenderData()
 
 TextureRenderData::~TextureRenderData()
 {
+	this->unmapBuffer();
 	glDeleteBuffers(1, &vertexBuffer);
 	glDeleteBuffers(1, &secondBuffer);
 }
@@ -61,6 +62,10 @@ void TextureRenderData::mapBuffer()
 
 void TextureRenderData::unmapBuffer()
 {
+	//Do not unmap, if the buffer is not mapped
+	if (this->mappedBuffer == nullptr)
+		return;
+
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
 	glUnmapBuffer(GL_ARRAY_BUFFER);
 	mappedBuffer = nullptr;
