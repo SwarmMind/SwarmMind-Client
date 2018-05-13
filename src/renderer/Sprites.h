@@ -1,9 +1,8 @@
 #pragma once
 #include <map>
+#include <renderer/Textures.h>
 
 using namespace std;
-
-enum TextureEnum;
 
 enum SpriteEnum
 {

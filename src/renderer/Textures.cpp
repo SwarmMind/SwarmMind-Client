@@ -26,7 +26,7 @@ Texture * Textures::operator[](TextureEnum texture)
 
 class Texture* Textures::get(TextureEnum texture)
 {
-	auto& iterator = textures.find(texture);
+	auto iterator = textures.find(texture);
 	if (iterator == textures.end())
 	{
 		throw out_of_range("Texture is not loaded!");
