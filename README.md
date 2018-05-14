@@ -56,4 +56,5 @@ Note: on Windows, the folder structure should look the same but all files ending
 5. Set the SIOCLIENT_DIR to "your-sioclient-dir" (this directory must have a folder structure as described in the building socket.IO C++ client section)
 6. Generate the cmake files and compile the project
 7. Copy the compiled OpenGLEngine.exe to your SwarmMind-Client directory
+8. Copy the compiled glbdinding.dll/glbindingd.dll (use the d Variant if your building on Debug) next to the OpenGLEngine.exe
 8. Run the OpenGLEngine.exe
