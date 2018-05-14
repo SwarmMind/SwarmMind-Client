@@ -11,7 +11,10 @@ enum Action {
 	MoveLeft,
 	MoveRight,
 	MoveUp,
-	MoveDown
+	MoveDown,
+	SelectUnit1,
+	SelectUnit2,
+	SelectUnit3
 };
 
 typedef struct ActionStatus {

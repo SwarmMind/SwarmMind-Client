@@ -67,7 +67,7 @@ Game::Game() : map{nullptr} {
     io.FontGlobalScale = 1.0f;
     ImGui::StyleColorsDark();
 
-    renderer->setCamera(15, 15, 15);
+    renderer->setCamera(5, 5, 5);
 }
 
 Game::~Game() {
@@ -88,6 +88,10 @@ void Game::processInputs()
 void Game::update(double time)
 {
 	localHost.update();
+	if (map != nullptr)
+	{
+		map->update(time);
+	}
 }
 
 std::string Game::statusString() const {
@@ -122,6 +126,7 @@ void Game::render(double timeElapsed)
     renderer->preDraw();
 
     drawStatus();
+
 	if (map != nullptr)
 	{
 		map->draw(*renderer);
@@ -148,7 +153,7 @@ void Game::loop() {
 }
 
 void Game::onInitState(Configuration config, Gamestate *gamestate) {
-    map = new Map { *input, config };
+    map = new Map { *input, localHost, config };
     map->updateGameState(gamestate);
 }
 

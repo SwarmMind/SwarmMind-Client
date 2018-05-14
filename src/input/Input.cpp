@@ -9,6 +9,9 @@ Input::Input(GLFWwindow* window)
 	actionStatus[MoveLeft] =	ActionStatus({ GLFW_KEY_A });
 	actionStatus[MoveUp] =		ActionStatus({ GLFW_KEY_W });
 	actionStatus[MoveDown] =	ActionStatus({ GLFW_KEY_S });
+	actionStatus[SelectUnit1] = ActionStatus({ GLFW_KEY_1 });
+	actionStatus[SelectUnit2] = ActionStatus({ GLFW_KEY_2 });
+	actionStatus[SelectUnit3] = ActionStatus({ GLFW_KEY_3 });
 }
 
 Input::~Input() 

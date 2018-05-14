@@ -80,6 +80,19 @@ void Networker::setGameOverCallback(std::function<void()> callback)
 	gameOverCallback = callback;
 }
 
+void Networker::sendCommand(std::string unitID, std::string action, std::string direction)
+{
+	if (!this->isConnected())
+		return;
+
+	sio::message::list arguments;
+	arguments.push(sio::string_message::create(unitID));
+	arguments.push(sio::string_message::create(action));
+	arguments.push(sio::string_message::create(direction));
+
+	this->sioSocket->emit("command", arguments);
+}
+
 void Networker::update()
 {
 	lock_guard<mutex> queueGuard(queueLock);
@@ -105,6 +118,7 @@ Gamestate* Networker::parseGamestate(string jsonString)
 		entity.posX = mapObject["posX"];
 		entity.posY = mapObject["posY"];
 		string id = mapObject["ID"];
+		entity.id = id;
 		if (id[0] == 'u')
 		{
 			units.push_back(entity);

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <string>
 
 struct Configuration 
 {
@@ -10,6 +11,7 @@ struct Configuration
 
 struct Entity
 {
+	std::string id;
 	unsigned posX;
 	unsigned posY;
 };

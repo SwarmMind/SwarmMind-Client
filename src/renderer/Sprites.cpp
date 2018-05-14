@@ -47,6 +47,7 @@ std::map <SpriteEnum, SpriteInitList> Sprites::spriteTextures()
 {
 	return map<SpriteEnum, SpriteInitList>({
 		{GridBlock, {GridSpriteSheet, 0, 0.5, 0.5, 0.5}},
+		{SelectedBlock, {GridSpriteSheet, 0.5, 0, 0.5, 0.5}},
 		{Unit, {GridSpriteSheet, 0.5, 0.5, 0.5, 0.5}},
 		{Monster, {GridSpriteSheet, 0, 0, 0.5, 0.5}}
 	});
