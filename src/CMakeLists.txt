@@ -6,6 +6,7 @@ add_subdirectory(lodepng)
 add_subdirectory(nlohmann)
 add_subdirectory(gamestate)
 add_subdirectory(input)
+add_subdirectory(game)
 
 add_executable(OpenGLEngine ${sources})
 
