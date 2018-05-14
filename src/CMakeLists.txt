@@ -6,6 +6,7 @@ add_subdirectory(lodepng)
 add_subdirectory(nlohmann)
 add_subdirectory(gamestate)
 add_subdirectory(input)
+add_subdirectory(game)
 
 add_executable(OpenGLEngine ${sources})
 
@@ -14,6 +15,13 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${sources})
 
 #Find and include the socketio cpp bindings
 set(SIOCLIENT_DIR "" CACHE PATH "The sioclient library directory")
+set(SIOCLIENT_USE_FIND_PACKAGE OFF CACHE BOOL "Use find_package for sioclient")
+
+if(SIOCLIENT_USE_FIND_PACKAGE)
+    find_package(sioclient 1.6.0 REQUIRED)
+    target_include_directories(OpenGLEngine PRIVATE ${sioclient_INCLUDE_DIRS})
+    target_link_libraries(OpenGLEngine PRIVATE ${sioclient_LIBRARIES})
+else()
 if(EXISTS ${SIOCLIENT_DIR})
 	target_include_directories(OpenGLEngine PUBLIC ${SIOCLIENT_DIR}/include)
 	
@@ -37,6 +45,7 @@ if(EXISTS ${SIOCLIENT_DIR})
 	endforeach(SIOCLIENT_LIB_RELEASE)
 else()
 	message(FATAL_ERROR "sioclient directory not set!")
+endif()
 endif()
 
 
