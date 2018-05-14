@@ -26,7 +26,7 @@ bool Input::isActionPressed(Key keycode)
 
 void Input::updateKeyStatus()
 {
-	for each (auto key in keyToStatus) {
+	for (auto key: keyToStatus) {
 		checkPressedKey(key);
 	}
 }

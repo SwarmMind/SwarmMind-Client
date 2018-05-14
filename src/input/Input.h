@@ -26,12 +26,12 @@ public:
 	~Input();
 
 	map<Key, ActionStatus> getKeyStatus();
+	void updateKeyStatus();
 
 private:
 	map<Key, ActionStatus> keyToStatus;
 	GLFWwindow* _window;
 
 	bool isActionPressed(Key keycode);
-	void updateKeyStatus();
 	void checkPressedKey(pair<Key, ActionStatus>);
 };

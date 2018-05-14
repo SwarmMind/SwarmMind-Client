@@ -74,23 +74,13 @@ void processInputs()
 OpenGLRenderer* renderer;
 ImGuiRenderer* imguiRenderer;
 Gamestate* gameState;
+Input* input;
 
 void update(double time)
 {
 	gameState->update(time);
 }
 
-<<<<<<< HEAD
-OpenGLRenderer* renderer;
-ImGuiRenderer* imguiRenderer;
-Sprite* gridSprite;
-Sprite* monsterSprite;
-Sprites* sprites;
-Textures* textures;
-Input* input;
-
-=======
->>>>>>> 2032c67d40af23984e502b9775660e4982f8ef82
 void render(GLFWwindow* window, float timeElapsed)
 {
 
