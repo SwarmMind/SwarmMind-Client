@@ -13,7 +13,7 @@ Networker::Networker()
 	sioSocket = sioClient.socket();
 	this->sioSocket->on("initState", bind(&Networker::onInitStateReceive, this, placeholders::_1));
 	this->sioSocket->on("state", bind(&Networker::onStateReceive, this, placeholders::_1));
-	this->sioClient.set_open_listener([&]() {
+	this->sioClient.set_open_listener([=]() {
 		if (this->connectCallback)
 		{
 			lock_guard<mutex> eventGuard(queueLock);
@@ -21,7 +21,7 @@ Networker::Networker()
 		}
 	});
 
-	this->sioClient.set_reconnecting_listener([&]() {
+	this->sioClient.set_reconnecting_listener([=]() {
 		if (this->disconnectCallback)
 		{
 			lock_guard<mutex> eventGuard(queueLock);
@@ -119,7 +119,7 @@ void Networker::onStateReceive(sio::event _event)
 		
 		{
 			lock_guard<mutex> queueGuard(queueLock);
-			this->eventQueue.push([&]() {
+			this->eventQueue.push([=]() {
 				this->stateCallback(state);
 			});
 		}
@@ -138,7 +138,7 @@ void Networker::onInitStateReceive(sio::event _event)
 
 		{
 			lock_guard<mutex> queueGuard(queueLock);
-			this->eventQueue.push([&]() {
+			this->eventQueue.push([=]() {
 				this->initStateCallback(config, state);
 			});
 		}
