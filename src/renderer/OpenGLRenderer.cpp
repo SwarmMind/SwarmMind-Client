@@ -165,6 +165,10 @@ void OpenGLRenderer::uploadCamera()
 
 }
 
+/**
+*	\brief draws a sprite at the specified position
+*	\param z has to be between 0 and 1, where 1 is the most "in front" and 0 is the most "in back"
+*/
 void OpenGLRenderer::drawSprite(float x, float y, float z, float width, float height, Sprite* sprite)
 {
 	unsigned int vertsPerSprite = 6;
