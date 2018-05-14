@@ -31,7 +31,7 @@ public:
 	Input(GLFWwindow* window);
 	~Input();
 
-
+	bool isActionReleased(Action action);
 	bool isActionPressed(Action action);
 	bool isActionJustPressed(Action action);
 	bool isActionJustReleased(Action action);
