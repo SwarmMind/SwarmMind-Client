@@ -100,14 +100,46 @@ Gamestate* Networker::parseGamestate(string jsonString)
 }
 
 
+Configuration Networker::parseConfiguration(std::string jsonString)
+{
+	nlohmann::json jsonConfig = nlohmann::json::parse(jsonString);
+	Configuration config;
+	config.sizeX = jsonConfig["sizeX"];
+	config.sizeY = jsonConfig["sizeY"];
+	return config;
+}
+
 void Networker::onStateReceive(sio::event _event)
 {
-	string jsonMessage = _event.get_message()->get_string();
+	if (this->stateCallback)
+	{
+		string jsonMessage = _event.get_message()->get_string();
+		Gamestate* state = this->parseGamestate(jsonMessage);
+		
+		{
+			lock_guard<mutex> queueGuard(queueLock);
+			this->eventQueue.push([&]() {
+				this->stateCallback(state);
+			});
+		}
+	}
 	
 }
 
 void Networker::onInitStateReceive(sio::event _event)
 {
-	string jsonMessage = _event.get_message()->get_string();
-	
+	if (this->initStateCallback)
+	{
+		string jsonMessage = _event.get_message()->get_string();
+		nlohmann::json initState = nlohmann::json::parse(jsonMessage);
+		Configuration config = this->parseConfiguration(initState["config"]);
+		Gamestate* state = this->parseGamestate(initState["state"]);
+
+		{
+			lock_guard<mutex> queueGuard(queueLock);
+			this->eventQueue.push([&]() {
+				this->initStateCallback(config, state);
+			});
+		}
+	}
 }
