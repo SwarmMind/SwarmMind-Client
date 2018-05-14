@@ -1,30 +1,29 @@
 #pragma once
-#include <nlohmann/json.hpp>
-#include <renderer/Renderer.h>
-#include <gamestate/Networker.h>
-#include <string>
-#include <renderer/Sprites.h>
-#include <renderer/Textures.h>
+
+#include <vector>
+
+struct Configuration 
+{
+	unsigned sizeX;
+	unsigned sizeY;
+};
+
+struct Entity
+{
+	unsigned posX;
+	unsigned posY;
+};
 
 class Gamestate
 {
 public:
-	Gamestate(Networker& _networker);
+	Gamestate(std::vector<Entity> _units, std::vector<Entity> _monsters);
 	~Gamestate();
 
-	void update(double deltaTime);
-	void draw(Renderer& renderer);
-
+	
+	std::vector<Entity> getUnits() const;
+	std::vector<Entity> getMonsters() const;
 private:
-	void updateConfiguration();
-	void updateGameState();
-
-	void drawStatus(std::string statusMessage);
-	void drawState(Renderer& renderer);
-
-	nlohmann::json* gameState;
-	nlohmann::json stateConfiguration;
-	Networker& networker;
-	Textures textures;
-	Sprites sprites;
+	std::vector<Entity> units;
+	std::vector<Entity> monsters;
 };

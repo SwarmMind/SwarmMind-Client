@@ -12,6 +12,7 @@
 #include <renderer/OpenGLRenderer.h>
 #include <renderer/ImGuiRenderer.h>
 #include <input/Input.h>
+#include <gamestate/Map.h>
 
 class Game {
     void createWindow();
@@ -28,7 +29,7 @@ protected:
     OpenGLRenderer *renderer;
     ImGuiRenderer *imguiRenderer;
     Input *input;
-    Gamestate *gameState;
+	Map* map;
 
 public:
     Game();
@@ -36,4 +37,6 @@ public:
     Game(const Game&) = delete;
 
     void loop();
+	void onConnect();
+	void onDisconnect();
 };

@@ -36,7 +36,7 @@ bool Input::isActionJustReleased(Action action)
 	return actionStatus[action].isJustReleased;
 }
 
-void Input::update(double deltaTime)
+void Input::update()
 {
 	for each (auto& actionPair in actionStatus)
 	{

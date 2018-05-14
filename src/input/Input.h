@@ -36,7 +36,7 @@ public:
 	bool isActionJustPressed(Action action);
 	bool isActionJustReleased(Action action);
 
-	void update(double deltaTime); //Time is not needed, but added for consistency with rest of game loop
+	void update();
 
 private:
 	map<Action, ActionStatus> actionStatus;
