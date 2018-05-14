@@ -16,6 +16,11 @@ Input::~Input()
 
 }
 
+bool Input::isActionReleased(Action action)
+{
+	return !this->isActionPressed(action);
+}
+
 bool Input::isActionPressed(Action action)
 {
 	return actionStatus[action].isPressed;
