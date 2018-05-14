@@ -31,7 +31,7 @@ public:
 private:
 	sio::client sioClient;
 	std::shared_ptr<sio::socket> sioSocket;
-	unsigned reconnectAttempts = 3;
+	unsigned reconnectAttempts = -1;
 	
 	std::mutex queueLock;
 	std::queue<std::function<void()>> eventQueue;

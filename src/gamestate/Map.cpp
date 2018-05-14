@@ -29,19 +29,22 @@ void Map::updateGameState(class Gamestate* newState)
 	this->gamestate = newState;
 }
 
-void Map::updateSelection()
+void Map::sendCommand(std::string action, std::string direction)
 {
-	if (input.isActionJustPressed(SelectUnit1))
+	if (!this->selectedUnitIsValid())
 	{
-		this->selectedUnit = 0;
+		return;
 	}
-	if (input.isActionJustPressed(SelectUnit2))
+
+	Entity unit = this->gamestate->getUnits().at(this->selectedUnit);
+	networker.sendCommand(unit.id, action, direction);
+}
+
+void Map::updateCommandAction(Action action, std::string command, std::string direction)
+{
+	if (input.isActionJustReleased(action))
 	{
-		this->selectedUnit = 1;
-	}
-	if (input.isActionJustPressed(SelectUnit3))
-	{
-		this->selectedUnit = 2;
+		this->sendCommand(command, direction);
 	}
 }
 
@@ -63,22 +66,19 @@ void Map::updateCommands()
 	this->updateCommandAction(ShootLeft, "shoot", "west");
 }
 
-void Map::sendCommand(std::string action, std::string direction)
+void Map::updateSelection()
 {
-	if (!this->selectedUnitIsValid())
+	if (input.isActionJustPressed(SelectUnit1))
 	{
-		return;
+		this->selectedUnit = 0;
 	}
-
-	Entity unit = this->gamestate->getUnits().at(this->selectedUnit);
-	networker.sendCommand(unit.id, action, direction);
-}
-
-void Map::updateCommandAction(Action action, std::string command, std::string direction)
-{
-	if (input.isActionJustReleased(action))
+	if (input.isActionJustPressed(SelectUnit2))
 	{
-		this->sendCommand(command, direction);
+		this->selectedUnit = 1;
+	}
+	if (input.isActionJustPressed(SelectUnit3))
+	{
+		this->selectedUnit = 2;
 	}
 }
 
@@ -103,6 +103,7 @@ void Map::draw(class Renderer& renderer)
     for (const auto& unit: gamestate->getUnits()) {
         renderer.drawSprite(unit.posX, unit.posY, 1, 1, 1, sprites.get(Unit));
     }
+
     for (const auto& monster: gamestate->getMonsters()) {
         renderer.drawSprite(monster.posX, monster.posY, 1, 1, 1, sprites.get(Monster));
     }

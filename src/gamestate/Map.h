@@ -27,11 +27,12 @@ private:
 
 	int selectedUnit = 0;
 	bool selectedUnitIsValid();
+
 	void updateSelection();
-	void updateCommands();
 
 	void sendCommand(std::string action, std::string direction);
 	void updateCommandAction(Action action, std::string command, std::string direction);
+	void updateCommands();
 
     Textures tex;
     Sprites sprites;

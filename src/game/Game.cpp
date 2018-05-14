@@ -23,7 +23,7 @@ void Game::createWindow() {
     /* Create a windowed mode window and its OpenGL context */
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
-    window = glfwCreateWindow(1920, 1080, "Hello World", NULL, NULL);
+    window = glfwCreateWindow(1920, 1080, "SwarmMind", NULL, NULL);
     if (!window)
     {
         throw std::runtime_error {
@@ -55,6 +55,7 @@ Game::Game() : map{nullptr} {
 	localHost.setDisconnectCallback(std::bind(&Game::onDisconnect, this));
 	localHost.setInitStateCallback(std::bind(&Game::onInitState, this, std::placeholders::_1, std::placeholders::_2));
 	localHost.setStateCallback(std::bind(&Game::onState, this, std::placeholders::_1));
+	localHost.setGameOverCallback(std::bind(&Game::onDisconnect, this));
 
 	localHost.connect("127.0.0.1");
 
@@ -105,19 +106,18 @@ std::string Game::statusString() const {
 void Game::drawStatus() {
     const std::string statusMessage { statusString() };
 
-       ImGui::SetNextWindowPos(ImVec2(30, 30), 0);
-       ImGui::Begin(statusMessage.data(), nullptr
-               , ImGuiWindowFlags_NoCollapse
-               | ImGuiWindowFlags_NoResize
-               | ImGuiWindowFlags_NoMove
-               | ImGuiWindowFlags_NoTitleBar
-               | ImGuiWindowFlags_AlwaysAutoResize
-               | ImGuiWindowFlags_NoInputs);
-       {
-               ImGui::Text(statusMessage.data());
-       }
-       ImGui::End();
-
+	ImGui::SetNextWindowPos(ImVec2(30, 30), 0);
+	ImGui::Begin(statusMessage.data(), nullptr
+		, ImGuiWindowFlags_NoCollapse
+		| ImGuiWindowFlags_NoResize
+		| ImGuiWindowFlags_NoMove
+		| ImGuiWindowFlags_NoTitleBar
+		| ImGuiWindowFlags_AlwaysAutoResize
+		| ImGuiWindowFlags_NoInputs);
+	{
+		ImGui::Text(statusMessage.data());
+	}
+	ImGui::End();
 }
 
 void Game::render(double timeElapsed)
@@ -153,7 +153,9 @@ void Game::loop() {
 }
 
 void Game::onInitState(Configuration config, Gamestate *gamestate) {
-    map = new Map { *input, localHost, config };
+	renderer->setCamera(config.sizeX / 2, config.sizeY / 2, config.sizeY / 2);
+	
+	map = new Map { *input, localHost, config };
     map->updateGameState(gamestate);
 }
 
