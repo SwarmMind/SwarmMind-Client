@@ -81,7 +81,7 @@ Gamestate* Networker::parseGamestate(string jsonString)
 	vector<Entity> units;
 	vector<Entity> monsters;
 	
-	for each (nlohmann::json mapObject in mapObjects)
+	for (nlohmann::json mapObject : mapObjects)
 	{
 		Entity entity;
 		entity.posX = mapObject["posX"];

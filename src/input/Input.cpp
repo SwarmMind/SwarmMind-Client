@@ -38,7 +38,7 @@ bool Input::isActionJustReleased(Action action)
 
 void Input::update()
 {
-	for each (auto& actionPair in actionStatus)
+	for (auto& actionPair: actionStatus)
 	{
 		this->updateAction(actionPair.first);
 	}
@@ -62,7 +62,7 @@ void Input::updateAction(Action action)
 
 bool Input::isAnyKeyPressed(std::vector<int> glfwKeys)
 {
-	for each (int keyCode in glfwKeys)
+	for (int keyCode: glfwKeys)
 	{
 		if (glfwGetKey(_window, keyCode) == GLFW_PRESS)
 		{
