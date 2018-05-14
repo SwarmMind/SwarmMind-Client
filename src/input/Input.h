@@ -12,6 +12,10 @@ enum Action {
 	MoveRight,
 	MoveUp,
 	MoveDown,
+	ShootLeft,
+	ShootRight,
+	ShootUp,
+	ShootDown,
 	SelectUnit1,
 	SelectUnit2,
 	SelectUnit3

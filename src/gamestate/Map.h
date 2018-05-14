@@ -4,6 +4,7 @@
 #include <renderer/Sprites.h>
 #include <gamestate/Gamestate.h>
 #include <gamestate/Networker.h>
+#include <input/Input.h>
 #include <string>
 
 class Map
@@ -30,6 +31,7 @@ private:
 	void updateCommands();
 
 	void sendCommand(std::string action, std::string direction);
+	void updateCommandAction(Action action, std::string command, std::string direction);
 
     Textures tex;
     Sprites sprites;

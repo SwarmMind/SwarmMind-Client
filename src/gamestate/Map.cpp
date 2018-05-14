@@ -51,23 +51,16 @@ void Map::updateCommands()
 	{
 		return;
 	}
+	
+	this->updateCommandAction(MoveDown, "move", "south");
+	this->updateCommandAction(MoveUp, "move", "north");
+	this->updateCommandAction(MoveRight, "move", "east");
+	this->updateCommandAction(MoveLeft, "move", "west");
 
-	if (input.isActionJustReleased(MoveDown))
-	{
-		this->sendCommand("move", "south");
-	}
-	if (input.isActionJustReleased(MoveUp))
-	{
-		this->sendCommand("move", "north");
-	}
-	if (input.isActionJustReleased(MoveRight))
-	{
-		this->sendCommand("move", "east");
-	}
-	if (input.isActionJustReleased(MoveLeft))
-	{
-		this->sendCommand("move", "west");
-	}
+	this->updateCommandAction(ShootDown, "shoot", "south");
+	this->updateCommandAction(ShootUp, "shoot", "north");
+	this->updateCommandAction(ShootRight, "shoot", "east");
+	this->updateCommandAction(ShootLeft, "shoot", "west");
 }
 
 void Map::sendCommand(std::string action, std::string direction)
@@ -81,10 +74,19 @@ void Map::sendCommand(std::string action, std::string direction)
 	networker.sendCommand(unit.id, action, direction);
 }
 
+void Map::updateCommandAction(Action action, std::string command, std::string direction)
+{
+	if (input.isActionJustReleased(action))
+	{
+		this->sendCommand(command, direction);
+	}
+}
+
 void Map::update(double deltaTime)
 {
 	if (this->gamestate == nullptr)
 		return;
+
 	this->updateSelection();
 	this->updateCommands();
 }
