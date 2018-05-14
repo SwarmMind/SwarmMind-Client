@@ -65,32 +65,24 @@ void initializeOpenGL(GLFWwindow* window)
 	});
 }
 
+OpenGLRenderer* renderer;
+ImGuiRenderer* imguiRenderer;
+Gamestate* gameState;
+Input* input;
+
 void processInputs()
 {
 	/* Poll for and process events */
 	glfwPollEvents();
+	input->update(0);
 }
-
-OpenGLRenderer* renderer;
-ImGuiRenderer* imguiRenderer;
-Gamestate* gameState;
 
 void update(double time)
 {
 	gameState->update(time);
 }
 
-<<<<<<< HEAD
-OpenGLRenderer* renderer;
-ImGuiRenderer* imguiRenderer;
-Sprite* gridSprite;
-Sprite* monsterSprite;
-Sprites* sprites;
-Textures* textures;
-Input* input;
 
-=======
->>>>>>> 2032c67d40af23984e502b9775660e4982f8ef82
 void render(GLFWwindow* window, float timeElapsed)
 {
 
@@ -98,6 +90,10 @@ void render(GLFWwindow* window, float timeElapsed)
 	renderer->preDraw();
 	
 	gameState->draw(*renderer);
+	if (input->isActionPressed(MoveDown))
+	{
+		ImGui::Text("MoveDown!");
+	}
 
 	renderer->draw();
 	imguiRenderer->render();
@@ -139,12 +135,13 @@ int main(void)
 		double elapsed = current - lastTime;
 		processInputs();
 		//input handling
-		input->updateKeyStatus();
+
 		update(elapsed);
 		render(window, elapsed);
 		lastTime = current;
 	}
 
+	delete input;
 	delete renderer;
 	delete imguiRenderer;
 	delete gameState;

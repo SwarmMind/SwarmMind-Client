@@ -17,6 +17,7 @@ enum Action {
 typedef struct ActionStatus {
 
 	ActionStatus(vector<int> keys);
+	ActionStatus();
 
 	std::vector<int> glfwKeys;
 	bool isPressed = false;
