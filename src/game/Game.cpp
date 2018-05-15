@@ -2,7 +2,7 @@
 #include <string>
 #include <stdexcept>
 
-#include <glbinding/gl/gl.h>
+#include <glbinding/gl41core/gl.h>
 #include <glbinding/Binding.h>
 #include <glbinding/callbacks.h>
 
@@ -22,7 +22,8 @@
 void Game::createWindow() {
     /* Create a windowed mode window and its OpenGL context */
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     window = glfwCreateWindow(720, 720, "SwarmMind", NULL, NULL);
     if (!window)
     {
@@ -51,11 +52,7 @@ Game::Game() : map{nullptr} {
     createWindow();
     initializeOpenGL();
 
-	localHost.setConnectCallback(std::bind(&Game::onConnect, this));
-	localHost.setDisconnectCallback(std::bind(&Game::onDisconnect, this));
-	localHost.setInitStateCallback(std::bind(&Game::onInitState, this, std::placeholders::_1, std::placeholders::_2));
-	localHost.setStateCallback(std::bind(&Game::onState, this, std::placeholders::_1));
-	localHost.setGameOverCallback(std::bind(&Game::onDisconnect, this));
+	enableCallbacks();
 
 	localHost.connect("127.0.0.1");
 
@@ -63,12 +60,28 @@ Game::Game() : map{nullptr} {
     imguiRenderer = new ImGuiRenderer(window);
     input = new Input(window);
 
-    ImGuiIO& io = ImGui::GetIO();
-    io.Fonts->AddFontFromFileTTF("fonts/DroidSans.ttf", 20);
-    io.FontGlobalScale = 1.0f;
-    ImGui::StyleColorsDark();
+	initializeImGui();
 
-    renderer->setCamera(5, 5, 5);
+}
+
+
+void Game::initializeImGui()
+{
+	ImGuiIO& io = ImGui::GetIO();
+	io.Fonts->AddFontFromFileTTF("fonts/DroidSans.ttf", 20);
+	io.FontGlobalScale = 1.0f;
+	ImGui::StyleColorsDark();
+}
+
+using namespace std::placeholders;
+
+void Game::enableCallbacks()
+{
+	localHost.setConnectCallback(std::bind(&Game::onConnect, this));
+	localHost.setDisconnectCallback(std::bind(&Game::onDisconnect, this));
+	localHost.setInitStateCallback(std::bind(&Game::onInitState, this, std::placeholders::_1, std::placeholders::_2));
+	localHost.setStateCallback(std::bind(&Game::onState, this, std::placeholders::_1));
+	localHost.setGameOverCallback(std::bind(&Game::onDisconnect, this));
 }
 
 Game::~Game() {

@@ -30,6 +30,8 @@ private:
 
 	void updateSelection();
 
+	void updateSelectionAction(Action action, int selectedPlayerNumber);
+
 	void sendCommand(std::string action, std::string direction);
 	void updateCommandAction(Action action, std::string command, std::string direction);
 	void updateCommands();

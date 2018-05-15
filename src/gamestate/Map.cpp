@@ -68,17 +68,16 @@ void Map::updateCommands()
 
 void Map::updateSelection()
 {
-	if (input.isActionJustPressed(SelectUnit1))
+	updateSelectionAction(SelectUnit1, 0);
+	updateSelectionAction(SelectUnit2, 1);
+	updateSelectionAction(SelectUnit3, 2);
+}
+
+void Map::updateSelectionAction(Action action, int selectedPlayerNumber)
+{
+	if (input.isActionJustPressed(action))
 	{
-		this->selectedUnit = 0;
-	}
-	if (input.isActionJustPressed(SelectUnit2))
-	{
-		this->selectedUnit = 1;
-	}
-	if (input.isActionJustPressed(SelectUnit3))
-	{
-		this->selectedUnit = 2;
+		this->selectedUnit = selectedPlayerNumber;
 	}
 }
 

@@ -29,6 +29,10 @@ class Game {
     void onState(Gamestate *state);
 	void onConnect();
 	void onDisconnect();
+	
+	void initializeImGui();
+	void enableCallbacks();
+
 protected:
     Networker localHost;
 
@@ -42,6 +46,7 @@ public:
     Game();
     ~Game();
     Game(const Game&) = delete;
+
 
     void loop();
 };
