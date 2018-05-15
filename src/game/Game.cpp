@@ -23,7 +23,7 @@ void Game::createWindow() {
     /* Create a windowed mode window and its OpenGL context */
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
-    window = glfwCreateWindow(1920, 1080, "SwarmMind", NULL, NULL);
+    window = glfwCreateWindow(720, 720, "SwarmMind", NULL, NULL);
     if (!window)
     {
         throw std::runtime_error {
