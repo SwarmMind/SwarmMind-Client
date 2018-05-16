@@ -9,7 +9,8 @@ Networker::Networker()
 	: sioSocket{nullptr}
 {
 	this->sioClient.set_reconnect_attempts(this->reconnectAttempts);
-	
+
+	sioSocket = sioClient.socket();
 	this->sioSocket->on("initState", bind(&Networker::onInitStateReceive, this, placeholders::_1));
 	this->sioSocket->on("state", bind(&Networker::onStateReceive, this, placeholders::_1));
 	this->sioClient.set_open_listener([&]() {
