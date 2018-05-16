@@ -128,7 +128,7 @@ void Game::drawStatus() {
 		| ImGuiWindowFlags_AlwaysAutoResize
 		| ImGuiWindowFlags_NoInputs);
 	{
-		ImGui::Text(statusMessage.data());
+		ImGui::Text("%s", statusMessage.data());
 	}
 	ImGui::End();
 }
