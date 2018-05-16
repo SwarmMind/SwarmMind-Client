@@ -1,6 +1,6 @@
 #pragma once
 
-#include <glbinding/gl/gl.h>
+#include <glbinding/gl41core/gl.h>
 #include <glbinding/Binding.h>
 #include <glbinding/callbacks.h>
 
@@ -21,6 +21,7 @@ class Game {
     void processInputs();
     void update(double time);
     void render(double timeElapsed);
+	void drawDebug(double timeElapsed);
 
     std::string statusString() const;
     void drawStatus();

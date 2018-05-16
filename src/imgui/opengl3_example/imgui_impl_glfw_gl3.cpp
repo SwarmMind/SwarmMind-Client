@@ -42,8 +42,8 @@
 
 // GL3W/GLFW
 //#include <GL/gl3w.h>    // This example is using gl3w to access OpenGL functions (because it is small). You may use glew/glad/glLoadGen/etc. whatever already works for you.
-#include <glbinding/gl/gl.h>
-using namespace gl;
+#include <glbinding/gl41core/gl.h>
+using namespace gl41core;
 
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>

@@ -18,6 +18,8 @@ Input::Input(GLFWwindow* window)
 	actionStatus[SelectUnit1] = ActionStatus({ GLFW_KEY_1 });
 	actionStatus[SelectUnit2] = ActionStatus({ GLFW_KEY_2 });
 	actionStatus[SelectUnit3] = ActionStatus({ GLFW_KEY_3 });
+
+	actionStatus[Debug] = ActionStatus({ GLFW_KEY_PERIOD });
 }
 
 Input::~Input() 

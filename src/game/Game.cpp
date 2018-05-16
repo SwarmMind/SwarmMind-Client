@@ -144,10 +144,29 @@ void Game::render(double timeElapsed)
 	{
 		map->draw(*renderer);
 	}
+	drawDebug(timeElapsed);
 
     renderer->draw();
     imguiRenderer->render();
     glfwSwapBuffers(window);
+}
+
+void Game::drawDebug(double timeElapsed)
+{
+	static list<double> frameTimes;
+
+	frameTimes.push_back(timeElapsed);
+	while (frameTimes.size() > 60)
+		frameTimes.pop_front();
+
+	if (input->isActionPressed(Debug))
+	{
+		double timeSum = 0;
+		for (double frameTime : frameTimes)
+			timeSum += frameTime;
+
+		ImGui::Text("Current FPS: %f", 60 / timeSum);
+	}
 }
 
 void Game::loop() {

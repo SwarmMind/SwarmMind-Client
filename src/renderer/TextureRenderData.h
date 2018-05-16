@@ -1,7 +1,7 @@
 #pragma once
 
-#include <glbinding/gl/gl.h>
-using namespace gl;
+#include <glbinding/gl41core/gl.h>
+using namespace gl41core;
 
 class TextureRenderData
 {
@@ -11,8 +11,14 @@ public:
 	~TextureRenderData();
 
 	bool addData(unsigned int size, GLfloat* data);
+	void draw();
+
+private:
+	GLuint vertexArrayObject;
+	GLuint secondVAO;
 
 	unsigned int vertexBufferSize;
+	unsigned int floatsPerVert;
 	int bufferOffset;
 	GLfloat* mappedBuffer;
 	GLuint vertexBuffer;
@@ -21,5 +27,5 @@ public:
 	void swapBuffers();
 	void mapBuffer();
 	void unmapBuffer();
-private:
+	bool bufferIsMapped();
 };
