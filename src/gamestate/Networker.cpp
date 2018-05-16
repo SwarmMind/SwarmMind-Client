@@ -104,29 +104,33 @@ void Networker::update()
 	}
 }
 
+void from_json(const nlohmann::json& json, Entity& entity)
+{
+	entity.posX = json["posX"];
+	entity.posY = json["posY"];
+	string id = json["ID"];
+	entity.id = id; //For some reason the id string is necessary to avoid a compiler error
+}
+
 Gamestate* Networker::parseGamestate(string jsonString)
 {
 	nlohmann::json state = nlohmann::json::parse(jsonString);
 
-	vector<nlohmann::json> mapObjects = state["mapObjects"];
+	vector<nlohmann::json> jsonMonsters = state["npcs"];
+	vector<nlohmann::json> jsonUnits = state["units"];
 	vector<Entity> units;
 	vector<Entity> monsters;
 	
-	for (nlohmann::json mapObject : mapObjects)
+	for (nlohmann::json jsonUnit : jsonUnits)
 	{
-		Entity entity;
-		entity.posX = mapObject["posX"];
-		entity.posY = mapObject["posY"];
-		string id = mapObject["ID"];
-		entity.id = id;
-		if (id[0] == 'u')
-		{
-			units.push_back(entity);
-		}
-		else
-		{
-			monsters.push_back(entity);
-		}
+		Entity unit = jsonUnit;
+		units.push_back(unit);
+	}
+
+	for (nlohmann::json jsonMonster : jsonMonsters)
+	{
+		Entity monster = jsonMonster;
+		monsters.push_back(monster);
 	}
 	return new Gamestate(units, monsters);
 }
