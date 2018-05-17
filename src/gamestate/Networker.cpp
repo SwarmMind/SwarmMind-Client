@@ -13,6 +13,13 @@ Networker::Networker()
 	sioSocket = sioClient.socket();
 	this->sioSocket->on("initState", bind(&Networker::onInitStateReceive, this, placeholders::_1));
 	this->sioSocket->on("state", bind(&Networker::onStateReceive, this, placeholders::_1));
+	this->sioSocket->on("gameOver", [=](sio::event _event) {
+		if (this->gameOverCallback)
+		{
+			lock_guard<mutex> eventGuard(queueLock);
+			eventQueue.push(this->gameOverCallback);
+		}
+	});
 	this->sioClient.set_open_listener([=]() {
 		if (this->connectCallback)
 		{
@@ -61,6 +68,16 @@ void Networker::setDisconnectCallback(std::function<void()> callback)
 void Networker::setInitStateCallback(std::function<void(Configuration, Gamestate *)> callback)
 {
 	initStateCallback = callback;
+}
+
+void Networker::setStateCallback(std::function<void(Gamestate *)> callback)
+{
+	stateCallback = callback;
+}
+
+void Networker::setGameOverCallback(std::function<void()> callback)
+{
+	gameOverCallback = callback;
 }
 
 void Networker::update()

@@ -21,7 +21,7 @@ public:
 	void setConnectCallback(std::function<void()> callback);
 	void setDisconnectCallback(std::function<void()> callback);
 	void setInitStateCallback(std::function<void(Configuration, Gamestate *)> callback);
-	void setStateCallback(std::function<void(Gamestate *)> val) { stateCallback = val; }
+	void setStateCallback(std::function<void(Gamestate *)> val);
 
 	void update();
 
@@ -38,6 +38,7 @@ private:
 	std::function<void()> disconnectCallback;
 	std::function<void(Configuration, Gamestate*)> initStateCallback;
 	std::function<void(Gamestate*)> stateCallback;
+	std::function<void()> endGameCallback;
 
 	void onStateReceive(sio::event event);
 	void onInitStateReceive(sio::event event);
