@@ -1,10 +1,10 @@
 #pragma once
 
-#include <glbinding/gl/gl.h>
+#include <glbinding/gl41core/gl.h>
 #include <string>
 #include <vector>
 
-using namespace gl;
+using namespace gl41core;
 using namespace std;
 
 class Texture

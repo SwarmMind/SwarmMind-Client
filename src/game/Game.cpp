@@ -1,22 +1,24 @@
-#include <iostream>
+#include <game/Game.h>
 #include <string>
 #include <stdexcept>
+#include <iostream>
 
 #include <glbinding/gl41core/gl.h>
 #include <glbinding/Binding.h>
 #include <glbinding/callbacks.h>
-
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
 #include <imgui/imgui.h>
 #include <renderer/OpenGLRenderer.h>
 #include <renderer/ImGuiRenderer.h>
-#include <gamestate/Gamestate.h>
-#include <gamestate/Networker.h>
 #include <input/Input.h>
-#include <game/Game.h>
 #include <functional>
+#include <menu/MainMenuState.h>
+#include <menu/ConnectedState.h>
+
+#include <renderer/Sprites.h>
+#include <renderer/Textures.h>
 
 
 void Game::createWindow() {
@@ -48,22 +50,34 @@ void Game::initializeOpenGL() {
     });
 }
 
-Game::Game() : map{nullptr} {
+Game::Game()
+{
     createWindow();
     initializeOpenGL();
 
-	enableCallbacks();
-
-	localHost.connect("127.0.0.1");
-
     renderer = new OpenGLRenderer(window);
+	renderer->setCamera(5, 5, 10);
     imguiRenderer = new ImGuiRenderer(window);
     input = new Input(window);
 
+	textures = new Textures();
+	sprites = new Sprites(*textures);
+
 	initializeImGui();
 
+	openMainMenu();
 }
 
+
+void Game::connectTo(std::string address, unsigned int port)
+{
+	menu = std::make_unique<ConnectedState>(*this, *sprites, *input, address, port);
+}
+
+void Game::openMainMenu()
+{
+	menu = std::make_unique<MainMenuState>(this);
+}
 
 void Game::initializeImGui()
 {
@@ -73,22 +87,13 @@ void Game::initializeImGui()
 	ImGui::StyleColorsDark();
 }
 
-using namespace std::placeholders;
-
-void Game::enableCallbacks()
-{
-	localHost.setConnectCallback(std::bind(&Game::onConnect, this));
-	localHost.setDisconnectCallback(std::bind(&Game::onDisconnect, this));
-	localHost.setInitStateCallback(std::bind(&Game::onInitState, this, std::placeholders::_1, std::placeholders::_2));
-	localHost.setStateCallback(std::bind(&Game::onState, this, std::placeholders::_1));
-	localHost.setGameOverCallback(std::bind(&Game::onDisconnect, this));
-}
-
 Game::~Game() {
+	delete sprites;
+	delete textures;
+
     delete input;
     delete renderer;
     delete imguiRenderer;
-	delete map;
 }
 
 
@@ -101,36 +106,7 @@ void Game::processInputs()
 
 void Game::update(double time)
 {
-	localHost.update();
-	if (map != nullptr)
-	{
-		map->update(time);
-	}
-}
-
-std::string Game::statusString() const {
-    if (!localHost.isConnected()) {
-        return "Connecting...";
-    } else {
-        return "Connected!";
-    }
-}
-
-void Game::drawStatus() {
-    const std::string statusMessage { statusString() };
-
-	ImGui::SetNextWindowPos(ImVec2(30, 30), 0);
-	ImGui::Begin(statusMessage.data(), nullptr
-		, ImGuiWindowFlags_NoCollapse
-		| ImGuiWindowFlags_NoResize
-		| ImGuiWindowFlags_NoMove
-		| ImGuiWindowFlags_NoTitleBar
-		| ImGuiWindowFlags_AlwaysAutoResize
-		| ImGuiWindowFlags_NoInputs);
-	{
-		ImGui::Text("%s", statusMessage.data());
-	}
-	ImGui::End();
+	menu->update(time);
 }
 
 void Game::render(double timeElapsed)
@@ -138,16 +114,30 @@ void Game::render(double timeElapsed)
     imguiRenderer->preRender();
     renderer->preDraw();
 
-    drawStatus();
-
-	if (map != nullptr)
-	{
-		map->draw(*renderer);
-	}
+	menu->draw(*renderer);
+	drawDebug(timeElapsed);
 
     renderer->draw();
     imguiRenderer->render();
     glfwSwapBuffers(window);
+}
+
+void Game::drawDebug(double timeElapsed)
+{
+	static list<double> frameTimes;
+
+	frameTimes.push_back(timeElapsed);
+	while (frameTimes.size() > 60)
+		frameTimes.pop_front();
+
+	if (input->isActionPressed(Debug))
+	{
+		double timeSum = 0;
+		for (double frameTime : frameTimes)
+			timeSum += frameTime;
+
+		ImGui::Text("Current FPS: %f", 60 / timeSum);
+	}
 }
 
 void Game::loop() {
@@ -163,25 +153,4 @@ void Game::loop() {
         render(elapsed);
         lastTime = current;
     }
-}
-
-void Game::onInitState(Configuration config, Gamestate *gamestate) {
-	renderer->setCamera(config.sizeX / 2, config.sizeY / 2, config.sizeY / 2);
-	
-	map = new Map { *input, localHost, config };
-    map->updateGameState(gamestate);
-}
-
-void Game::onState(Gamestate *gamestate) {
-    map->updateGameState(gamestate);
-}
-
-void Game::onConnect()
-{
-}
-
-void Game::onDisconnect()
-{
-	delete map;
-	map = nullptr;
 }

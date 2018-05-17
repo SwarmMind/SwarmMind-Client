@@ -18,7 +18,8 @@ enum Action {
 	ShootDown,
 	SelectUnit1,
 	SelectUnit2,
-	SelectUnit3
+	SelectUnit3,
+	Debug
 };
 
 typedef struct ActionStatus {

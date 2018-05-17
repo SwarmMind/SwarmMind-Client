@@ -1,4 +1,5 @@
 #include <renderer/OpenGLRenderer.h>
+#include <glbinding/gl41core/gl.h>
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 #include <vector>
@@ -8,6 +9,8 @@
 #include <renderer/Sprite.h>
 #include <renderer/Texture.h>
 #include <imgui/imgui.h>
+
+using namespace std;
 
 #pragma region Shader loading
 
@@ -94,26 +97,8 @@ std::string OpenGLRenderer::loadShaderFile(string path)
 
 #pragma region initialization
 
-void OpenGLRenderer::createVertexArray()
+void OpenGLRenderer::findUniformLocations()
 {
-	glGenVertexArrays(1, &vertexArrayObject);
-	glBindVertexArray(vertexArrayObject);
-}
-
-void OpenGLRenderer::setVertexAttributes()
-{
-	floatsPerVert = 5;
-
-	GLuint positionLocation = glGetAttribLocation(program, "position");
-	glVertexArrayAttribBinding(vertexArrayObject, positionLocation, 0);
-	glVertexArrayAttribFormat(vertexArrayObject, positionLocation, 3, GL_FLOAT, GL_FALSE, 0);
-	glEnableVertexArrayAttrib(vertexArrayObject, positionLocation);
-
-	GLuint uvLocation = glGetAttribLocation(program, "uv");
-	glVertexArrayAttribBinding(vertexArrayObject, uvLocation, 0);
-	glVertexArrayAttribFormat(vertexArrayObject, uvLocation, 2, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat));
-	glEnableVertexArrayAttrib(vertexArrayObject, uvLocation);
-
 	xLocation = glGetUniformLocation(program, "camX");
 	yLocation = glGetUniformLocation(program, "camY");
 	widthLocation = glGetUniformLocation(program, "camWidth");
@@ -132,8 +117,7 @@ OpenGLRenderer::OpenGLRenderer(GLFWwindow* _window)
 	program = loadProgram("shaders/vert.glsl", "shaders/frag.glsl");
 	glUseProgram(program);
 
-	createVertexArray();
-	setVertexAttributes();
+	findUniformLocations();
 	
 	glfwSetFramebufferSizeCallback(window, [](GLFWwindow* window, int width, int height) {
 		glViewport(0, 0, width, height);
@@ -143,7 +127,6 @@ OpenGLRenderer::OpenGLRenderer(GLFWwindow* _window)
 OpenGLRenderer::~OpenGLRenderer()
 {
 	glDeleteProgram(program);
-	glDeleteVertexArrays(1, &vertexArrayObject);
 }
 
 #pragma endregion initialization
@@ -172,6 +155,7 @@ void OpenGLRenderer::uploadCamera()
 void OpenGLRenderer::drawSprite(float x, float y, float z, float width, float height, Sprite* sprite)
 {
 	unsigned int vertsPerSprite = 6;
+	unsigned int floatsPerVert = 5;
 	unsigned int floatsPerSprite = floatsPerVert * vertsPerSprite;
 
 	Texture* texture = sprite->texture();
@@ -200,14 +184,9 @@ void OpenGLRenderer::drawSprite(float x, float y, float z, float width, float he
 void OpenGLRenderer::drawTexture(Texture* texture)
 {
 	TextureRenderData& textureData = renderData[texture];
-	unsigned int vertexCount = textureData.bufferOffset / floatsPerVert;
 	glBindTexture(GL_TEXTURE_2D, texture->ID());
 
-	textureData.unmapBuffer();
-	glBindBuffer(GL_ARRAY_BUFFER, textureData.vertexBuffer);
-	glVertexArrayVertexBuffer(vertexArrayObject, 0, textureData.vertexBuffer, 0, floatsPerVert * sizeof(GLfloat));
-	
-	glDrawArrays(GL_TRIANGLES, 0, vertexCount);
+	textureData.draw();
 }
 
 /**
@@ -238,7 +217,7 @@ void OpenGLRenderer::preDraw()
 	glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
 	glClearDepth(0.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	this->renderData.clear();
+	renderData.clear();
 }
 
 void OpenGLRenderer::draw()

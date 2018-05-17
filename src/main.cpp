@@ -1,7 +1,7 @@
 #include <iostream>
 #include <stdexcept>
 
-#include <glbinding/gl/gl.h>
+#include <glbinding/gl41core/gl.h>
 #include <glbinding/Binding.h>
 #include <glbinding/callbacks.h>
 

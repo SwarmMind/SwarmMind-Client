@@ -1,14 +1,14 @@
 #pragma once
 #include <renderer/Renderer.h>
 #include <string>
-#include <glbinding/gl/gl.h>
+#include <glbinding/gl41core/gl.h>
 #include <map>
 #include <unordered_map>
 #include <vector>
 #include <renderer/TextureRenderData.h>
 
+using namespace gl41core;
 using namespace std;
-using namespace gl;
 
 struct GLFWwindow;
 
@@ -31,17 +31,14 @@ private:
 
 	GLint loadProgram(string vertexShader, string fragmentShader);
 	GLint loadShader(string path, GLenum shaderType);
-	string loadShaderFile(string path);
+	std::string loadShaderFile(string path);
 
-	void createVertexArray();
-	void setVertexAttributes();
-	
-	unsigned int floatsPerVert;
-	GLuint vertexArrayObject;
+	void findUniformLocations();
+
 	GLint program;
 
 	//Texture render data
-	unordered_map<class Texture*, TextureRenderData> renderData;
+	std::unordered_map<class Texture*, TextureRenderData> renderData;
 	void drawTexture(class Texture* texture);
 
 	//Camera
