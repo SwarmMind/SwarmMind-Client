@@ -22,6 +22,9 @@ class Game {
     void update(double time);
     void render(double timeElapsed);
 
+    std::string statusString() const;
+    void drawStatus();
+
 protected:
     Networker localHost;
 

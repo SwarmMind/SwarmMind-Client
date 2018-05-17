@@ -87,11 +87,38 @@ void Game::update(double time)
 	localHost.update();
 }
 
+std::string Game::statusString() const {
+    if (!localHost.isConnected()) {
+        return "Connecting...";
+    } else {
+        return "Connected!";
+    }
+}
+
+void Game::drawStatus() {
+    const std::string statusMessage { statusString() };
+
+       ImGui::SetNextWindowPos(ImVec2(30, 30), 0);
+       ImGui::Begin(statusMessage.data(), nullptr
+               , ImGuiWindowFlags_NoCollapse
+               | ImGuiWindowFlags_NoResize
+               | ImGuiWindowFlags_NoMove
+               | ImGuiWindowFlags_NoTitleBar
+               | ImGuiWindowFlags_AlwaysAutoResize
+               | ImGuiWindowFlags_NoInputs);
+       {
+               ImGui::Text(statusMessage.data());
+       }
+       ImGui::End();
+
+}
+
 void Game::render(double timeElapsed)
 {
     imguiRenderer->preRender();
     renderer->preDraw();
 
+    drawStatus();
 	if (map != nullptr)
 	{
 		map->draw(*renderer);
