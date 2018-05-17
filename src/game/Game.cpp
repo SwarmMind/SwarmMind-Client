@@ -53,6 +53,9 @@ Game::Game() : map{nullptr} {
 
 	localHost.setConnectCallback(std::bind(&Game::onConnect, this));
 	localHost.setDisconnectCallback(std::bind(&Game::onDisconnect, this));
+	localHost.setInitStateCallback(std::bind(&Game::onInitState, this, std::placeholders::_1, std::placeholders::_2));
+	localHost.setStateCallback(std::bind(&Game::onState, this, std::placeholders::_1));
+
 	localHost.connect("127.0.0.1");
 
     renderer = new OpenGLRenderer(window);
@@ -142,6 +145,15 @@ void Game::loop() {
         render(elapsed);
         lastTime = current;
     }
+}
+
+void Game::onInitState(Configuration config, Gamestate *gamestate) {
+    map = new Map { *input, config };
+    map->updateGameState(gamestate);
+}
+
+void Game::onInitState(Gamestate *gamestate) {
+    map->updateGameState(gamestate);
 }
 
 void Game::onConnect()

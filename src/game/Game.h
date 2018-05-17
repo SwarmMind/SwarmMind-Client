@@ -25,6 +25,9 @@ class Game {
     std::string statusString() const;
     void drawStatus();
 
+    void onInitState(Configuration config, Gamestate *state);
+    void onState(Gamestate *state);
+
 protected:
     Networker localHost;
 
