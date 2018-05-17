@@ -2,6 +2,10 @@ language: cpp
 compiler:
     - clang
     - gcc
+addons:
+  apt:
+    packages:
+    - libboost-all-dev
 install:
     - git clone https://github.com/socketio/socket.io-client-cpp.git sioclient
     - mkdir build-sioclient && cd build-sioclient
