@@ -133,8 +133,8 @@ void Networker::onInitStateReceive(sio::event _event)
 	{
 		string jsonMessage = _event.get_message()->get_string();
 		nlohmann::json initState = nlohmann::json::parse(jsonMessage);
-		Configuration config = this->parseConfiguration(initState["config"]);
-		Gamestate* state = this->parseGamestate(initState["state"]);
+		Configuration config = this->parseConfiguration(initState["config"].dump());
+		Gamestate* state = this->parseGamestate(initState["state"].dump());
 
 		{
 			lock_guard<mutex> queueGuard(queueLock);
