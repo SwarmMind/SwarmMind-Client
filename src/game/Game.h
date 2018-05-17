@@ -1,11 +1,5 @@
 #pragma once
 
-#include <glbinding/gl41core/gl.h>
-#include <glbinding/Binding.h>
-#include <glbinding/callbacks.h>
-#define GLFW_INCLUDE_NONE
-#include <GLFW/glfw3.h>
-
 #include <renderer/OpenGLRenderer.h>
 #include <renderer/ImGuiRenderer.h>
 #include <input/Input.h>
@@ -27,10 +21,13 @@ class Game {
 
 protected:
     
-    GLFWwindow *window;
+    class GLFWwindow *window;
     OpenGLRenderer *renderer;
     ImGuiRenderer *imguiRenderer;
     Input *input;
+
+	class Textures* textures;
+	class Sprites* sprites;
 
 public:
     Game();
@@ -38,6 +35,7 @@ public:
     Game(const Game&) = delete;
 
 	void connectTo(std::string address, unsigned int port = 3000);
+	void openMainMenu();
 
     void loop();
 };

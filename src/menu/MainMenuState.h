@@ -6,10 +6,18 @@ class MainMenuState : public MenuState
 {
 public:
 	MainMenuState(class Game* _game);
-	~MainMenuState();
+	virtual ~MainMenuState() override;
 
 	virtual void update(double deltaTime) override;
 	virtual void draw(Renderer& renderer) override;
 private:
 	class Game* game;
+
+	int addressBufferSize = 12;
+	char address[12] = "localhost";
+	
+	int defaultPort = 3000;
+	int port = defaultPort;
+	int minimumPort = 0;
+	int maximumPort = 65535;
 };

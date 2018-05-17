@@ -1,10 +1,14 @@
 #include <menu/ConnectedState.h>
 #include <functional>
 #include <imgui/imgui.h>
+#include <game/Game.h>
+#include <renderer/Sprites.h>
 
-ConnectedState::ConnectedState(Input& _input, std::string address, unsigned port)
+ConnectedState::ConnectedState(Game& _game, Sprites& _sprites, Input& _input, std::string address, unsigned port)
 	: input{ _input }
 	, map{nullptr}
+	, game{_game}
+	, sprites{_sprites}
 {
 	enableCallbacks();
 	networker.connect(address, port);
@@ -12,6 +16,7 @@ ConnectedState::ConnectedState(Input& _input, std::string address, unsigned port
 
 ConnectedState::~ConnectedState()
 {
+	networker.disconnect();
 	delete map;
 }
 
@@ -36,15 +41,22 @@ std::string ConnectedState::statusString() const {
 void ConnectedState::drawStatus() {
 	const std::string statusMessage{ statusString() };
 
+	ImGui::SetNextWindowBgAlpha(0.5);
+
 	ImGui::SetNextWindowPos(ImVec2(30, 30), 0);
 	ImGui::Begin(statusMessage.data(), nullptr
 		, ImGuiWindowFlags_NoCollapse
 		| ImGuiWindowFlags_NoResize
 		| ImGuiWindowFlags_NoMove
 		| ImGuiWindowFlags_NoTitleBar
-		| ImGuiWindowFlags_AlwaysAutoResize
-		| ImGuiWindowFlags_NoInputs);
+		| ImGuiWindowFlags_AlwaysAutoResize);
 	{
+		if (ImGui::Button("Exit"))
+		{
+			game.openMainMenu();
+		}
+		
+		ImGui::SameLine();
 		ImGui::Text("%s", statusMessage.data());
 	}
 	ImGui::End();
@@ -52,11 +64,11 @@ void ConnectedState::drawStatus() {
 
 void ConnectedState::draw(Renderer& renderer)
 {
-	drawStatus();
 	if (map != nullptr)
 	{
 		map->draw(renderer);
 	}
+	drawStatus();
 }
 
 using namespace std::placeholders;
@@ -73,7 +85,7 @@ void ConnectedState::enableCallbacks()
 void ConnectedState::onInitState(Configuration config, Gamestate *gamestate) {
 	//renderer->setCamera(config.sizeX / 2, config.sizeY / 2, config.sizeY / 2);
 
-	map = new Map{ input, networker, config };
+	map = new Map{ input, sprites, networker, config };
 	map->updateGameState(gamestate);
 }
 

@@ -1,6 +1,7 @@
 #include <game/Game.h>
 #include <string>
 #include <stdexcept>
+#include <iostream>
 
 #include <glbinding/gl41core/gl.h>
 #include <glbinding/Binding.h>
@@ -15,6 +16,9 @@
 #include <functional>
 #include <menu/MainMenuState.h>
 #include <menu/ConnectedState.h>
+
+#include <renderer/Sprites.h>
+#include <renderer/Textures.h>
 
 
 void Game::createWindow() {
@@ -46,7 +50,8 @@ void Game::initializeOpenGL() {
     });
 }
 
-Game::Game(){
+Game::Game()
+{
     createWindow();
     initializeOpenGL();
 
@@ -55,15 +60,23 @@ Game::Game(){
     imguiRenderer = new ImGuiRenderer(window);
     input = new Input(window);
 
+	textures = new Textures();
+	sprites = new Sprites(*textures);
+
 	initializeImGui();
 
-	menu = std::make_unique<MainMenuState>(this);
+	openMainMenu();
 }
 
 
 void Game::connectTo(std::string address, unsigned int port)
 {
-	menu = std::make_unique<ConnectedState>(*input, address, port);
+	menu = std::make_unique<ConnectedState>(*this, *sprites, *input, address, port);
+}
+
+void Game::openMainMenu()
+{
+	menu = std::make_unique<MainMenuState>(this);
 }
 
 void Game::initializeImGui()
@@ -75,6 +88,9 @@ void Game::initializeImGui()
 }
 
 Game::~Game() {
+	delete sprites;
+	delete textures;
+
     delete input;
     delete renderer;
     delete imguiRenderer;

@@ -1,4 +1,5 @@
 #include <input/Input.h>
+#include <imgui/imgui.h>
 
 using namespace std;
 
@@ -73,9 +74,10 @@ void Input::updateAction(Action action)
 
 bool Input::isAnyKeyPressed(std::vector<int> glfwKeys)
 {
+	bool imGuiConsumesInput = ImGui::GetIO().WantCaptureKeyboard;
 	for (int keyCode: glfwKeys)
 	{
-		if (glfwGetKey(_window, keyCode) == GLFW_PRESS)
+		if (glfwGetKey(_window, keyCode) == GLFW_PRESS && !imGuiConsumesInput)
 		{
 			return true;
 		}

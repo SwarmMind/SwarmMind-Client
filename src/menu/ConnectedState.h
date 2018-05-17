@@ -9,8 +9,8 @@
 class ConnectedState : public MenuState
 {
 public:
-	ConnectedState(Input& input, std::string address, unsigned port = 3000);
-	~ConnectedState();
+	ConnectedState(class Game& _game, class Sprites& _sprites, Input& input, std::string address, unsigned port = 3000);
+	virtual ~ConnectedState() override;
 
 
 	virtual void update(double deltaTime) override;
@@ -27,6 +27,8 @@ public:
 	void enableCallbacks();
 
 private:
+	class Game& game;
+	class Sprites& sprites;
 	Networker networker;
 	Input& input;
 	Map* map;

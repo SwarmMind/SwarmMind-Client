@@ -39,8 +39,7 @@ Networker::Networker()
 
 Networker::~Networker()
 {
-	this->sioSocket->off_all();
-	this->sioClient.sync_close();
+	disconnect();
 }
 
 void Networker::connect(std::string adress, unsigned int port /*= 3000*/)
@@ -48,6 +47,12 @@ void Networker::connect(std::string adress, unsigned int port /*= 3000*/)
 	this->sioClient.connect(string("http://") + adress + ":" + to_string(port));
 
 	this->sioSocket = this->sioClient.socket();
+}
+
+void Networker::disconnect()
+{
+	this->sioSocket->off_all();
+	this->sioClient.sync_close();
 }
 
 bool Networker::isConnected() const

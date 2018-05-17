@@ -8,12 +8,12 @@
 #include <imgui/imgui.h>
 #include <renderer/Sprites.h>
 
-Map::Map(Input& _input, Networker& _networker, const Configuration& _config) 
+Map::Map(Input& _input, Sprites& _sprites, Networker& _networker, const Configuration& _config) 
 	: input{ _input }
 	, config{_config}
 	, networker{_networker}
 	, gamestate{nullptr}
-	, sprites{tex}
+	, sprites{_sprites}
 {
 
 }

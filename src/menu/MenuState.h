@@ -6,7 +6,7 @@ class MenuState
 {
 public:
 	MenuState() = default;
-	~MenuState() = default;
+	virtual ~MenuState() = default;
 
 	virtual void update(double deltaTime) = 0;
 	virtual void draw(Renderer& renderer) = 0;

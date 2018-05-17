@@ -10,7 +10,7 @@
 class Map
 {
 public:
-	Map(class Input& _input, Networker& _networker, const class Configuration& config);
+	Map(class Input& _input, class Sprites& _sprites, Networker& _networker, const class Configuration& config);
 
 	~Map();
 
@@ -21,6 +21,7 @@ public:
 
 private:
 	class Gamestate* gamestate;
+	class Sprites& sprites;
 	class Input& input;
 	class Networker& networker;
     class Configuration config;
@@ -35,7 +36,4 @@ private:
 	void sendCommand(std::string action, std::string direction);
 	void updateCommandAction(Action action, std::string command, std::string direction);
 	void updateCommands();
-
-    Textures tex;
-    Sprites sprites;
 };
