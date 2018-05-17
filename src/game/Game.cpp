@@ -152,7 +152,7 @@ void Game::onInitState(Configuration config, Gamestate *gamestate) {
     map->updateGameState(gamestate);
 }
 
-void Game::onInitState(Gamestate *gamestate) {
+void Game::onState(Gamestate *gamestate) {
     map->updateGameState(gamestate);
 }
 
