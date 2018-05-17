@@ -2,16 +2,13 @@ language: cpp
 compiler:
     - clang
     - gcc
-addons:
-  apt:
-    packages:
-    - libboost-all-dev
 install:
-    - git clone https://github.com/socketio/socket.io-client-cpp.git sioclient
-    - mkdir build-sioclient && cd build-sioclient
-    - cmake -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr "../sioclient"
+    - wget https://dl.bintray.com/boostorg/release/1.67.0/source/boost_1_67_0.tar.gz && gzip -d boost_1_67_0.tar.gz && tar xf boost_1_67_0.tar && cd boost_1_67_0
+    - ./bootstrap.sh --prefix=/usr && ./b2 && sudo ./b2 install
+    - cd ..
+    - git clone https://github.com/socketio/socket.io-client-cpp.git sioclient && mkdir build-sioclient && cd build-sioclient
+    - cmake -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr ../sioclient
     - make && sudo make install
-
 script:
     - mkdir build && cd build
     - cmake -DSIOCLIENT_USE_FIND_PACKAGE=ON -DCMAKE_PREFIX_PATH=../thirdparty -DCMAKE_BUILD_TYPE=Release ..
