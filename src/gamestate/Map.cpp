@@ -30,6 +30,18 @@ void Map::updateGameState(class Gamestate* newState)
 
 void Map::draw(class Renderer& renderer)
 {
-	ImGui::Text("Connected!");
+    if (gamestate == nullptr) return;
+    for (uint32_t y = 0; y < config.sizeY; y++) {
+    for (uint32_t x = 0; x < config.sizeX; x++) {
+        renderer.drawSprite(x, y, 0, 1, 1, sprites.get(GridBlock));
+    }
+    }
+
+    for (const auto& unit: gamestate->getUnits()) {
+        renderer.drawSprite(unit.posX, unit.posY, 1, 1, 1, sprites.get(Unit));
+    }
+    for (const auto& monster: gamestate->getMonsters()) {
+        renderer.drawSprite(monster.posX, monster.posY, 1, 1, 1, sprites.get(Monster));
+    }
 }
 
