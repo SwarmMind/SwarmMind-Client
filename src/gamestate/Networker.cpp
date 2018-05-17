@@ -52,6 +52,15 @@ void Networker::connect(std::string adress, unsigned int port /*= 3000*/)
 void Networker::disconnect()
 {
 	this->sioSocket->off_all();
+
+	//These two lines are a workaround to fix a bug in Socket.IO, which causes this thread to lock forever,
+	//if sioClient.sync_close is called while the sioClient is trying to connect
+	//The bug seems to be caused, because sioClient.sync_close is waiting for a thread, which is forever
+	//trying to reconnect and never notices, that the client should actually close
+	this->sioClient.set_reconnect_attempts(0);
+	this->sioClient.connect(""); //This will cause the reconnect timer to be reset and the sio thread to be joined
+	
+	
 	this->sioClient.sync_close();
 }
 
