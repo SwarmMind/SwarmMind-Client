@@ -13,8 +13,8 @@ public:
 private:
 	class Game* game;
 
-	int addressBufferSize = 12;
-	char address[12] = "localhost";
+	int addressBufferSize = 256;
+	char address[256] = "localhost";
 	
 	int defaultPort = 3000;
 	int port = defaultPort;
