@@ -11,10 +11,10 @@ Input::Input(GLFWwindow* window)
 	actionStatus[MoveUp] =		ActionStatus({ GLFW_KEY_W });
 	actionStatus[MoveDown] =	ActionStatus({ GLFW_KEY_S });
 
-	actionStatus[ShootRight] =	ActionStatus({ GLFW_KEY_H });
-	actionStatus[ShootLeft] =	ActionStatus({ GLFW_KEY_F });
-	actionStatus[ShootUp] =		ActionStatus({ GLFW_KEY_T });
-	actionStatus[ShootDown] =	ActionStatus({ GLFW_KEY_G });
+	actionStatus[ShootRight] =	ActionStatus({ GLFW_KEY_H, GLFW_KEY_RIGHT });
+	actionStatus[ShootLeft] =	ActionStatus({ GLFW_KEY_F, GLFW_KEY_LEFT });
+	actionStatus[ShootUp] =		ActionStatus({ GLFW_KEY_T, GLFW_KEY_UP });
+	actionStatus[ShootDown] =	ActionStatus({ GLFW_KEY_G, GLFW_KEY_DOWN });
 
 	actionStatus[SelectUnit1] = ActionStatus({ GLFW_KEY_1 });
 	actionStatus[SelectUnit2] = ActionStatus({ GLFW_KEY_2 });
