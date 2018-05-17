@@ -27,12 +27,12 @@ before_install:
 
 install:
     - wget https://dl.bintray.com/boostorg/release/1.67.0/source/boost_1_67_0.tar.gz && gzip -d boost_1_67_0.tar.gz && tar xf boost_1_67_0.tar && cd boost_1_67_0
-    - ./bootstrap.sh --prefix=/usr
+    - ./bootstrap.sh --prefix=/usr --with-libraries=system,date_time,random
     - ./b2
     - sudo ./b2 install
     - cd ..
     - git clone --recurse-submodules https://github.com/socketio/socket.io-client-cpp.git sioclient && mkdir build-sioclient && cd build-sioclient
-    - cmake -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr ../sioclient
+    - cmake -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr -DBOOST_VER=1.67.0 ../sioclient
     - make
     - sudo make install
 
