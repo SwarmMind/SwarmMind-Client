@@ -20,23 +20,23 @@ Map::Map(Input& _input, Networker& _networker, const Configuration& _config)
 
 Map::~Map()
 {
-	delete this->gamestate;
+	delete gamestate;
 }
 
 void Map::updateGameState(class Gamestate* newState)
 {
-	delete this->gamestate;
-	this->gamestate = newState;
+	delete gamestate;
+	gamestate = newState;
 }
 
 void Map::sendCommand(std::string action, std::string direction)
 {
-	if (!this->selectedUnitIsValid())
+	if (!selectedUnitIsValid())
 	{
 		return;
 	}
 
-	Entity unit = this->gamestate->getUnits().at(this->selectedUnit);
+	Entity unit = gamestate->getUnits().at(selectedUnit);
 	networker.sendCommand(unit.id, action, direction);
 }
 
@@ -44,26 +44,26 @@ void Map::updateCommandAction(Action action, std::string command, std::string di
 {
 	if (input.isActionJustReleased(action))
 	{
-		this->sendCommand(command, direction);
+		sendCommand(command, direction);
 	}
 }
 
 void Map::updateCommands()
 {
-	if (!this->selectedUnitIsValid())
+	if (!selectedUnitIsValid())
 	{
 		return;
 	}
 	
-	this->updateCommandAction(MoveDown, "move", "south");
-	this->updateCommandAction(MoveUp, "move", "north");
-	this->updateCommandAction(MoveRight, "move", "east");
-	this->updateCommandAction(MoveLeft, "move", "west");
+	updateCommandAction(MoveDown, "move", "south");
+	updateCommandAction(MoveUp, "move", "north");
+	updateCommandAction(MoveRight, "move", "east");
+	updateCommandAction(MoveLeft, "move", "west");
 
-	this->updateCommandAction(ShootDown, "shoot", "south");
-	this->updateCommandAction(ShootUp, "shoot", "north");
-	this->updateCommandAction(ShootRight, "shoot", "east");
-	this->updateCommandAction(ShootLeft, "shoot", "west");
+	updateCommandAction(ShootDown, "shoot", "south");
+	updateCommandAction(ShootUp, "shoot", "north");
+	updateCommandAction(ShootRight, "shoot", "east");
+	updateCommandAction(ShootLeft, "shoot", "west");
 }
 
 void Map::updateSelection()
@@ -77,17 +77,17 @@ void Map::updateSelectionAction(Action action, int selectedPlayerNumber)
 {
 	if (input.isActionJustPressed(action))
 	{
-		this->selectedUnit = selectedPlayerNumber;
+		selectedUnit = selectedPlayerNumber;
 	}
 }
 
 void Map::update(double deltaTime)
 {
-	if (this->gamestate == nullptr)
+	if (gamestate == nullptr)
 		return;
 
-	this->updateSelection();
-	this->updateCommands();
+	updateSelection();
+	updateCommands();
 }
 
 void Map::draw(class Renderer& renderer)
@@ -107,7 +107,7 @@ void Map::draw(class Renderer& renderer)
         renderer.drawSprite(monster.posX, monster.posY, 1, 1, 1, sprites.get(Monster));
     }
 	vector<Entity> units = gamestate->getUnits();
-	if (this->selectedUnitIsValid())
+	if (selectedUnitIsValid())
 	{
 		renderer.drawSprite(units[selectedUnit].posX, units[selectedUnit].posY, 0.5, 1, 1, sprites.get(SelectedBlock));
 	}
