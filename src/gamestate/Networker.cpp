@@ -43,7 +43,7 @@ void Networker::connect(std::string adress, unsigned int port /*= 3000*/)
 	this->sioSocket = this->sioClient.socket();
 }
 
-bool Networker::isConnected()
+bool Networker::isConnected() const
 {
 	return this->sioClient.opened();
 }

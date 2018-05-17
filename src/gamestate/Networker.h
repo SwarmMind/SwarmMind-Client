@@ -16,7 +16,7 @@ public:
 	~Networker();
 
 	void connect(std::string adress, unsigned int port = 3000);
-	bool isConnected();
+	bool isConnected() const;
 	
 	void setConnectCallback(std::function<void()> callback);
 	void setDisconnectCallback(std::function<void()> callback);
