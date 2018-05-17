@@ -1,4 +1,5 @@
 #include <game/Game.h>
+#include <list>
 #include <string>
 #include <stdexcept>
 #include <iostream>
