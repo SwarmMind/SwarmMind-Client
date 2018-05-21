@@ -16,7 +16,6 @@ ConnectedState::ConnectedState(Game& _game, Sprites& _sprites, Input& _input, st
 
 ConnectedState::~ConnectedState()
 {
-	networker.disconnect();
 	delete map;
 }
 
