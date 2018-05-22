@@ -1,0 +1,42 @@
+language: cpp
+matrix:
+  include:
+    # works on Trusty
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - llvm-toolchain-trusty-5.0
+          packages:
+            - clang-5.0
+      env:
+        - MATRIX_EVAL="CC=clang-5.0 && CXX=clang++-5.0"
+    # works on Precise and Trusty
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-7
+      env:
+        - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7"
+
+before_install:
+    - eval "${MATRIX_EVAL}"
+
+install:
+    - wget https://dl.bintray.com/boostorg/release/1.67.0/source/boost_1_67_0.tar.gz && gzip -d boost_1_67_0.tar.gz && tar xf boost_1_67_0.tar && cd boost_1_67_0
+    - ./bootstrap.sh --prefix=/usr --with-libraries=system,date_time,random
+    - ./b2
+    - sudo ./b2 install
+    - cd ..
+    - git clone --recurse-submodules https://github.com/socketio/socket.io-client-cpp.git sioclient && mkdir build-sioclient && cd build-sioclient
+    - cmake -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr -DBOOST_INCLUDEDIR=/usr/include/boost -DBOOST_LIBRARYDIR=/usr/lib -DBOOST_VER:STRING=1.67.0 ../sioclient
+    - make
+    - sudo make install
+
+script:
+    - mkdir build && cd build
+    - cmake -DSIOCLIENT_USE_FIND_PACKAGE=ON -DCMAKE_PREFIX_PATH=../thirdparty -DCMAKE_BUILD_TYPE=Release ..
+    - make

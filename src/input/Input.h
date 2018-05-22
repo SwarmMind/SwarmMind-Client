@@ -3,20 +3,34 @@
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 #include <map>
+#include <vector>
 
 using namespace std;
 
-enum Key {
-	W = GLFW_KEY_W,
-	A = GLFW_KEY_A,
-	S = GLFW_KEY_S,
-	D = GLFW_KEY_D
+enum Action {
+	MoveLeft,
+	MoveRight,
+	MoveUp,
+	MoveDown,
+	ShootLeft,
+	ShootRight,
+	ShootUp,
+	ShootDown,
+	SelectUnit1,
+	SelectUnit2,
+	SelectUnit3,
+	Debug
 };
 
 typedef struct ActionStatus {
+
+	ActionStatus(vector<int> keys);
+	ActionStatus();
+
+	std::vector<int> glfwKeys;
 	bool isPressed = false;
 	bool isJustPressed = false;
-	bool isJustReleased = !isJustPressed;
+	bool isJustReleased = false;
 } ActionStatus;
 
 class Input
@@ -25,13 +39,17 @@ public:
 	Input(GLFWwindow* window);
 	~Input();
 
-	map<Key, ActionStatus> getKeyStatus();
-	void updateKeyStatus();
+	bool isActionReleased(Action action);
+	bool isActionPressed(Action action);
+	bool isActionJustPressed(Action action);
+	bool isActionJustReleased(Action action);
+
+	void update();
 
 private:
-	map<Key, ActionStatus> keyToStatus;
+	map<Action, ActionStatus> actionStatus;
 	GLFWwindow* _window;
 
-	bool isActionPressed(Key keycode);
-	void checkPressedKey(pair<Key, ActionStatus>);
+	void updateAction(Action action);
+	bool isAnyKeyPressed(std::vector<int> glfwKeys);
 };

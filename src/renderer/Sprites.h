@@ -7,6 +7,7 @@ using namespace std;
 enum SpriteEnum
 {
 	GridBlock,
+	SelectedBlock,
 	Unit,
 	Monster
 };

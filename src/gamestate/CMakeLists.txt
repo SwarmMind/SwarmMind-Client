@@ -4,4 +4,6 @@ set(sources
 	gamestate/Networker.cpp
 	gamestate/Gamestate.h
 	gamestate/Gamestate.cpp
+	gamestate/Map.h
+	gamestate/Map.cpp
 	PARENT_SCOPE)

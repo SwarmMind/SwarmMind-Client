@@ -1,55 +1,93 @@
-#include <imgui/imgui.h>
-#include <imgui/opengl3_example/imgui_impl_glfw_gl3.h>
-#include <imgui/imgui_internal.h>
 #include <input/Input.h>
+#include <imgui/imgui.h>
 
 using namespace std;
 
 Input::Input(GLFWwindow* window)
 	: _window{window} 
-	, keyToStatus{ { Key::W, ActionStatus()}, { Key::A, ActionStatus()}, { Key::S, ActionStatus()}, { Key::D, ActionStatus()} }
-{}
+{
+	actionStatus[MoveRight] =	ActionStatus({ GLFW_KEY_D });
+	actionStatus[MoveLeft] =	ActionStatus({ GLFW_KEY_A });
+	actionStatus[MoveUp] =		ActionStatus({ GLFW_KEY_W });
+	actionStatus[MoveDown] =	ActionStatus({ GLFW_KEY_S });
+
+	actionStatus[ShootRight] =	ActionStatus({ GLFW_KEY_H, GLFW_KEY_RIGHT });
+	actionStatus[ShootLeft] =	ActionStatus({ GLFW_KEY_F, GLFW_KEY_LEFT });
+	actionStatus[ShootUp] =		ActionStatus({ GLFW_KEY_T, GLFW_KEY_UP });
+	actionStatus[ShootDown] =	ActionStatus({ GLFW_KEY_G, GLFW_KEY_DOWN });
+
+	actionStatus[SelectUnit1] = ActionStatus({ GLFW_KEY_1 });
+	actionStatus[SelectUnit2] = ActionStatus({ GLFW_KEY_2 });
+	actionStatus[SelectUnit3] = ActionStatus({ GLFW_KEY_3 });
+
+	actionStatus[Debug] = ActionStatus({ GLFW_KEY_PERIOD });
+}
 
 Input::~Input() 
 {
 
 }
 
-bool Input::isActionPressed(Key keycode)
+bool Input::isActionReleased(Action action)
 {
-	if (glfwGetKey(_window, keycode) == GLFW_PRESS) 
+	return !this->isActionPressed(action);
+}
+
+bool Input::isActionPressed(Action action)
+{
+	return actionStatus[action].isPressed;
+}
+
+bool Input::isActionJustPressed(Action action)
+{
+	return actionStatus[action].isJustPressed;
+}
+
+bool Input::isActionJustReleased(Action action)
+{
+	return actionStatus[action].isJustReleased;
+}
+
+void Input::update()
+{
+	for (auto& actionPair: actionStatus)
 	{
-		return true;
+		this->updateAction(actionPair.first);
+	}
+}
+
+void Input::updateAction(Action action)
+{
+	ActionStatus& status = actionStatus[action];
+
+	if (isAnyKeyPressed(status.glfwKeys)) {
+		status.isJustPressed = !status.isPressed;
+		status.isPressed = true;
+		status.isJustReleased = false;
+	}
+	else {
+		status.isJustPressed = false;
+		status.isJustReleased = status.isPressed;
+		status.isPressed = false;
+	}
+}
+
+bool Input::isAnyKeyPressed(std::vector<int> glfwKeys)
+{
+	bool imGuiConsumesInput = ImGui::GetIO().WantCaptureKeyboard;
+	for (int keyCode: glfwKeys)
+	{
+		if (glfwGetKey(_window, keyCode) == GLFW_PRESS && !imGuiConsumesInput)
+		{
+			return true;
+		}
 	}
 	return false;
 }
 
-void Input::updateKeyStatus()
-{
-	for (auto key: keyToStatus) {
-		checkPressedKey(key);
-	}
-}
+ActionStatus::ActionStatus(vector<int> keys) 
+	: glfwKeys{ keys }
+{}
 
-void Input::checkPressedKey(pair<Key, ActionStatus> key)
-{
-	if (isActionPressed(key.first)) {
-		if (keyToStatus.at(key.first).isJustPressed) {
-			keyToStatus.at(key.first).isPressed = true;
-			keyToStatus.at(key.first).isJustPressed = false;
-		}
-		else {
-			keyToStatus.at(key.first).isJustPressed = true;
-		}
-	}
-	else {
-		keyToStatus.at(key.first).isPressed = false;
-		keyToStatus.at(key.first).isJustPressed = false;
-	}
-}
-
-map<Key, ActionStatus> Input::getKeyStatus()
-{
-	return keyToStatus;
-}
-
+ActionStatus::ActionStatus()
+{}
