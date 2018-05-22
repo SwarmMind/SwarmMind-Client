@@ -1,5 +1,5 @@
 #include <imgui/imgui.h>
-#include <imgui/opengl3_example/imgui_impl_glfw_gl3.h>
+#include <imgui/examples/opengl3_example/imgui_impl_glfw_gl3.h>
 #include <imgui/imgui_internal.h>
 #include <renderer/ImGuiRenderer.h>
 

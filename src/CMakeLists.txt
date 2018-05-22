@@ -11,6 +11,8 @@ add_subdirectory(menu)
 
 add_executable(SwarmMind-Client ${sources})
 
+target_link_libraries(SwarmMind-Client PRIVATE imgui)
+
 #Replicate the directory structure in Visual Studio filters
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${sources})
 
@@ -54,3 +56,4 @@ find_package(glfw3 REQUIRED)
 find_package(glbinding REQUIRED)
 
 target_link_libraries(SwarmMind-Client PUBLIC glbinding::glbinding glfw)
+
