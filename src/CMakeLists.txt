@@ -1,3 +1,6 @@
+find_package(glfw3 REQUIRED)
+find_package(glbinding REQUIRED)
+
 set(sources "main.cpp")
 
 add_subdirectory(renderer)
@@ -50,10 +53,6 @@ else()
 	message(FATAL_ERROR "sioclient directory not set!")
 endif()
 endif()
-
-
-find_package(glfw3 REQUIRED)
-find_package(glbinding REQUIRED)
 
 target_link_libraries(SwarmMind-Client PUBLIC glbinding::glbinding glfw)
 
