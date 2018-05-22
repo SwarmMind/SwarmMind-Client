@@ -7,6 +7,8 @@ using namespace std;
 
 ImGuiRenderer::ImGuiRenderer(GLFWwindow* window)
 {
+	IMGUI_CHECKVERSION();
+
 	ImGui::CreateContext();
 	ImGui_ImplGlfwGL3_Init(window, true);
 }
