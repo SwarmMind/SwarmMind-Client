@@ -43,7 +43,11 @@
 #define IM_FMTLIST(FMT)
 #endif
 #define IM_ARRAYSIZE(_ARR)          ((int)(sizeof(_ARR)/sizeof(*_ARR)))         // Size of a static C-style array. Don't use on pointers!
+#if __cplusplus >= 201103L
+#define IM_OFFSETOF(_TYPE,_MEMBER) offsetof(_TYPE,_MEMBER)
+#else
 #define IM_OFFSETOF(_TYPE,_MEMBER)  ((size_t)&(((_TYPE*)0)->_MEMBER))           // Offset of _MEMBER within _TYPE. Standardized as offsetof() in modern C++.
+#endif
 
 #if defined(__clang__)
 #pragma clang diagnostic push
