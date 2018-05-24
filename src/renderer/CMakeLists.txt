@@ -15,4 +15,8 @@ set(sources
 	"renderer/Sprites.cpp"
 	"renderer/ImGuiRenderer.cpp"
 	"renderer/ImGuiRenderer.h"
+	"renderer/ParticleRenderer.h"
+	"renderer/ParticleRenderer.cpp"
+	"renderer/OpenGLHelpers.h"
+	"renderer/OpenGLHelpers.cpp"
 	PARENT_SCOPE)

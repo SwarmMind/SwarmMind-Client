@@ -118,7 +118,7 @@ void Game::render(double timeElapsed)
 	menu->draw(*renderer);
 	drawDebug(timeElapsed);
 
-    renderer->draw();
+    renderer->draw(timeElapsed);
     imguiRenderer->render();
     glfwSwapBuffers(window);
 }
@@ -138,6 +138,25 @@ void Game::drawDebug(double timeElapsed)
 			timeSum += frameTime;
 
 		ImGui::Text("Current FPS: %f", 60 / timeSum);
+	}
+
+	if (input->isActionJustPressed(Debug))
+	{
+		ParticleSystem particles;
+
+		for (size_t i = 0; i < 200; i++)
+		{
+			particles.dynamicData.push_back(0.f);
+			particles.dynamicData.push_back(0.f);
+			particles.dynamicData.push_back((float)std::rand() / (float)RAND_MAX * 0.5);
+			particles.dynamicData.push_back(0.f);
+
+			particles.staticData.push_back((float)std::rand() / (float)RAND_MAX * 2.f);
+			particles.staticData.push_back(((float)std::rand() / (float)RAND_MAX - 0.5f) * 0.5f);
+			particles.staticData.push_back(0.f);
+			particles.staticData.push_back(0.f);
+		}
+		renderer->addParticles(particles);
 	}
 }
 
