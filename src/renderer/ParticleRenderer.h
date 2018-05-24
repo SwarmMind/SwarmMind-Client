@@ -9,6 +9,7 @@ using namespace gl41core;
 struct ParticleSystem {
 	std::vector<GLfloat> dynamicData;
 	std::vector<GLfloat> staticData;
+	std::vector<GLubyte> color;
 };
 
 class ParticleRenderer

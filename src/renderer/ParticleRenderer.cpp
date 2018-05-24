@@ -135,6 +135,8 @@ void ParticleRenderer::intializeUniforms()
 	glUseProgram(particleDrawingProgram);
 	GLuint textureSizeUniform = glGetUniformLocation(particleDrawingProgram, "particleTextureSize");
 	glUniform1ui(textureSizeUniform, textureSize);
+	GLuint particleColorSampler = glGetUniformLocation(particleDrawingProgram, "particleColorSampler");
+	glUniform1i(particleColorSampler, 1);
 }
 
 void ParticleRenderer::setTextureParameters()
@@ -192,6 +194,10 @@ void ParticleRenderer::drawParticles()
 	glBindVertexArray(drawVao);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, particleColor);
+
+	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, dynamicParticleData[front]);
 
 	glDrawArraysInstanced(GL_TRIANGLES, 0, 6, textureSize * textureSize);
@@ -211,6 +217,7 @@ void ParticleRenderer::addParticles(ParticleSystem particles)
 {
 	assert(particles.dynamicData.size() % 4 == 0);
 	assert(particles.dynamicData.size() == particles.staticData.size());
+	assert(particles.dynamicData.size() == particles.color.size());
 
 	unsigned int dataOffset = 0;
 	unsigned int dataSize = particles.dynamicData.size() / 4;
@@ -241,6 +248,17 @@ void ParticleRenderer::addParticles(ParticleSystem particles)
 			GL_RGBA,
 			GL_FLOAT,
 			particles.staticData.data() + dataOffset * 4);
+
+		glBindTexture(GL_TEXTURE_2D, particleColor);
+		glTexSubImage2D(GL_TEXTURE_2D,
+			0,
+			xOffset,
+			yOffset,
+			remainingWidth,
+			1,
+			GL_RGBA,
+			GL_UNSIGNED_BYTE,
+			particles.color.data() + dataOffset * 4);
 		
 		textureOffset += remainingWidth;
 		if (textureOffset >= textureSize * textureSize)

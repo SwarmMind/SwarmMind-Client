@@ -155,6 +155,11 @@ void Game::drawDebug(double timeElapsed)
 			particles.staticData.push_back(((float)std::rand() / (float)RAND_MAX - 0.5f) * 0.5f);
 			particles.staticData.push_back(0.f);
 			particles.staticData.push_back(0.f);
+
+			particles.color.push_back(255 * (float)std::rand() / (float)RAND_MAX);
+			particles.color.push_back(255 * (float)std::rand() / (float)RAND_MAX);
+			particles.color.push_back(255 * (float)std::rand() / (float)RAND_MAX);
+			particles.color.push_back(255);
 		}
 		renderer->addParticles(particles);
 	}
