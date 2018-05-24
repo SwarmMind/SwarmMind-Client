@@ -3,7 +3,10 @@
 uniform sampler2D dynamicDataSampler;
 uniform uint particleTextureSize;
 
-layout (location = 0) in vec2 position;
+uniform vec2 cameraPosition;
+uniform vec2 cameraSize;
+
+layout (location = 0) in vec2 basePosition;
 layout (location = 1) in vec2 uv;
 
 out vec2 v_uv;
@@ -27,5 +30,7 @@ void main()
 	}
 
 	vec2 offset = dynamicParticleData.xy;
-	gl_Position = vec4(position + offset, 1, 1);
+	vec2 position = basePosition + offset;
+	position = (position - cameraPosition) / cameraSize;
+	gl_Position = vec4(position, 0.5, 1);
 }

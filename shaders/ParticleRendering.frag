@@ -16,7 +16,7 @@ void main()
 		discard;
 
 	//smoothly fade out the particles at the end of their lifetime
-	float alpha = zz * smoothstep(0, 0.1, lifeTime);
+	float alpha = zz * smoothstep(0.0, 0.1, lifeTime);
 
 	vec4 color = texelFetch(particleColorSampler, v_particleCoord, 0);
 

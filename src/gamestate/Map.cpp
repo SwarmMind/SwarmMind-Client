@@ -109,7 +109,7 @@ void Map::draw(class Renderer& renderer)
 	vector<Entity> units = gamestate->getUnits();
 	if (selectedUnitIsValid())
 	{
-		renderer.drawSprite(units[selectedUnit].posX, units[selectedUnit].posY, 0.5, 1, 1, sprites.get(SelectedBlock));
+		renderer.drawSprite(units[selectedUnit].posX, units[selectedUnit].posY, 0.4, 1, 1, sprites.get(SelectedBlock));
 	}
 }
 

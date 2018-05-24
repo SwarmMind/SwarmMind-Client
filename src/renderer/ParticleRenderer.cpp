@@ -2,23 +2,21 @@
 
 #include <assert.h>
 #include <renderer/OpenGLHelpers.h>
+#include <renderer/Renderer.h>
 #include <algorithm>
 #include <vector>
 #include <array>
 
-ParticleRenderer::ParticleRenderer(GLFWwindow* _window)
+ParticleRenderer::ParticleRenderer(GLFWwindow* _window, Renderer& _renderer)
 	: window{_window}
+	, renderer{_renderer}
 {
-	front = 0;
-	back = 1;
-	
-	glGenTextures(2, dynamicParticleData);
-	glGenFramebuffers(2, frameBuffers);
-
 	particleUpdateProgram = loadProgram("shaders/Passthrough.vert", "shaders/UpdateParticles.frag");
 	particleDrawingProgram = loadProgram("shaders/ParticleRendering.vert", "shaders/ParticleRendering.frag");
 	intializeUniforms();
 
+	glGenTextures(2, dynamicParticleData);
+	glGenFramebuffers(2, frameBuffers);
 	initializeDynamicData(front);
 	initializeDynamicData(back);
 	initializeStaticData();
@@ -29,12 +27,18 @@ ParticleRenderer::ParticleRenderer(GLFWwindow* _window)
 
 ParticleRenderer::~ParticleRenderer()
 {
-	glDeleteTextures(2, dynamicParticleData);
 	glDeleteFramebuffers(2, frameBuffers);
+	glDeleteTextures(2, dynamicParticleData);
+	glDeleteTextures(1, &particleColor);
+	glDeleteTextures(1, &staticParticleData);
+
 	glDeleteProgram(particleUpdateProgram);
 	glDeleteProgram(particleDrawingProgram);
+
 	glDeleteVertexArrays(1, &updateVao);
 	glDeleteBuffers(1, &updateVbo);
+	glDeleteVertexArrays(1, &drawVao);
+	glDeleteBuffers(1, &drawVbo);
 }
 
 void ParticleRenderer::initializeStaticData()
@@ -137,6 +141,9 @@ void ParticleRenderer::intializeUniforms()
 	glUniform1ui(textureSizeUniform, textureSize);
 	GLuint particleColorSampler = glGetUniformLocation(particleDrawingProgram, "particleColorSampler");
 	glUniform1i(particleColorSampler, 1);
+
+	cameraPositionUniform = glGetUniformLocation(particleDrawingProgram, "cameraPosition");
+	cameraSizeUniform = glGetUniformLocation(particleDrawingProgram, "cameraSize");
 }
 
 void ParticleRenderer::setTextureParameters()
@@ -166,6 +173,7 @@ void ParticleRenderer::setFrameBufferTextures(int index)
 void ParticleRenderer::updateParticles(double deltaTime)
 {
 	glDisable(GL_BLEND);
+	glDisable(GL_DEPTH_TEST);
 	glViewport(0, 0, textureSize, textureSize);
 	glUseProgram(particleUpdateProgram);
 	glBindVertexArray(updateVao);
@@ -186,9 +194,15 @@ void ParticleRenderer::updateParticles(double deltaTime)
 
 void ParticleRenderer::drawParticles()
 {
+
 	glEnable(GL_BLEND);
+	glEnable(GL_DEPTH_TEST);
+	glDepthMask(GL_FALSE); //only read from the depth buffer, do not write
+
 	int width, height;
 	glfwGetFramebufferSize(window, &width, &height);
+	uploadCamera(width, height);
+
 	glViewport(0, 0, width, height);
 	glUseProgram(particleDrawingProgram);
 	glBindVertexArray(drawVao);
@@ -201,12 +215,20 @@ void ParticleRenderer::drawParticles()
 	glBindTexture(GL_TEXTURE_2D, dynamicParticleData[front]);
 
 	glDrawArraysInstanced(GL_TRIANGLES, 0, 6, textureSize * textureSize);
+
+	glDepthMask(GL_TRUE);
+}
+
+void ParticleRenderer::uploadCamera(int frameBufferWidth, int frameBufferHeight)
+{
+	glUseProgram(particleDrawingProgram);
+	Camera camera = renderer.getCamera();
+	glUniform2f(cameraPositionUniform, camera.x, camera.y);
+	glUniform2f(cameraSizeUniform, camera.width, camera.height);
 }
 
 void ParticleRenderer::draw(double deltaTime)
 {
-	//Important for updating the particles
-	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_CULL_FACE);
 
 	updateParticles(deltaTime);

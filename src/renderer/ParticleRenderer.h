@@ -15,7 +15,7 @@ struct ParticleSystem {
 class ParticleRenderer
 {
 public:
-	ParticleRenderer(GLFWwindow* _window);
+	ParticleRenderer(GLFWwindow* _window, class Renderer& _renderer);
 
 	~ParticleRenderer();
 
@@ -26,10 +26,10 @@ public:
 private:
 	unsigned int particleCount;
 	unsigned int textureSize = 256;
-	GLfloat particleSize = 0.01;
+	GLfloat particleSize = 0.05;
 
-	unsigned int front;
-	unsigned int back;
+	unsigned int front = 0;
+	unsigned int back = 1;
 	GLuint dynamicParticleData[2];
 	GLuint frameBuffers[2];
 	GLuint staticParticleData;
@@ -65,4 +65,9 @@ private:
 	//drawing
 	void updateParticles(double deltaTime);
 	void drawParticles();
+	void uploadCamera(int frameBufferWidth, int frameBufferHeight);
+
+	GLuint cameraPositionUniform, cameraSizeUniform;
+
+	class Renderer& renderer;
 };

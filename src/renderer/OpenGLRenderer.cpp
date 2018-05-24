@@ -25,7 +25,7 @@ void OpenGLRenderer::findUniformLocations()
 
 OpenGLRenderer::OpenGLRenderer(GLFWwindow* _window)
 	: window{_window}
-	, particleRenderer{_window}
+	, particleRenderer{ _window, *this }
 {
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -141,9 +141,7 @@ void OpenGLRenderer::preDraw()
 }
 
 void OpenGLRenderer::draw(double deltaTime)
-{	
-	
-	
+{
 	glEnable(GL_BLEND);
 	glEnable(GL_DEPTH_TEST);
 	glUseProgram(program);

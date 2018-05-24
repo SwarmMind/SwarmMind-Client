@@ -57,7 +57,7 @@ Game::Game()
     initializeOpenGL();
 
     renderer = new OpenGLRenderer(window);
-	renderer->setCamera(5, 5, 10);
+	renderer->setCamera(5, 5, 6);
     imguiRenderer = new ImGuiRenderer(window);
     input = new Input(window);
 
@@ -140,26 +140,26 @@ void Game::drawDebug(double timeElapsed)
 		ImGui::Text("Current FPS: %f", 60 / timeSum);
 	}
 
-	if (input->isActionJustPressed(Debug))
+	if (input->isActionPressed(Debug))
 	{
 		ParticleSystem particles;
 
-		for (size_t i = 0; i < 200; i++)
+		for (size_t i = 0; i < 20000 * timeElapsed; i++)
 		{
-			particles.dynamicData.push_back(0.f);
-			particles.dynamicData.push_back(0.f);
+			particles.dynamicData.push_back(5.5f);
+			particles.dynamicData.push_back(5.5f);
 			particles.dynamicData.push_back((float)std::rand() / (float)RAND_MAX * 0.5);
 			particles.dynamicData.push_back(0.f);
 
-			particles.staticData.push_back((float)std::rand() / (float)RAND_MAX * 2.f);
-			particles.staticData.push_back(((float)std::rand() / (float)RAND_MAX - 0.5f) * 0.5f);
+			particles.staticData.push_back(((float)std::rand() / (float)RAND_MAX - 0.05f) * 5.f);
+			particles.staticData.push_back(((float)std::rand() / (float)RAND_MAX - 0.5f) * 1.f);
 			particles.staticData.push_back(0.f);
 			particles.staticData.push_back(0.f);
 
 			particles.color.push_back(255 * (float)std::rand() / (float)RAND_MAX);
 			particles.color.push_back(255 * (float)std::rand() / (float)RAND_MAX);
 			particles.color.push_back(255 * (float)std::rand() / (float)RAND_MAX);
-			particles.color.push_back(255);
+			particles.color.push_back(128);
 		}
 		renderer->addParticles(particles);
 	}
