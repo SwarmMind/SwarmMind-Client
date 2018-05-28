@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <vector>
 #include <array>
+#include <renderer/ParticleSystem.h>
 
 ParticleRenderer::ParticleRenderer(GLFWwindow* _window, Renderer& _renderer)
 	: window{_window}
@@ -170,6 +171,16 @@ void ParticleRenderer::setFrameBufferTextures(int index)
 	glDrawBuffers(drawBuffers.size(), drawBuffers.data());
 }
 
+void ParticleRenderer::addParticlesFromQueue()
+{
+	std::queue<ParticleSystem>& particleSystems = ParticleSystem::particlesToSpawn();
+	while (particleSystems.size() > 0)
+	{
+		addParticles(particleSystems.front());
+		particleSystems.pop();
+	}
+}
+
 void ParticleRenderer::updateParticles(double deltaTime)
 {
 	glDisable(GL_BLEND);
@@ -197,7 +208,7 @@ void ParticleRenderer::drawParticles()
 
 	glEnable(GL_BLEND);
 	glEnable(GL_DEPTH_TEST);
-	glDepthMask(GL_FALSE); //only read from the depth buffer, do not write
+	glDepthMask(GL_FALSE); //only read from the depth buffer, do not writoe
 
 	int width, height;
 	glfwGetFramebufferSize(window, &width, &height);
@@ -231,6 +242,7 @@ void ParticleRenderer::draw(double deltaTime)
 {
 	glDisable(GL_CULL_FACE);
 
+	addParticlesFromQueue();
 	updateParticles(deltaTime);
 	drawParticles();
 }

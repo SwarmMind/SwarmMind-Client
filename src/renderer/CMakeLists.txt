@@ -19,4 +19,6 @@ set(sources
 	"renderer/ParticleRenderer.cpp"
 	"renderer/OpenGLHelpers.h"
 	"renderer/OpenGLHelpers.cpp"
+	"renderer/ParticleSystem.h"
+	"renderer/ParticleSystem.cpp"
 	PARENT_SCOPE)

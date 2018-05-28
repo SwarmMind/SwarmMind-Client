@@ -5,12 +5,8 @@ using namespace gl41core;
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 #include <vector>
+#include <renderer/ParticleSystem.h>
 
-struct ParticleSystem {
-	std::vector<GLfloat> dynamicData;
-	std::vector<GLfloat> staticData;
-	std::vector<GLubyte> color;
-};
 
 class ParticleRenderer
 {
@@ -26,7 +22,7 @@ public:
 private:
 	unsigned int particleCount;
 	unsigned int textureSize = 256;
-	GLfloat particleSize = 0.05;
+	GLfloat particleSize = 0.04;
 
 	unsigned int front = 0;
 	unsigned int back = 1;
@@ -63,6 +59,7 @@ private:
 	void setFrameBufferTextures(int index);
 
 	//drawing
+	void addParticlesFromQueue();
 	void updateParticles(double deltaTime);
 	void drawParticles();
 	void uploadCamera(int frameBufferWidth, int frameBufferHeight);
