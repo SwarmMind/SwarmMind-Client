@@ -1,5 +1,6 @@
 find_package(glfw3 REQUIRED)
 find_package(glbinding REQUIRED)
+find_package(glm REQUIRED)
 
 set(sources "main.cpp")
 
@@ -54,5 +55,5 @@ else()
 endif()
 endif()
 
-target_link_libraries(SwarmMind-Client PUBLIC glbinding::glbinding glfw)
+target_link_libraries(SwarmMind-Client PUBLIC glbinding::glbinding glfw glm)
 
