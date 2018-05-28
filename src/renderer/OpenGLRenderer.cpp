@@ -9,91 +9,9 @@
 #include <renderer/Sprite.h>
 #include <renderer/Texture.h>
 #include <imgui/imgui.h>
+#include <renderer/OpenGLHelpers.h>
 
 using namespace std;
-
-#pragma region Shader loading
-
-GLint OpenGLRenderer::loadProgram(string vertexShaderPath, string fragmentShaderPath)
-{
-	GLint vertexShader = loadShader(vertexShaderPath, GL_VERTEX_SHADER);
-	GLint fragmentShader = loadShader(fragmentShaderPath, GL_FRAGMENT_SHADER);
-
-	GLint program = glCreateProgram();
-	glAttachShader(program, vertexShader);
-	glAttachShader(program, fragmentShader);
-	glLinkProgram(program);
-
-	glDeleteShader(vertexShader);
-	glDeleteShader(fragmentShader);
-
-	GLboolean isLinked;
-	glGetProgramiv(program, GL_LINK_STATUS, &isLinked);
-	if (isLinked == GL_FALSE)
-	{
-		GLint maxLength = 0;
-		glGetProgramiv(program, GL_INFO_LOG_LENGTH, &maxLength);
-
-		vector<GLchar> errorLog(maxLength);
-		glGetProgramInfoLog(program, maxLength, &maxLength, &errorLog[0]);
-
-		cout << "OpenGL Linker Error:" << std::endl;
-		cout << errorLog.data();
-		glDeleteProgram(program);
-		exit(-1);
-	}
-
-	return program;
-}
-
-GLint OpenGLRenderer::loadShader(string path, GLenum shaderType)
-{
-	string code = loadShaderFile(path);
-	const GLchar* source = code.data();
-	const GLint length = code.length();
-	GLint shader = glCreateShader(shaderType);
-	glShaderSource(shader, 1, &source, &length);
-	glCompileShader(shader);
-
-	GLboolean compileStatus;
-	glGetShaderiv(shader, GL_COMPILE_STATUS, &compileStatus);
-	if (compileStatus == GL_FALSE)
-	{
-		GLint errorLength;
-		glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &errorLength);
-
-		vector<GLchar> infoLog(errorLength);
-		glGetShaderInfoLog(shader, errorLength, &errorLength, &infoLog[0]);
-
-		cout << "Shader compilation: " << path << " failed:\n" << infoLog.data();
-
-		glDeleteShader(shader);
-		exit(-1);
-	}
-
-	return shader;
-}
-
-std::string OpenGLRenderer::loadShaderFile(string path)
-{
-	string shader;
-	ifstream file(path);
-	if (!file.is_open())
-	{
-		cout << "Could not open file: " << path << endl;
-		exit(-1);
-	}
-
-	while (!file.eof())
-	{
-		char character = file.get();
-		if (character > 0)
-			shader += character;
-	}
-	return shader;
-}
-
-#pragma  endregion
 
 #pragma region initialization
 
@@ -107,6 +25,7 @@ void OpenGLRenderer::findUniformLocations()
 
 OpenGLRenderer::OpenGLRenderer(GLFWwindow* _window)
 	: window{_window}
+	, particleRenderer{ _window, *this }
 {
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -114,14 +33,14 @@ OpenGLRenderer::OpenGLRenderer(GLFWwindow* _window)
 	glDepthFunc(GL_GREATER);
 	glDepthRange(0.0, 1.0);
 
-	program = loadProgram("shaders/vert.glsl", "shaders/frag.glsl");
+	program = loadProgram("shaders/Sprite.vert", "shaders/Sprite.frag");
 	glUseProgram(program);
 
 	findUniformLocations();
 	
-	glfwSetFramebufferSizeCallback(window, [](GLFWwindow* window, int width, int height) {
+	/*glfwSetFramebufferSizeCallback(window, [](GLFWwindow* window, int width, int height) {
 		glViewport(0, 0, width, height);
-	});
+	});*/
 }
 
 OpenGLRenderer::~OpenGLRenderer()
@@ -140,6 +59,7 @@ void OpenGLRenderer::uploadCamera()
 	float width = (static_cast<float>(bufferWidth) / static_cast<float>(bufferHeight)) * camera.height;
 	camera.width = width;
 
+	glUseProgram(program);
 	glUniform1f(xLocation, camera.x);
 	glUniform1f(yLocation, camera.y);
 
@@ -220,12 +140,30 @@ void OpenGLRenderer::preDraw()
 	renderData.clear();
 }
 
-void OpenGLRenderer::draw()
-{	
+void OpenGLRenderer::draw(double deltaTime)
+{
+	glEnable(GL_BLEND);
+	glEnable(GL_DEPTH_TEST);
+	glUseProgram(program);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	
+
+	int width, height;
+	glfwGetFramebufferSize(window, &width, &height);
+	glViewport(0, 0, width, height);
+
 	for (auto iterator = renderData.begin(); iterator != renderData.end(); iterator++)
 	{
 		drawTexture(iterator->first);
 	}
+
+	particleRenderer.draw(deltaTime);
+}
+
+void OpenGLRenderer::addParticles(ParticleSystem particles)
+{
+	particleRenderer.addParticles(particles);
 }
 
 #pragma endregion Drawing
