@@ -60,12 +60,13 @@ public:
 
 	void update();
 	double getMousePosition(string coordinate);
+	float screenToWorldCoordinate();
 	//MousePosition getMousePosition();
 
 private:
 	map<Action, ActionStatus> actionStatus;
 	GLFWwindow* _window;
-	double xMousePosition, yMousePosition;
+	double _xMousePosition, _yMousePosition;
 	
 	void updateAction(Action action);
 	void setMousePosition();

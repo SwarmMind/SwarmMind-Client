@@ -7,22 +7,22 @@ using namespace std;
 Input::Input(GLFWwindow* window)
 	: _window{window} 
 {
-	actionStatus[MoveRight] =	ActionStatus({ GLFW_KEY_D });
-	actionStatus[MoveLeft] =	ActionStatus({ GLFW_KEY_A });
-	actionStatus[MoveUp] =		ActionStatus({ GLFW_KEY_W });
-	actionStatus[MoveDown] =	ActionStatus({ GLFW_KEY_S });
-	actionStatus[Move] = ActionStatus({ GLFW_MOUSE_BUTTON_LEFT });
+	actionStatus[MoveRight]  =	ActionStatus({ GLFW_KEY_D });
+	actionStatus[MoveLeft]   =	ActionStatus({ GLFW_KEY_A });
+	actionStatus[MoveUp]  	 =	ActionStatus({ GLFW_KEY_W });
+	actionStatus[MoveDown]   =	ActionStatus({ GLFW_KEY_S });
+	actionStatus[Move]       = ActionStatus({ GLFW_MOUSE_BUTTON_LEFT });
 
 	actionStatus[ShootRight] =	ActionStatus({ GLFW_KEY_H, GLFW_KEY_RIGHT });
-	actionStatus[ShootLeft] =	ActionStatus({ GLFW_KEY_F, GLFW_KEY_LEFT });
-	actionStatus[ShootUp] =		ActionStatus({ GLFW_KEY_T, GLFW_KEY_UP });
-	actionStatus[ShootDown] =	ActionStatus({ GLFW_KEY_G, GLFW_KEY_DOWN });
-	actionStatus[Shoot] = ActionStatus({ GLFW_MOUSE_BUTTON_RIGHT });
+	actionStatus[ShootLeft]  =	ActionStatus({ GLFW_KEY_F, GLFW_KEY_LEFT });
+	actionStatus[ShootUp]    = 		ActionStatus({ GLFW_KEY_T, GLFW_KEY_UP });
+	actionStatus[ShootDown]  =	ActionStatus({ GLFW_KEY_G, GLFW_KEY_DOWN });
+	actionStatus[Shoot]      = ActionStatus({ GLFW_MOUSE_BUTTON_RIGHT });
 
 	actionStatus[SelectUnit1] = ActionStatus({ GLFW_KEY_1 });
 	actionStatus[SelectUnit2] = ActionStatus({ GLFW_KEY_2 });
 	actionStatus[SelectUnit3] = ActionStatus({ GLFW_KEY_3 });
-	actionStatus[SelectUnit] = ActionStatus({ GLFW_MOUSE_BUTTON_MIDDLE });
+	actionStatus[SelectUnit]  = ActionStatus({ GLFW_MOUSE_BUTTON_MIDDLE });
 
 	actionStatus[Debug] = ActionStatus({ GLFW_KEY_PERIOD });
 	//actionStatus[ChooseDirection] = ActionStatus({ GLFW_MOUSE_BUTTON_LEFT });
@@ -64,6 +64,10 @@ void Input::update()
 
 void Input::updateAction(Action action)
 {
+	ImGui::Text("Mouse_x: %f", _xMousePosition);
+	ImGui::Text("Mouse_y: %f", _yMousePosition);
+	//ImGui::Text("Mouse_y: %f", getMousePosition("y"));
+
 	ActionStatus& status = actionStatus[action];
 
 	if (isAnyKeyPressed(status.glfwKeys) || isMousePressed(status.glfwKeys)) {
@@ -110,15 +114,19 @@ MousePosition Input::getMousePosition() {
 */
 
 void Input::setMousePosition() {
-	glfwGetCursorPos(_window, &xMousePosition, &yMousePosition);
+	glfwGetCursorPos(_window, &_xMousePosition, &_yMousePosition);
 }
 
 double Input::getMousePosition(string coordinate) {
 	if (coordinate == "x") {
-		return xMousePosition;
+		return _xMousePosition;
 	} else {
-		return yMousePosition;
+		return _yMousePosition;
 	}
+}
+
+float Input::screenToWorldCoordinate() {
+	return 42.42;
 }
 
 ActionStatus::ActionStatus(vector<int> keys) 

@@ -10,6 +10,7 @@
 #include <renderer/Texture.h>
 #include <imgui/imgui.h>
 #include <renderer/OpenGLHelpers.h>
+#include <game/Camera.h>
 
 using namespace std;
 
@@ -23,9 +24,10 @@ void OpenGLRenderer::findUniformLocations()
 	heightLocation = glGetUniformLocation(program, "camHeight");
 }
 
-OpenGLRenderer::OpenGLRenderer(GLFWwindow* _window)
+OpenGLRenderer::OpenGLRenderer(GLFWwindow* _window, Camera& _camera)
 	: window{_window}
 	, particleRenderer{ _window, *this }
+	, camera {_camera}
 {
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -53,19 +55,12 @@ OpenGLRenderer::~OpenGLRenderer()
 #pragma region Drawing
 void OpenGLRenderer::uploadCamera()
 {
-	//Update the size every frame
-	int bufferWidth, bufferHeight;
-	glfwGetFramebufferSize(window, &bufferWidth, &bufferHeight);
-	float width = (static_cast<float>(bufferWidth) / static_cast<float>(bufferHeight)) * camera.height;
-	camera.width = width;
-
 	glUseProgram(program);
-	glUniform1f(xLocation, camera.x);
-	glUniform1f(yLocation, camera.y);
+	glUniform1f(xLocation, camera.getX());
+	glUniform1f(yLocation, camera.getY());
 
-	glUniform1f(widthLocation, camera.width);
-	glUniform1f(heightLocation, camera.height);
-
+	glUniform1f(widthLocation, camera.getWidth());
+	glUniform1f(heightLocation, camera.getHeight());
 }
 
 /**
@@ -114,22 +109,6 @@ void OpenGLRenderer::drawTexture(Texture* texture)
 	The width is calculated automatically according to the current aspect ratio
 	This command is best called before calling preDraw in the current frame, as otherwise the camera will not be updated for the current frame
 */
-void OpenGLRenderer::setCamera(float x, float y, float height)
-{
-	int bufferWidth, bufferHeight;
-	glfwGetFramebufferSize(window, &bufferWidth, &bufferHeight);
-	float width = (static_cast<float>(bufferWidth) / static_cast<float>(bufferHeight)) * height;
-
-	camera.x = x;
-	camera.y = y;
-	camera.height = height;
-	camera.width = width;
-}
-
-Camera OpenGLRenderer::getCamera()
-{
-	return camera;
-}
 
 void OpenGLRenderer::preDraw()
 {
@@ -145,9 +124,7 @@ void OpenGLRenderer::draw(double deltaTime)
 	glEnable(GL_BLEND);
 	glEnable(GL_DEPTH_TEST);
 	glUseProgram(program);
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-	
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);	
 
 	int width, height;
 	glfwGetFramebufferSize(window, &width, &height);
