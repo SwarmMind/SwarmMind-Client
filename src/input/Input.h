@@ -12,14 +12,18 @@ enum Action {
 	MoveRight,
 	MoveUp,
 	MoveDown,
+	Move,
 	ShootLeft,
 	ShootRight,
 	ShootUp,
 	ShootDown,
+	Shoot,
 	SelectUnit1,
 	SelectUnit2,
 	SelectUnit3,
-	Debug
+	SelectUnit,
+	Debug,
+	ChooseDirection
 };
 
 typedef struct ActionStatus {
@@ -31,7 +35,17 @@ typedef struct ActionStatus {
 	bool isPressed = false;
 	bool isJustPressed = false;
 	bool isJustReleased = false;
+
 } ActionStatus;
+
+/*
+typedef struct MousePosition {
+
+	double xMousePosition;
+	double yMousePosition;
+
+} MousePosition;
+*/
 
 class Input
 {
@@ -45,11 +59,16 @@ public:
 	bool isActionJustReleased(Action action);
 
 	void update();
+	double getMousePosition(string coordinate);
+	//MousePosition getMousePosition();
 
 private:
 	map<Action, ActionStatus> actionStatus;
 	GLFWwindow* _window;
-
+	double xMousePosition, yMousePosition;
+	
 	void updateAction(Action action);
+	void setMousePosition();
 	bool isAnyKeyPressed(std::vector<int> glfwKeys);
+	bool isMousePressed(std::vector<int> glfwKeys);
 };

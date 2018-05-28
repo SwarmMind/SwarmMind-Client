@@ -31,9 +31,13 @@ private:
 
 	void updateSelection();
 
+	int getSelectedUnit();
+	void updateMouseSelection(Action action);
 	void updateSelectionAction(Action action, int selectedPlayerNumber);
 
 	void sendCommand(std::string action, std::string direction);
 	void updateCommandAction(Action action, std::string command, std::string direction);
+	string getDirection();
+	void updateMouseCommand(Action action, std::string command);
 	void updateCommands();
 };

@@ -8,6 +8,8 @@
 #include <imgui/imgui.h>
 #include <renderer/Sprites.h>
 
+using namespace std;
+
 Map::Map(Input& _input, Sprites& _sprites, Networker& _networker, const Configuration& _config) 
 	: input{ _input }
 	, config{_config}
@@ -48,6 +50,19 @@ void Map::updateCommandAction(Action action, std::string command, std::string di
 	}
 }
 
+void Map::updateMouseCommand(Action action, std::string command)
+{
+	string direction;
+	if (input.isActionJustReleased(action))
+	{
+		sendCommand(command, direction);
+	}
+}
+
+string Map::getDirection() {
+	return "nichts";
+}
+
 void Map::updateCommands()
 {
 	if (!selectedUnitIsValid())
@@ -59,11 +74,15 @@ void Map::updateCommands()
 	updateCommandAction(MoveUp, "move", "north");
 	updateCommandAction(MoveRight, "move", "east");
 	updateCommandAction(MoveLeft, "move", "west");
+	updateCommandAction(Move, "move", "north");
+	//updateMouseCommand(Move, "move");
 
 	updateCommandAction(ShootDown, "shoot", "south");
 	updateCommandAction(ShootUp, "shoot", "north");
 	updateCommandAction(ShootRight, "shoot", "east");
 	updateCommandAction(ShootLeft, "shoot", "west");
+	updateCommandAction(Shoot, "shoot", "north");
+	//updateMouseCommand(Shoot, "shoot");
 }
 
 void Map::updateSelection()
@@ -71,6 +90,44 @@ void Map::updateSelection()
 	updateSelectionAction(SelectUnit1, 0);
 	updateSelectionAction(SelectUnit2, 1);
 	updateSelectionAction(SelectUnit3, 2);
+	updateMouseSelection(SelectUnit);
+}
+
+int Map::getSelectedUnit(){
+
+	//doesUnitExist() is missing
+/*
+	Entity unit1 = gamestate->getUnits().at(0);
+	Entity unit2 = gamestate->getUnits().at(1);
+	Entity unit3 = gamestate->getUnits().at(2);
+
+	cout << "Mouse_x: " << input.getMousePosition("x") << endl;
+	cout << "Mouse_Y: " << input.getMousePosition("y") << endl;
+	cout << "Unit2_x: " << unit2.posX << endl;
+	cout << "Unit2_y: " << unit2.posY << endl;
+
+	if (input.getMousePosition("x") == unit1.posX && input.getMousePosition("y") == unit1.posY) { // comparing double with unsigned??
+		selectedUnit = 0;
+	}
+	if (input.getMousePosition("x") == unit2.posX && input.getMousePosition("y") == unit2.posY) { // comparing double with unsigned??
+		selectedUnit = 1;
+	}
+	if (input.getMousePosition("x") == unit3.posX && input.getMousePosition("y") == unit3.posY) { // comparing double with unsigned??
+		selectedUnit = 2;
+	}
+	else {
+		selectedUnit = -1;
+	}
+*/
+	return 2;
+}
+
+void Map::updateMouseSelection(Action action) {
+
+	if (input.isActionJustPressed(action))
+	{
+		selectedUnit = getSelectedUnit();
+	}
 }
 
 void Map::updateSelectionAction(Action action, int selectedPlayerNumber)
