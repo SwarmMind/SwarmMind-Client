@@ -7,10 +7,11 @@
 #include <vector>
 #include <array>
 #include <renderer/ParticleSystem.h>
+#include <game/Camera.h>
 
-ParticleRenderer::ParticleRenderer(GLFWwindow* _window, Renderer& _renderer)
+ParticleRenderer::ParticleRenderer(GLFWwindow* _window, Camera& _camera)
 	: window{_window}
-	, renderer{_renderer}
+	, camera{_camera}
 {
 	particleUpdateProgram = loadProgram("shaders/Passthrough.vert", "shaders/UpdateParticles.frag");
 	particleDrawingProgram = loadProgram("shaders/ParticleRendering.vert", "shaders/ParticleRendering.frag");
@@ -233,9 +234,8 @@ void ParticleRenderer::drawParticles()
 void ParticleRenderer::uploadCamera(int frameBufferWidth, int frameBufferHeight)
 {
 	glUseProgram(particleDrawingProgram);
-	Camera camera = renderer.getCamera();
-	glUniform2f(cameraPositionUniform, camera.x, camera.y);
-	glUniform2f(cameraSizeUniform, camera.width, camera.height);
+	glUniform2f(cameraPositionUniform, camera.getX(), camera.getY());
+	glUniform2f(cameraSizeUniform, camera.getWidth(), camera.getHeight());
 }
 
 void ParticleRenderer::draw(double deltaTime)

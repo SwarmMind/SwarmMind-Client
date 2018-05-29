@@ -26,7 +26,7 @@ void OpenGLRenderer::findUniformLocations()
 
 OpenGLRenderer::OpenGLRenderer(GLFWwindow* _window, Camera& _camera)
 	: window{_window}
-	, particleRenderer{ _window, *this }
+	, particleRenderer{ _window, _camera }
 	, camera {_camera}
 {
 	glEnable(GL_BLEND);

@@ -20,5 +20,4 @@ private:
 	float _x;
 	float _y;
 	float _height;
-	float _width;
 };

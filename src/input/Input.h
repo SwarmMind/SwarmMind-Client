@@ -4,6 +4,7 @@
 #include <GLFW/glfw3.h>
 #include <map>
 #include <vector>
+#include <game/Camera.h>
 
 using namespace std;
 
@@ -50,7 +51,7 @@ typedef struct MousePosition {
 class Input
 {
 public:
-	Input(GLFWwindow* window);
+	Input(GLFWwindow* window, Camera* camera);
 	~Input();
 
 	bool isActionReleased(Action action);
@@ -60,12 +61,13 @@ public:
 
 	void update();
 	double getMousePosition(string coordinate);
-	float screenToWorldCoordinate();
+	float screenToWorldCoordinate(double MousePosition);
 	//MousePosition getMousePosition();
 
 private:
 	map<Action, ActionStatus> actionStatus;
 	GLFWwindow* _window;
+	Camera* _camera;
 	double _xMousePosition, _yMousePosition;
 	
 	void updateAction(Action action);
