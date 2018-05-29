@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cstdint>
 #include <string>
+#include <cmath>
 
 #include <gamestate/Map.h>
 #include <gamestate/Gamestate.h>
@@ -120,7 +121,6 @@ int Map::getSelectedUnit()
 
 void Map::updateMouseSelection(Action action) 
 {
-
 	if (input.isActionJustPressed(action))
 	{
 		selectedUnit = getSelectedUnit();
