@@ -6,6 +6,7 @@ The SwarmMind-Client uses CMake (v.3.8 required) as its build system and has the
 1. [GLFW 3.2.1](http://www.glfw.org/)
 2. [glbinding](https://github.com/cginternals/glbinding)
 3. [socket.IO c++ client](https://github.com/socketio/socket.io-client-cpp)
+4. [glm](https://glm.g-truc.net/0.9.9/index.html)
 
 ### Building GLFW
 Follow the [build instructions](http://www.glfw.org/docs/latest/compile_guide.html#compile_generate) on the GLFW site to build the library using Cmake.
@@ -47,6 +48,10 @@ For SwarmMind-developers on Unix:
     * libboost_system_ ... .a
 
 Note: on Windows, the folder structure should look the same but all files ending with .a should end with .lib
+
+### Building glm
+Just download and unzip Version 0.9.9.0 of [glm](https://glm.g-truc.net/0.9.9/index.html).
+Run Cmake in the folder you unzipped glm to, make sure to set GLM_INSTALL_ENABLE to true.
 
 ### Adding the libraries and building the SwarmMind-Client
 1. Download the repository (either by pulling from the repository or downloading the zip file).
