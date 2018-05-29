@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cstdint>
 #include <string>
+#include <glm/glm.hpp>
 
 #include <gamestate/Map.h>
 #include <gamestate/Gamestate.h>
@@ -97,23 +98,19 @@ void Map::updateSelection()
 	updateMouseSelection(SelectUnit);
 }
 
-unsigned Map::getSpriteOfXMousePosition() 
+glm::vec2 Map::getCellOfMousePosition() 
 {
-	return floor (input.screenToWorldCoordinate(input.getMousePosition("x")));
+	return floor(input.mousePositionInWorld());
 }
 
-unsigned Map::getSpriteOfYMousePosition() 
+void Map::updateUnitSelectedByMouse()
 {
-	return floor(input.screenToWorldCoordinate(input.getMousePosition("y")));
-}
+	vector<Entity> units = gamestate->getUnits();
 
-int Map::getSelectedUnit()
-{
-	vector<Entity> unit = gamestate->getUnits();
-
-	for (int i = 0; i < unit.size(); i++) {
-		if (getSpriteOfXMousePosition() == unit[i].posX && getSpriteOfYMousePosition() == unit[i].posY) {
-			return i;
+	for (int i = 0; i < units.size(); i++) {
+		Entity& unit = units.at(i);
+		if (getCellOfMousePosition() == glm::vec2(unit.posX, unit.posY)) {
+			selectedUnit = i;
 		}
 	}
 }
@@ -123,7 +120,7 @@ void Map::updateMouseSelection(Action action)
 
 	if (input.isActionJustPressed(action))
 	{
-		selectedUnit = getSelectedUnit();
+		updateUnitSelectedByMouse();
 	}
 }
 

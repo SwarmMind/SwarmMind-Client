@@ -1,5 +1,6 @@
 #include <input/Input.h>
 #include <imgui/imgui.h>
+#include <glm/glm.hpp>
 #include <iostream>
 
 using namespace std;
@@ -116,33 +117,36 @@ void Input::setMousePosition() {
 	glfwGetCursorPos(_window, &_xMousePosition, &_yMousePosition);
 }
 
-double Input::getMousePosition(string coordinate) {
-	if (coordinate == "x") {
-		return _xMousePosition;
-	} else {
-		return _yMousePosition;
-	}
+glm::vec2 Input::getMousePosition() {
+	float xFloatMousePosition = (float)_xMousePosition;
+	float yFloatMousePosition = (float)_yMousePosition;
+	return glm::vec2(xFloatMousePosition, yFloatMousePosition);
 }
 
-float Input::screenToWorldCoordinate(double MousePosition) {
+glm::vec2 Input::mousePositionInWorld() {
+	return screenToWorldCoordinate(getMousePosition());
+}
 
-	float worldCoordinate;
+glm::vec2 Input::screenToWorldCoordinate(glm::vec2 mousePosition) {
+
 	int bufferWidth, bufferHeight;
 	glfwGetFramebufferSize(_window, &bufferWidth, &bufferHeight);
 	
-	if (MousePosition == _yMousePosition) {
-		MousePosition = bufferHeight - _yMousePosition; // set origin to lower left corner
-		MousePosition = MousePosition / bufferHeight; // normalize
-		MousePosition = MousePosition * 2 - 1; // unified screen coordinate
-		worldCoordinate = MousePosition * _camera->getHeight() + _camera->getY();
-	} 
-	else {
-		MousePosition = MousePosition / bufferWidth; // normalize
-		MousePosition = MousePosition * 2 - 1; // unified screen coordinate
-		worldCoordinate = MousePosition * _camera->getWidth() + _camera->getX();
-	}	
-		
-	return worldCoordinate;
+	// set origin to lower left corner
+	mousePosition.y = bufferHeight - mousePosition.y;
+
+	// normalize
+	mousePosition.x = mousePosition.x / bufferWidth;
+	mousePosition.y = mousePosition.y / bufferHeight; 
+
+	// unified screen coordinate
+	mousePosition.x = mousePosition.x * 2 - 1;
+	mousePosition.y = mousePosition.y * 2 - 1; 
+	
+	mousePosition.x = mousePosition.x * _camera->getWidth() + _camera->getX();
+	mousePosition.y = mousePosition.y * _camera->getHeight() + _camera->getY();	
+			
+	return glm::vec2(mousePosition.x, mousePosition.y);
 }
 
 ActionStatus::ActionStatus(vector<int> keys) 

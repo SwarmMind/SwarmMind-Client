@@ -5,6 +5,7 @@
 #include <map>
 #include <vector>
 #include <game/Camera.h>
+#include <glm/fwd.hpp>
 
 using namespace std;
 
@@ -60,18 +61,20 @@ public:
 	bool isActionJustReleased(Action action);
 
 	void update();
-	double getMousePosition(string coordinate);
-	float screenToWorldCoordinate(double MousePosition);
+	glm::vec2 Input::screenToWorldCoordinate(glm::vec2 mousePosition);
 	//MousePosition getMousePosition();
+	glm::vec2 mousePositionInWorld();
 
 private:
 	map<Action, ActionStatus> actionStatus;
 	GLFWwindow* _window;
 	Camera* _camera;
+	//glm::vec2 _mousePosition;
 	double _xMousePosition, _yMousePosition;
 	
 	void updateAction(Action action);
 	void setMousePosition();
 	bool isAnyKeyPressed(std::vector<int> glfwKeys);
 	bool isMousePressed(std::vector<int> glfwKeys);
+	glm::vec2 getMousePosition();
 };
