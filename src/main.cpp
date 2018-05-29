@@ -1,3 +1,4 @@
+#include <cstdlib>
 #include <iostream>
 #include <stdexcept>
 
@@ -14,7 +15,7 @@ int main(void)
 {
 	if (!glfwInit()) 
 	{
-		return -1;
+		return EXIT_FAILURE;
 	}
 
     try {
@@ -23,8 +24,8 @@ int main(void)
     } catch (std::runtime_error e) {
         std::cerr << e.what() << std::endl;
         glfwTerminate();
-        return -1;
+        return EXIT_FAILURE;
     }
 
-    return 0;
+    return EXIT_SUCCESS;
 }

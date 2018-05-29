@@ -2,6 +2,7 @@
 #include <cstdint>
 #include <string>
 #include <glm/glm.hpp>
+#include <cmath>
 
 #include <gamestate/Map.h>
 #include <gamestate/Gamestate.h>
@@ -117,7 +118,6 @@ void Map::updateUnitSelectedByMouse()
 
 void Map::updateMouseSelection(Action action) 
 {
-
 	if (input.isActionJustPressed(action))
 	{
 		updateUnitSelectedByMouse();

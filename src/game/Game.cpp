@@ -96,6 +96,7 @@ Game::~Game() {
 
     delete input;
     delete renderer;
+    delete camera;
     delete imguiRenderer;
 }
 
@@ -144,30 +145,7 @@ void Game::drawDebug(double timeElapsed)
 
 	if (input->isActionJustPressed(Debug))
 	{
-		ParticleSystem::spawnBloodParticles(5, 5);
-/*
-
-		ParticleSystem particles;
-
-		for (size_t i = 0; i < 10000; i++)
-		{
-			particles.dynamicData.push_back(6.5f);
-			particles.dynamicData.push_back(5.5f);
-			particles.dynamicData.push_back((float)std::rand() / (float)RAND_MAX * 1.f);
-			particles.dynamicData.push_back(0.f);
-
-			particles.staticData.push_back(((float)std::rand() / (float)RAND_MAX - 0.05f) * 5.f);
-			particles.staticData.push_back(((float)std::rand() / (float)RAND_MAX - 0.5f) * 1.f);
-			particles.staticData.push_back(0.f);
-			particles.staticData.push_back(0.f);
-
-			particles.color.push_back(255 * (float)std::rand() / (float)RAND_MAX);
-			particles.color.push_back(255 * (float)std::rand() / (float)RAND_MAX);
-			particles.color.push_back(255 * (float)std::rand() / (float)RAND_MAX);
-			particles.color.push_back(128);
-		}
-		renderer->addParticles(particles);
-*/
+		ParticleSystem::spawnBloodParticles(5.5, 5.5);
 	}
 }
 
