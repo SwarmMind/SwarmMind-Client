@@ -96,6 +96,7 @@ Game::~Game() {
 
     delete input;
     delete renderer;
+    delete camera;
     delete imguiRenderer;
 }
 
