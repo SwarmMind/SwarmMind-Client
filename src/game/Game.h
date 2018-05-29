@@ -5,6 +5,7 @@
 #include <input/Input.h>
 #include <memory>
 #include <menu/MenuState.h>
+#include <game/Camera.h>
 
 class Game {
     void createWindow();
@@ -25,6 +26,7 @@ protected:
     OpenGLRenderer *renderer;
     ImGuiRenderer *imguiRenderer;
     Input *input;
+	Camera *camera;
 
 	class Textures* textures;
 	class Sprites* sprites;

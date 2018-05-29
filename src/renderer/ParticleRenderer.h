@@ -11,7 +11,7 @@ using namespace gl41core;
 class ParticleRenderer
 {
 public:
-	ParticleRenderer(GLFWwindow* _window, class Renderer& _renderer);
+	ParticleRenderer(GLFWwindow* _window, class Camera& _camera);
 
 	~ParticleRenderer();
 
@@ -66,5 +66,5 @@ private:
 
 	GLuint cameraPositionUniform, cameraSizeUniform;
 
-	class Renderer& renderer;
+	class Camera& camera;
 };

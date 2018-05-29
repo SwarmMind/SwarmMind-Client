@@ -4,6 +4,7 @@
 #include <GLFW/glfw3.h>
 #include <map>
 #include <vector>
+#include <game/Camera.h>
 
 using namespace std;
 
@@ -12,14 +13,18 @@ enum Action {
 	MoveRight,
 	MoveUp,
 	MoveDown,
+	Move,
 	ShootLeft,
 	ShootRight,
 	ShootUp,
 	ShootDown,
+	Shoot,
 	SelectUnit1,
 	SelectUnit2,
 	SelectUnit3,
-	Debug
+	SelectUnit,
+	Debug,
+	ChooseDirection
 };
 
 typedef struct ActionStatus {
@@ -31,12 +36,22 @@ typedef struct ActionStatus {
 	bool isPressed = false;
 	bool isJustPressed = false;
 	bool isJustReleased = false;
+
 } ActionStatus;
+
+/*
+typedef struct MousePosition {
+
+	double xMousePosition;
+	double yMousePosition;
+
+} MousePosition;
+*/
 
 class Input
 {
 public:
-	Input(GLFWwindow* window);
+	Input(GLFWwindow* window, Camera* camera);
 	~Input();
 
 	bool isActionReleased(Action action);
@@ -45,11 +60,18 @@ public:
 	bool isActionJustReleased(Action action);
 
 	void update();
+	double getMousePosition(string coordinate);
+	float screenToWorldCoordinate(double MousePosition);
+	//MousePosition getMousePosition();
 
 private:
 	map<Action, ActionStatus> actionStatus;
 	GLFWwindow* _window;
-
+	Camera* _camera;
+	double _xMousePosition, _yMousePosition;
+	
 	void updateAction(Action action);
+	void setMousePosition();
 	bool isAnyKeyPressed(std::vector<int> glfwKeys);
+	bool isMousePressed(std::vector<int> glfwKeys);
 };

@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cstdint>
+#include <string>
 
 #include <gamestate/Map.h>
 #include <gamestate/Gamestate.h>
@@ -7,6 +8,8 @@
 #include <renderer/Renderer.h>
 #include <imgui/imgui.h>
 #include <renderer/Sprites.h>
+
+using namespace std;
 
 Map::Map(Input& _input, Sprites& _sprites, Networker& _networker, const Configuration& _config) 
 	: input{ _input }
@@ -48,6 +51,22 @@ void Map::updateCommandAction(Action action, std::string command, std::string di
 	}
 }
 
+void Map::updateMouseCommand(Action action, std::string command)
+{
+	string direction = getDirection();
+	if (input.isActionJustReleased(action))
+	{
+		sendCommand(command, direction);
+	}
+}
+
+string Map::getDirection() 
+{
+	// TODO!!!
+
+	return "";
+}
+
 void Map::updateCommands()
 {
 	if (!selectedUnitIsValid())
@@ -59,11 +78,15 @@ void Map::updateCommands()
 	updateCommandAction(MoveUp, "move", "north");
 	updateCommandAction(MoveRight, "move", "east");
 	updateCommandAction(MoveLeft, "move", "west");
+	//updateCommandAction(Move, "move", "north");
+	//updateMouseCommand(Move, "move");
 
 	updateCommandAction(ShootDown, "shoot", "south");
 	updateCommandAction(ShootUp, "shoot", "north");
 	updateCommandAction(ShootRight, "shoot", "east");
 	updateCommandAction(ShootLeft, "shoot", "west");
+	//updateCommandAction(Shoot, "shoot", "north");
+	//updateMouseCommand(Shoot, "shoot");
 }
 
 void Map::updateSelection()
@@ -71,6 +94,37 @@ void Map::updateSelection()
 	updateSelectionAction(SelectUnit1, 0);
 	updateSelectionAction(SelectUnit2, 1);
 	updateSelectionAction(SelectUnit3, 2);
+	updateMouseSelection(SelectUnit);
+}
+
+unsigned Map::getSpriteOfXMousePosition() 
+{
+	return floor (input.screenToWorldCoordinate(input.getMousePosition("x")));
+}
+
+unsigned Map::getSpriteOfYMousePosition() 
+{
+	return floor(input.screenToWorldCoordinate(input.getMousePosition("y")));
+}
+
+int Map::getSelectedUnit()
+{
+	vector<Entity> unit = gamestate->getUnits();
+
+	for (int i = 0; i < unit.size(); i++) {
+		if (getSpriteOfXMousePosition() == unit[i].posX && getSpriteOfYMousePosition() == unit[i].posY) {
+			return i;
+		}
+	}
+}
+
+void Map::updateMouseSelection(Action action) 
+{
+
+	if (input.isActionJustPressed(action))
+	{
+		selectedUnit = getSelectedUnit();
+	}
 }
 
 void Map::updateSelectionAction(Action action, int selectedPlayerNumber)

@@ -16,20 +16,17 @@ struct GLFWwindow;
 class OpenGLRenderer : public Renderer
 {
 public:
-	OpenGLRenderer(GLFWwindow* window);
+	OpenGLRenderer(GLFWwindow* _window, Camera& _camera);
 	~OpenGLRenderer();
 	
 	void preDraw();
 
 	virtual void drawSprite(float x, float y, float z, float width, float height, Sprite* sprite) override;
-	virtual void setCamera(float x, float y, float height) override;
-	virtual Camera getCamera() override;
 	void draw(double deltaTime);
 
 	void addParticles(ParticleSystem particles);
 
 private:
-	Camera camera;
 	virtual void uploadCamera();
 
 	void findUniformLocations();
@@ -46,6 +43,7 @@ private:
 	GLint yLocation;
 	GLint widthLocation;
 	GLint heightLocation;
+	class Camera& camera;
 
 	ParticleRenderer particleRenderer;
 };

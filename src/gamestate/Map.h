@@ -5,6 +5,7 @@
 #include <gamestate/Gamestate.h>
 #include <gamestate/Networker.h>
 #include <input/Input.h>
+#include <game/Camera.h>
 #include <string>
 
 class Map
@@ -25,15 +26,20 @@ private:
 	class Input& input;
 	class Networker& networker;
     class Configuration config;
-
+	
 	int selectedUnit = 0;
 	bool selectedUnitIsValid();
 
 	void updateSelection();
-
+	unsigned getSpriteOfXMousePosition();
+	unsigned getSpriteOfYMousePosition();
+	int getSelectedUnit();
+	void updateMouseSelection(Action action);
 	void updateSelectionAction(Action action, int selectedPlayerNumber);
 
 	void sendCommand(std::string action, std::string direction);
 	void updateCommandAction(Action action, std::string command, std::string direction);
+	string getDirection();
+	void updateMouseCommand(Action action, std::string command);
 	void updateCommands();
 };

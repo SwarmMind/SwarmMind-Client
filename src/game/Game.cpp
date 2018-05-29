@@ -57,10 +57,11 @@ Game::Game()
     createWindow();
     initializeOpenGL();
 
-    renderer = new OpenGLRenderer(window);
-	renderer->setCamera(5, 5, 6);
+	camera = new Camera(window);
+	camera->setCamera(5, 5, 6);
+    renderer = new OpenGLRenderer(window, *camera);
     imguiRenderer = new ImGuiRenderer(window);
-    input = new Input(window);
+	input = new Input(window, camera);
 
 	textures = new Textures();
 	sprites = new Sprites(*textures);

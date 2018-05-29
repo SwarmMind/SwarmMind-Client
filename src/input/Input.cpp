@@ -1,26 +1,32 @@
 #include <input/Input.h>
 #include <imgui/imgui.h>
+#include <iostream>
 
 using namespace std;
 
-Input::Input(GLFWwindow* window)
+Input::Input(GLFWwindow* window, Camera* camera)
 	: _window{window} 
+	, _camera{ camera }
 {
-	actionStatus[MoveRight] =	ActionStatus({ GLFW_KEY_D });
-	actionStatus[MoveLeft] =	ActionStatus({ GLFW_KEY_A });
-	actionStatus[MoveUp] =		ActionStatus({ GLFW_KEY_W });
-	actionStatus[MoveDown] =	ActionStatus({ GLFW_KEY_S });
+	actionStatus[MoveRight]  =	ActionStatus({ GLFW_KEY_D });
+	actionStatus[MoveLeft]   =	ActionStatus({ GLFW_KEY_A });
+	actionStatus[MoveUp]  	 =	ActionStatus({ GLFW_KEY_W });
+	actionStatus[MoveDown]   =	ActionStatus({ GLFW_KEY_S });
+	//actionStatus[Move]       = ActionStatus({ GLFW_MOUSE_BUTTON_MIDDLE });
 
 	actionStatus[ShootRight] =	ActionStatus({ GLFW_KEY_H, GLFW_KEY_RIGHT });
-	actionStatus[ShootLeft] =	ActionStatus({ GLFW_KEY_F, GLFW_KEY_LEFT });
-	actionStatus[ShootUp] =		ActionStatus({ GLFW_KEY_T, GLFW_KEY_UP });
-	actionStatus[ShootDown] =	ActionStatus({ GLFW_KEY_G, GLFW_KEY_DOWN });
+	actionStatus[ShootLeft]  =	ActionStatus({ GLFW_KEY_F, GLFW_KEY_LEFT });
+	actionStatus[ShootUp]    = 		ActionStatus({ GLFW_KEY_T, GLFW_KEY_UP });
+	actionStatus[ShootDown]  =	ActionStatus({ GLFW_KEY_G, GLFW_KEY_DOWN });
+	//actionStatus[Shoot]      = ActionStatus({ GLFW_MOUSE_BUTTON_RIGHT });
 
 	actionStatus[SelectUnit1] = ActionStatus({ GLFW_KEY_1 });
 	actionStatus[SelectUnit2] = ActionStatus({ GLFW_KEY_2 });
 	actionStatus[SelectUnit3] = ActionStatus({ GLFW_KEY_3 });
+	actionStatus[SelectUnit]  = ActionStatus({ GLFW_MOUSE_BUTTON_LEFT });
 
 	actionStatus[Debug] = ActionStatus({ GLFW_KEY_PERIOD });
+	//actionStatus[ChooseDirection] = ActionStatus({ GLFW_MOUSE_BUTTON_LEFT });
 }
 
 Input::~Input() 
@@ -50,6 +56,7 @@ bool Input::isActionJustReleased(Action action)
 
 void Input::update()
 {
+	setMousePosition();
 	for (auto& actionPair: actionStatus)
 	{
 		this->updateAction(actionPair.first);
@@ -58,14 +65,15 @@ void Input::update()
 
 void Input::updateAction(Action action)
 {
+	//std::cout << _xMousePosition << ", " << _yMousePosition << std::endl;
+
 	ActionStatus& status = actionStatus[action];
 
-	if (isAnyKeyPressed(status.glfwKeys)) {
+	if (isAnyKeyPressed(status.glfwKeys) || isMousePressed(status.glfwKeys)) {
 		status.isJustPressed = !status.isPressed;
 		status.isPressed = true;
 		status.isJustReleased = false;
-	}
-	else {
+	} else {
 		status.isJustPressed = false;
 		status.isJustReleased = status.isPressed;
 		status.isPressed = false;
@@ -85,9 +93,62 @@ bool Input::isAnyKeyPressed(std::vector<int> glfwKeys)
 	return false;
 }
 
+bool Input::isMousePressed(std::vector<int> glfwKeys) {
+	bool imGuiConsumesInput = ImGui::GetIO().WantCaptureMouse;
+
+	for (int mouseCode : glfwKeys)
+	if (glfwGetMouseButton(_window, mouseCode) == GLFW_PRESS && !imGuiConsumesInput) {
+			return true;
+	}
+	return false;
+}
+
+/*
+MousePosition Input::getMousePosition() {
+	MousePosition position; 
+	glfwGetCursorPos(_window, &position.xMousePosition, &position.yMousePosition);
+	
+	return position;
+}
+*/
+
+void Input::setMousePosition() {
+	glfwGetCursorPos(_window, &_xMousePosition, &_yMousePosition);
+}
+
+double Input::getMousePosition(string coordinate) {
+	if (coordinate == "x") {
+		return _xMousePosition;
+	} else {
+		return _yMousePosition;
+	}
+}
+
+float Input::screenToWorldCoordinate(double MousePosition) {
+
+	float worldCoordinate;
+	int bufferWidth, bufferHeight;
+	glfwGetFramebufferSize(_window, &bufferWidth, &bufferHeight);
+	
+	if (MousePosition == _yMousePosition) {
+		MousePosition = bufferHeight - _yMousePosition; // set origin to lower left corner
+		MousePosition = MousePosition / bufferHeight; // normalize
+		MousePosition = MousePosition * 2 - 1; // unified screen coordinate
+		worldCoordinate = MousePosition * _camera->getHeight() + _camera->getY();
+	} 
+	else {
+		MousePosition = MousePosition / bufferWidth; // normalize
+		MousePosition = MousePosition * 2 - 1; // unified screen coordinate
+		worldCoordinate = MousePosition * _camera->getWidth() + _camera->getX();
+	}	
+		
+	return worldCoordinate;
+}
+
 ActionStatus::ActionStatus(vector<int> keys) 
 	: glfwKeys{ keys }
 {}
 
 ActionStatus::ActionStatus()
 {}
+
