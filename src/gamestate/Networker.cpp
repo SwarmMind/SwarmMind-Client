@@ -8,31 +8,31 @@ using namespace std;
 Networker::Networker()
 	: sioSocket{nullptr}
 {
-	this->sioClient.set_reconnect_attempts(this->reconnectAttempts);
+	sioClient.set_reconnect_attempts(reconnectAttempts);
 
 	sioSocket = sioClient.socket();
-	this->sioSocket->on("initState", bind(&Networker::onInitStateReceive, this, placeholders::_1));
-	this->sioSocket->on("state", bind(&Networker::onStateReceive, this, placeholders::_1));
-	this->sioSocket->on("gameOver", [=](sio::event _event) {
-		if (this->gameOverCallback)
+	sioSocket->on("initState", bind(&Networker::onInitStateReceive, this, placeholders::_1));
+	sioSocket->on("state", bind(&Networker::onStateReceive, this, placeholders::_1));
+	sioSocket->on("gameOver", [=](sio::event _event) {
+		if (gameOverCallback)
 		{
 			lock_guard<mutex> eventGuard(queueLock);
-			eventQueue.push(this->gameOverCallback);
+			eventQueue.push(gameOverCallback);
 		}
 	});
-	this->sioClient.set_open_listener([=]() {
-		if (this->connectCallback)
+	sioClient.set_open_listener([=]() {
+		if (connectCallback)
 		{
 			lock_guard<mutex> eventGuard(queueLock);
-			eventQueue.push(this->connectCallback);
+			eventQueue.push(connectCallback);
 		}
 	});
 
-	this->sioClient.set_reconnecting_listener([=]() {
-		if (this->disconnectCallback)
+	sioClient.set_reconnecting_listener([=]() {
+		if (disconnectCallback)
 		{
 			lock_guard<mutex> eventGuard(queueLock);
-			eventQueue.push(this->disconnectCallback);
+			eventQueue.push(disconnectCallback);
 		}
 	});
 }
@@ -44,39 +44,39 @@ Networker::~Networker()
 
 void Networker::connect(std::string adress, unsigned int port /*= 3000*/)
 {
-	this->sioClient.connect(string("http://") + adress + ":" + to_string(port));
+	sioClient.connect(string("http://") + adress + ":" + to_string(port));
 
-	this->sioSocket = this->sioClient.socket();
+	sioSocket = sioClient.socket();
 }
 
 void Networker::disconnect()
 {
-	this->sioSocket->off_all();
+	sioSocket->off_all();
 
 	//These two lines are a workaround to fix a bug in Socket.IO, which causes this thread to lock forever,
 	//if sioClient.sync_close is called while the sioClient is trying to connect
 	//The bug seems to be caused, because sioClient.sync_close is waiting for a thread, which is forever
 	//trying to reconnect and never notices, that the client should actually close
-	this->sioClient.set_reconnect_attempts(0);
-	this->sioClient.connect(""); //This will cause the reconnect timer to be reset and the sio thread to be joined
+	sioClient.set_reconnect_attempts(0);
+	sioClient.connect(""); //This will cause the reconnect timer to be reset and the sio thread to be joined
 	
 	
-	this->sioClient.sync_close();
+	sioClient.sync_close();
 }
 
 bool Networker::isConnected() const
 {
-	return this->sioClient.opened();
+	return sioClient.opened();
 }
 
 void Networker::setConnectCallback(std::function<void()> callback)
 {
-	this->connectCallback = callback;
+	connectCallback = callback;
 }
 
 void Networker::setDisconnectCallback(std::function<void()> callback)
 {
-	this->disconnectCallback = callback;
+	disconnectCallback = callback;
 }
 
 void Networker::setInitStateCallback(std::function<void(Configuration, Gamestate *)> callback)
@@ -96,7 +96,7 @@ void Networker::setGameOverCallback(std::function<void()> callback)
 
 void Networker::sendCommand(std::string unitID, std::string action, std::string direction)
 {
-	if (!this->isConnected())
+	if (!isConnected())
 		return;
 
 	sio::message::list arguments;
@@ -104,7 +104,7 @@ void Networker::sendCommand(std::string unitID, std::string action, std::string 
 	arguments.push(sio::string_message::create(action));
 	arguments.push(sio::string_message::create(direction));
 
-	this->sioSocket->emit("command", arguments);
+	sioSocket->emit("command", arguments);
 }
 
 void Networker::update()
@@ -129,19 +129,19 @@ void from_json(const nlohmann::json& json, Entity& entity)
 Gamestate* Networker::parseGamestate(string jsonString)
 {
 	nlohmann::json state = nlohmann::json::parse(jsonString);
-
+    
 	vector<nlohmann::json> jsonMonsters = state["npcs"];
 	vector<nlohmann::json> jsonUnits = state["units"];
 	vector<Entity> units;
 	vector<Entity> monsters;
 	
-	for (nlohmann::json jsonUnit : jsonUnits)
+	for (const nlohmann::json& jsonUnit : jsonUnits)
 	{
 		Entity unit = jsonUnit;
 		units.push_back(unit);
 	}
 
-	for (nlohmann::json jsonMonster : jsonMonsters)
+	for (const nlohmann::json& jsonMonster : jsonMonsters)
 	{
 		Entity monster = jsonMonster;
 		monsters.push_back(monster);
@@ -152,7 +152,7 @@ Gamestate* Networker::parseGamestate(string jsonString)
 
 Configuration Networker::parseConfiguration(std::string jsonString)
 {
-	nlohmann::json jsonConfig = nlohmann::json::parse(jsonString);
+	const nlohmann::json jsonConfig = nlohmann::json::parse(jsonString);
 	Configuration config;
 	config.sizeX = jsonConfig["sizeX"];
 	config.sizeY = jsonConfig["sizeY"];
@@ -161,35 +161,31 @@ Configuration Networker::parseConfiguration(std::string jsonString)
 
 void Networker::onStateReceive(sio::event _event)
 {
-	if (this->stateCallback)
-	{
-		string jsonMessage = _event.get_message()->get_string();
-		Gamestate* state = this->parseGamestate(jsonMessage);
+	if (!stateCallback) return;
+
+	const string jsonMessage = _event.get_message()->get_string();
+	Gamestate* state = parseGamestate(jsonMessage);
 		
-		{
-			lock_guard<mutex> queueGuard(queueLock);
-			this->eventQueue.push([=]() {
-				this->stateCallback(state);
-			});
-		}
+	{
+		lock_guard<mutex> queueGuard(queueLock);
+		eventQueue.push([=]() {
+			stateCallback(state);
+		});
 	}
-	
 }
 
 void Networker::onInitStateReceive(sio::event _event)
 {
-	if (this->initStateCallback)
-	{
-		string jsonMessage = _event.get_message()->get_string();
-		nlohmann::json initState = nlohmann::json::parse(jsonMessage);
-		Configuration config = this->parseConfiguration(initState["config"].dump());
-		Gamestate* state = this->parseGamestate(initState["state"].dump());
+	if (!initStateCallback) return;
+	const string jsonMessage = _event.get_message()->get_string();
+	const nlohmann::json initState = nlohmann::json::parse(jsonMessage);
+	const Configuration config = parseConfiguration(initState["config"].dump());
+	Gamestate* state = parseGamestate(initState["state"].dump());
 
-		{
-			lock_guard<mutex> queueGuard(queueLock);
-			this->eventQueue.push([=]() {
-				this->initStateCallback(config, state);
-			});
-		}
+	{
+		lock_guard<mutex> queueGuard(queueLock);
+		eventQueue.push([=]() {
+			initStateCallback(config, state);
+		});
 	}
 }
