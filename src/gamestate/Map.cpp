@@ -165,21 +165,21 @@ void Map::draw(class Renderer& renderer)
     if (gamestate == nullptr) return;
     for (uint32_t y = 0; y < config.sizeY; y++) {
     for (uint32_t x = 0; x < config.sizeX; x++) {
-        renderer.drawSprite(x, y, 0, 1, 1, sprites.get(GridBlock));
+        renderer.drawSprite(glm::vec3{x, y, 0}, 1, 1, sprites.get(GridBlock));
     }
     }
 
     for (const auto& unit: gamestate->getUnits()) {
-        renderer.drawSprite(unit.posX, unit.posY, 1, 1, 1, sprites.get(Unit));
+        renderer.drawSprite(glm::vec3{unit.pos(), 1}, 1, 1, sprites.get(Unit));
     }
 
     for (const auto& monster: gamestate->getMonsters()) {
-        renderer.drawSprite(monster.posX, monster.posY, 1, 1, 1, sprites.get(Monster));
+        renderer.drawSprite(glm::vec3{monster.pos(), 1}, 1, 1, sprites.get(Monster));
     }
 	vector<Entity> units = gamestate->getUnits();
 	if (selectedUnitIsValid())
 	{
-		renderer.drawSprite(units[selectedUnit].posX, units[selectedUnit].posY, 0.4, 1, 1, sprites.get(SelectedBlock));
+		renderer.drawSprite(glm::vec3{units[selectedUnit].pos(), 0.4}, 1, 1, sprites.get(SelectedBlock));
 	}
 }
 

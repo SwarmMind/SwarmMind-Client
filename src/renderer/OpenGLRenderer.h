@@ -2,6 +2,7 @@
 #include <renderer/Renderer.h>
 #include <string>
 #include <glbinding/gl41core/gl.h>
+#include <glm/vec3.hpp>
 #include <map>
 #include <unordered_map>
 #include <vector>
@@ -21,7 +22,7 @@ public:
 	
 	void preDraw();
 
-	virtual void drawSprite(float x, float y, float z, float width, float height, Sprite* sprite) override;
+	virtual void drawSprite(glm::vec3 pos, float width, float height, Sprite* sprite) override;
 	void draw(double deltaTime);
 
 	void addParticles(ParticleSystem particles);

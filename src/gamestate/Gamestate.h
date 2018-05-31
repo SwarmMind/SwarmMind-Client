@@ -1,19 +1,26 @@
 #pragma once
 
+#include <cstdint>
+
 #include <vector>
 #include <string>
 
+#include <glm/vec2.hpp>
+
 struct Configuration 
 {
-	unsigned sizeX;
-	unsigned sizeY;
+	uint32_t sizeX;
+	uint32_t sizeY;
 };
 
 struct Entity
 {
 	std::string id;
-	unsigned posX;
-	unsigned posY;
+	uint32_t posX;
+	uint32_t posY;
+	glm::vec2 pos() const {
+		return glm::vec2{ posX, posY };
+	}
 };
 
 class Gamestate

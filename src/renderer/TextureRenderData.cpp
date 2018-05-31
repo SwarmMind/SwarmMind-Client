@@ -52,7 +52,7 @@ TextureRenderData::~TextureRenderData()
 	glDeleteVertexArrays(1, &secondVAO);
 }
 
-bool TextureRenderData::addData(unsigned int size, GLfloat* data)
+bool TextureRenderData::addData(unsigned int size, const GLfloat* data)
 {
 	if (!bufferIsMapped())
 	{

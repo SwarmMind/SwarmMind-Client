@@ -63,11 +63,27 @@ void OpenGLRenderer::uploadCamera()
 	glUniform1f(heightLocation, camera.getHeight());
 }
 
+std::array<GLfloat, 6*5> spriteVertices(glm::vec3 pos, float width, float height, Sprite* sprite) {
+	GLfloat u = sprite->u();
+	GLfloat v = sprite->v();
+	GLfloat u2 = sprite->u2();
+	GLfloat v2 = sprite->v2();
+
+	return std::array<GLfloat, 6*5> {
+		pos.x,			pos.y,			pos.z,			u,	v,
+		pos.x,			pos.y + height, pos.z,			u,	v2,
+		pos.x + width,	pos.y,			pos.z,			u2,	v,
+		pos.x,			pos.y + height, pos.z,			u,	v2,
+		pos.x + width,	pos.y + height,	pos.z,			u2, v2,
+		pos.x + width,	pos.y,			pos.z,			u2, v
+    };
+}
+
 /**
 *	\brief draws a sprite at the specified position
 *	\param z has to be between 0 and 1, where 1 is the most "in front" and 0 is the most "in back"
 */
-void OpenGLRenderer::drawSprite(float x, float y, float z, float width, float height, Sprite* sprite)
+void OpenGLRenderer::drawSprite(glm::vec3 pos, float width, float height, Sprite* sprite)
 {
 	unsigned int vertsPerSprite = 6;
 	unsigned int floatsPerVert = 5;
@@ -76,23 +92,12 @@ void OpenGLRenderer::drawSprite(float x, float y, float z, float width, float he
 	Texture* texture = sprite->texture();
 	TextureRenderData& textureData = renderData[texture];
 	
-	GLfloat u = sprite->u();
-	GLfloat v = sprite->v();
-	GLfloat u2 = sprite->u2();
-	GLfloat v2 = sprite->v2();
+    const auto data = spriteVertices(pos, width, height, sprite);
 
-	GLfloat data[] = { 
-		x,			y,			z,			u,	v,
-		x,			y + height, z,			u,	v2,
-		x + width,	y,			z,			u2,	v,
-		x,			y + height, z,			u,	v2,
-		x + width,	y + height,	z,			u2, v2,
-		x + width,	y,			z,			u2, v };
-
-	if (!textureData.addData(floatsPerSprite, data))
+	if (!textureData.addData(floatsPerSprite, data.data()))
 	{
 		drawTexture(texture);
-		textureData.addData(floatsPerSprite, data);
+		textureData.addData(floatsPerSprite, data.data());
 	}
 }
 
