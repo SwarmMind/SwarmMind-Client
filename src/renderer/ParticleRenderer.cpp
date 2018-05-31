@@ -208,8 +208,8 @@ void ParticleRenderer::drawParticles()
 {
 
 	glEnable(GL_BLEND);
-	glEnable(GL_DEPTH_TEST);
-	glDepthMask(GL_FALSE); //only read from the depth buffer, do not writoe
+	glDisable(GL_DEPTH_TEST);
+	glDepthMask(GL_FALSE); //only read from the depth buffer, do not write
 
 	int width, height;
 	glfwGetFramebufferSize(window, &width, &height);
