@@ -7,19 +7,19 @@ using namespace std;
 
 Input::Input(GLFWwindow* window, Camera* camera)
 	: _window{window} 
-	, _camera{ camera }
+	, _camera{camera}
 {
 	actionStatus[MoveRight]  =	ActionStatus({ GLFW_KEY_D });
 	actionStatus[MoveLeft]   =	ActionStatus({ GLFW_KEY_A });
 	actionStatus[MoveUp]  	 =	ActionStatus({ GLFW_KEY_W });
 	actionStatus[MoveDown]   =	ActionStatus({ GLFW_KEY_S });
-	//actionStatus[Move]       = ActionStatus({ GLFW_MOUSE_BUTTON_MIDDLE });
+	actionStatus[Move]       = ActionStatus({ GLFW_MOUSE_BUTTON_LEFT });
 
 	actionStatus[ShootRight] =	ActionStatus({ GLFW_KEY_H, GLFW_KEY_RIGHT });
 	actionStatus[ShootLeft]  =	ActionStatus({ GLFW_KEY_F, GLFW_KEY_LEFT });
 	actionStatus[ShootUp]    = 		ActionStatus({ GLFW_KEY_T, GLFW_KEY_UP });
 	actionStatus[ShootDown]  =	ActionStatus({ GLFW_KEY_G, GLFW_KEY_DOWN });
-	//actionStatus[Shoot]      = ActionStatus({ GLFW_MOUSE_BUTTON_RIGHT });
+	actionStatus[Shoot]      = ActionStatus({ GLFW_MOUSE_BUTTON_RIGHT });
 
 	actionStatus[SelectUnit1] = ActionStatus({ GLFW_KEY_1 });
 	actionStatus[SelectUnit2] = ActionStatus({ GLFW_KEY_2 });
@@ -66,8 +66,6 @@ void Input::update()
 
 void Input::updateAction(Action action)
 {
-	//std::cout << _xMousePosition << ", " << _yMousePosition << std::endl;
-
 	ActionStatus& status = actionStatus[action];
 
 	if (isAnyKeyPressed(status.glfwKeys) || isMousePressed(status.glfwKeys)) {
@@ -103,15 +101,6 @@ bool Input::isMousePressed(std::vector<int> glfwKeys) {
 	}
 	return false;
 }
-
-/*
-MousePosition Input::getMousePosition() {
-	MousePosition position; 
-	glfwGetCursorPos(_window, &position.xMousePosition, &position.yMousePosition);
-	
-	return position;
-}
-*/
 
 void Input::setMousePosition() {
 	glfwGetCursorPos(_window, &_xMousePosition, &_yMousePosition);

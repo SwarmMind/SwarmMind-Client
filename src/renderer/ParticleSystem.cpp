@@ -54,6 +54,40 @@ void ParticleSystem::spawnBloodParticles(float x, float y)
 	addParticles(particles);
 }
 
+void ParticleSystem::mouseDragParticles(glm::vec2 mousePosition, glm::vec2 target, glm::vec4 color, double deltaTime)
+{
+	ParticleSystem particles;
+	for (size_t i = 0; i <= 100 * deltaTime; i++) {
+		glm::vec2 offset(randomFloatBetween(-1, 1), randomFloatBetween(-1, 1));
+		offset = glm::normalize(offset) * randomFloatBetween(0.f, 0.2f);
+
+		glm::vec2 position = offset + mousePosition;
+		glm::vec2 velocity = target - position;
+		float lifeTime = randomFloatBetween(0.3, 0.7);
+		particles.addParticle(position, velocity, lifeTime, color);
+	}
+	addParticles(particles);
+}
+
+void ParticleSystem::spawnAcknowledgeParticles(glm::vec2 position)
+{
+	ParticleSystem particles;
+	for (size_t i = 0; i <100; i++)
+	{
+		glm::vec2 offset(randomFloatBetween(-1, 1), randomFloatBetween(-1, 1));
+		offset = glm::normalize(offset);
+		glm::vec2 direction = offset;
+
+		offset *= randomFloatBetween(0, 0.1);
+		direction *= randomFloatBetween(0.5, 1);
+
+		GLfloat lifeTime = randomFloatBetween(0.1, 0.5);
+
+		particles.addParticle(offset + position, direction, lifeTime, glm::vec4(randomFloat(),randomFloat(), randomFloat(), 0.8));
+	}
+	addParticles(particles);
+}
+
 std::queue<ParticleSystem>& ParticleSystem::particlesToSpawn()
 {
 	return particleQueue;
@@ -94,6 +128,11 @@ void ParticleSystem::addParticle(GLfloat x, GLfloat y, GLfloat xVelocity, GLfloa
 	color.push_back(g);
 	color.push_back(b);
 	color.push_back(alpha);
+}
+
+void ParticleSystem::addParticle(glm::vec2 position, glm::vec2 velocity, float lifeTime, glm::vec4 color)
+{
+	addParticle(position.x, position.y, velocity.x, velocity.y, lifeTime, color.x * 255, color.y * 255, color.z * 255, color.w * 255);
 }
 
 template<class T>

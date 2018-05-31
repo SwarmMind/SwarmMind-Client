@@ -10,6 +10,7 @@
 #include <renderer/Renderer.h>
 #include <imgui/imgui.h>
 #include <renderer/Sprites.h>
+#include <renderer/ParticleSystem.h>
 
 using namespace std;
 
@@ -53,24 +54,49 @@ void Map::updateCommandAction(Action action, std::string command, std::string di
 	}
 }
 
-void Map::updateMouseCommand(Action action, std::string command)
+void Map::updateMouseCommand(Action action, std::string command, double deltaTime)
 {
-	string direction = getDirection();
+	float minimumDragDistance = 0.5;
+	if (input.isActionJustPressed(action))
+	{
+		selectedUnit = clickedUnit(input.mousePositionInWorld());
+		mouseClickPosition = input.mousePositionInWorld();
+	}
+	if (!isUnitClicked(mouseClickPosition))
+	{
+		return;
+	}
+
 	if (input.isActionJustReleased(action))
 	{
-		sendCommand(command, direction);
+		glm::vec2 delta = input.mousePositionInWorld() - mouseClickPosition;
+		if (glm::length(delta) > minimumDragDistance)
+		{
+			if (std::abs(delta.x) > std::abs(delta.y)) {
+				sendCommand(command, delta.x > 0 ? "east" : "west");
+			}
+			else {
+				sendCommand(command, delta.y > 0 ? "north" : "south");
+			}
+			ParticleSystem::spawnAcknowledgeParticles(input.mousePositionInWorld());
+		}
+	}
+
+	if (input.isActionPressed(action))
+	{
+		glm::vec2 delta = input.mousePositionInWorld() - mouseClickPosition;
+		if (glm::length(delta) > minimumDragDistance)
+		{
+			ParticleSystem::mouseDragParticles(input.mousePositionInWorld(), mouseClickPosition, action == Move ? glm::vec4(0.1, 0.8, 0.1, 0.7) : glm::vec4(1, 0.5, 0.1, 0.8), deltaTime);
+		}
 	}
 }
 
-string Map::getDirection() 
+void Map::updateCommands(double deltaTime)
 {
-	// TODO!!!
+	updateMouseCommand(Move, "move", deltaTime);
+	updateMouseCommand(Shoot, "shoot", deltaTime);
 
-	return "";
-}
-
-void Map::updateCommands()
-{
 	if (!selectedUnitIsValid())
 	{
 		return;
@@ -80,15 +106,13 @@ void Map::updateCommands()
 	updateCommandAction(MoveUp, "move", "north");
 	updateCommandAction(MoveRight, "move", "east");
 	updateCommandAction(MoveLeft, "move", "west");
-	//updateCommandAction(Move, "move", "north");
-	//updateMouseCommand(Move, "move");
+	//updateCommandAction(Move, "move", "north");	
 
 	updateCommandAction(ShootDown, "shoot", "south");
 	updateCommandAction(ShootUp, "shoot", "north");
 	updateCommandAction(ShootRight, "shoot", "east");
 	updateCommandAction(ShootLeft, "shoot", "west");
-	//updateCommandAction(Shoot, "shoot", "north");
-	//updateMouseCommand(Shoot, "shoot");
+	//updateCommandAction(Shoot, "shoot", "north");	
 }
 
 void Map::updateSelection()
@@ -96,7 +120,6 @@ void Map::updateSelection()
 	updateSelectionAction(SelectUnit1, 0);
 	updateSelectionAction(SelectUnit2, 1);
 	updateSelectionAction(SelectUnit3, 2);
-	updateMouseSelection(SelectUnit);
 }
 
 glm::vec2 Map::getCellOfMousePosition() 
@@ -104,24 +127,20 @@ glm::vec2 Map::getCellOfMousePosition()
 	return floor(input.mousePositionInWorld());
 }
 
-void Map::updateUnitSelectedByMouse()
-{
-	vector<Entity> units = gamestate->getUnits();
-
-	for (int i = 0; i < units.size(); i++) {
-		Entity& unit = units.at(i);
-		if (getCellOfMousePosition() == glm::vec2(unit.posX, unit.posY)) {
-			selectedUnit = i;
-		}
-	}
+bool Map::isUnitClicked(glm::vec2 mousePosition) {
+	return clickedUnit(mousePosition) != -1;
 }
 
-void Map::updateMouseSelection(Action action) 
+int Map::clickedUnit(glm::vec2 mousePosition)
 {
-	if (input.isActionJustPressed(action))
-	{
-		updateUnitSelectedByMouse();
+	vector<Entity> units = gamestate->getUnits();
+	for (int i = 0; i < units.size(); i++) {
+		Entity& unit = units.at(i);
+		if (glm::floor(mousePosition) == glm::vec2(unit.posX, unit.posY)) {
+			return i;
+		}
 	}
+	return -1;
 }
 
 void Map::updateSelectionAction(Action action, int selectedPlayerNumber)
@@ -138,7 +157,7 @@ void Map::update(double deltaTime)
 		return;
 
 	updateSelection();
-	updateCommands();
+	updateCommands(deltaTime);
 }
 
 void Map::draw(class Renderer& renderer)

@@ -7,7 +7,7 @@
 #include <input/Input.h>
 #include <game/Camera.h>
 #include <string>
-#include <glm/fwd.hpp>
+#include <glm/vec2.hpp>
 
 class Map
 {
@@ -30,16 +30,16 @@ private:
 	
 	int selectedUnit = 0;
 	bool selectedUnitIsValid();
+	glm::vec2 mouseClickPosition;
 
 	void updateSelection();
-	glm::vec2 Map::getCellOfMousePosition();
-	void updateUnitSelectedByMouse();
-	void updateMouseSelection(Action action);
+	glm::vec2 getCellOfMousePosition();
 	void updateSelectionAction(Action action, int selectedPlayerNumber);
+	bool isUnitClicked(glm::vec2 mousePosition);
+	int clickedUnit(glm::vec2 mousePosition);
 
 	void sendCommand(std::string action, std::string direction);
 	void updateCommandAction(Action action, std::string command, std::string direction);
-	string getDirection();
-	void updateMouseCommand(Action action, std::string command);
-	void updateCommands();
+	void updateMouseCommand(Action action, std::string command, double deltaTime);
+	void updateCommands(double deltaTime);
 };

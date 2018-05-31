@@ -40,15 +40,6 @@ typedef struct ActionStatus {
 
 } ActionStatus;
 
-/*
-typedef struct MousePosition {
-
-	double xMousePosition;
-	double yMousePosition;
-
-} MousePosition;
-*/
-
 class Input
 {
 public:
@@ -62,14 +53,12 @@ public:
 
 	void update();
 	glm::vec2 Input::screenToWorldCoordinate(glm::vec2 mousePosition);
-	//MousePosition getMousePosition();
 	glm::vec2 mousePositionInWorld();
 
 private:
 	map<Action, ActionStatus> actionStatus;
 	GLFWwindow* _window;
 	Camera* _camera;
-	//glm::vec2 _mousePosition;
 	double _xMousePosition, _yMousePosition;
 	
 	void updateAction(Action action);

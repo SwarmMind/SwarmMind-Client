@@ -20,20 +20,24 @@ void Camera::setCamera(float x, float y, float height)
 	_height = height;
 }
 
-float Camera::getWidth() {
+float Camera::getWidth() 
+{
 	int bufferWidth, bufferHeight;
 	glfwGetFramebufferSize(_window, &bufferWidth, &bufferHeight);
 	return (static_cast<float>(bufferWidth) / static_cast<float>(bufferHeight)) * _height;
 }
 
-float Camera::getHeight() {
+float Camera::getHeight() 
+{
 	return _height;
 }
 
-float Camera::getX() {
+float Camera::getX() 
+{
 	return _x;
 }
 
-float Camera::getY() {
+float Camera::getY() 
+{
 	return _y;
 }
