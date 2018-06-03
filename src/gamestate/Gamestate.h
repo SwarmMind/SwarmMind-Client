@@ -21,6 +21,15 @@ struct Entity
 	glm::vec2 pos() const {
 		return glm::vec2{ posX, posY };
 	}
+	bool is_npc() const {
+		return id.substr(0, 3).compare("npc") == 0;
+	}
+	uint32_t intid() const {
+		return std::stoi(id.substr(is_npc() ? 3 : 4));
+	}
+	bool operator<(const Entity& rhs) const {
+		return intid() < rhs.intid() && is_npc() < rhs.is_npc();
+	}
 };
 
 class Gamestate
