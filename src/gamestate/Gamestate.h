@@ -2,6 +2,7 @@
 
 #include <cstdint>
 
+#include <map>
 #include <vector>
 #include <string>
 
@@ -32,16 +33,17 @@ struct Entity
 	}
 };
 
+using EntityMap = std::map<uint32_t, Entity>;
+
 class Gamestate
 {
 public:
-	Gamestate(std::vector<Entity> _units, std::vector<Entity> _monsters);
+	Gamestate() {}
+	Gamestate(const EntityMap& _units, const EntityMap& _monsters);
 	~Gamestate();
-
 	
-	std::vector<Entity> getUnits() const;
-	std::vector<Entity> getMonsters() const;
+	EntityMap getUnits() const;
+	EntityMap getMonsters() const;
 private:
-	std::vector<Entity> units;
-	std::vector<Entity> monsters;
+	EntityMap units, monsters;
 };

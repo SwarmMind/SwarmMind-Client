@@ -1,23 +1,26 @@
+#include <algorithm>
+
 #include <gamestate/Gamestate.h>
 
 using namespace std;
 
-Gamestate::Gamestate(vector<Entity> _units, vector<Entity> _monsters)
+Gamestate::Gamestate(const EntityMap& _units, const EntityMap& _monsters)
 	: units{_units}
 	, monsters{_monsters}
-{}
+{
+}
 
 Gamestate::~Gamestate()
 {
 
 }
 
-std::vector<Entity> Gamestate::getUnits() const
+EntityMap Gamestate::getUnits() const
 {
 	return units;
 }
 
-std::vector<Entity> Gamestate::getMonsters() const
+EntityMap Gamestate::getMonsters() const
 {
 	return monsters;
 }

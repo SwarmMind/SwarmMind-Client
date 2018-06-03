@@ -12,16 +12,19 @@
 #include <renderer/Sprites.h>
 #include <renderer/ParticleSystem.h>
 
+#include <glm/common.hpp>
+
 using namespace std;
 
 Map::Map(Input& _input, Sprites& _sprites, Networker& _networker, const Configuration& _config) 
 	: input{ _input }
 	, config{_config}
 	, networker{_networker}
-	, gamestate{nullptr}
+	, gamestate{new Gamestate{}}
+    , old_gamestate{new Gamestate{}}
 	, sprites{_sprites}
+	, lastUpdate{glfwGetTime()}
 {
-
 }
 
 Map::~Map()
@@ -31,8 +34,11 @@ Map::~Map()
 
 void Map::updateGameState(class Gamestate* newState)
 {
-	delete gamestate;
+	delete old_gamestate;
+	old_gamestate = gamestate;
 	gamestate = newState;
+
+	lastUpdate = glfwGetTime();
 }
 
 void Map::sendCommand(std::string action, std::string direction)
@@ -133,11 +139,10 @@ bool Map::isUnitClicked(glm::vec2 mousePosition) {
 
 int Map::clickedUnit(glm::vec2 mousePosition)
 {
-	vector<Entity> units = gamestate->getUnits();
-	for (int i = 0; i < units.size(); i++) {
-		Entity& unit = units.at(i);
-		if (glm::floor(mousePosition) == glm::vec2(unit.posX, unit.posY)) {
-			return i;
+	EntityMap units = gamestate->getUnits();
+	for (auto it = units.cbegin(); it != units.cend(); it++) {
+		if (glm::floor(mousePosition) == glm::vec2(it->second.posX, it->second.posY)) {
+			return it->first;
 		}
 	}
 	return -1;
@@ -160,31 +165,65 @@ void Map::update(double deltaTime)
 	updateCommands(deltaTime);
 }
 
+void Map::drawGrid(Renderer& renderer) {
+    const auto sprite = sprites.get(GridBlock);
+    glm::vec3 p;
+
+    for (p.x = 0; p.y < config.sizeY; p.y++) {
+    for (p.x = 0; p.x < config.sizeX; p.x++) {
+        renderer.drawSprite(p, 1, 1, sprite);
+    }
+    }  
+}
+
+void Map::drawEntities(Renderer& renderer) {
+	const double t = glm::smoothstep(lastUpdate, lastUpdate + moveAnimationTime, glfwGetTime());
+
+	{
+	    const auto unitsprite = sprites.get(Unit);
+	    const auto oldunits = old_gamestate->getUnits(), units = gamestate->getUnits();
+  
+		for (auto it = units.cbegin(), oldit = oldunits.cbegin(); it != units.cend(); it++) {
+			while (oldit != oldunits.cend() && oldit->first != it->first) { oldit++; }
+	        if (oldit != oldunits.cend() && oldit->first == it->first) {
+	            const glm::vec3 p { glm::mix(oldit->second.pos(), it->second.pos(), t), 1 };
+	            renderer.drawSprite(p, 1, 1, unitsprite);
+	        } else {
+		        renderer.drawSprite(glm::vec3{it->second.pos(), 1}, 1, 1, unitsprite);
+	        }
+	    }
+	}
+
+	{
+		const auto monstersprite = sprites.get(Monster);
+	    const auto oldmonsters = old_gamestate->getMonsters(), monsters = gamestate->getMonsters();
+
+		for (auto it = monsters.cbegin(), oldit = oldmonsters.cbegin(); it != monsters.cend(); it++) {
+			while (oldit != oldmonsters.cend() && oldit->first != it->first) { oldit++; }
+	        if (oldit != oldmonsters.cend() && oldit->first == it->first) {
+	            const glm::vec3 p { glm::mix(oldit->second.pos(), it->second.pos(), t), 1 };
+	            renderer.drawSprite(p, 1, 1, monstersprite);
+	        } else {
+		        renderer.drawSprite(glm::vec3{it->second.pos(), 1}, 1, 1, monstersprite);
+	        }
+	    }
+	}
+}
+
 void Map::draw(class Renderer& renderer)
 {
-    if (gamestate == nullptr) return;
-    for (uint32_t y = 0; y < config.sizeY; y++) {
-    for (uint32_t x = 0; x < config.sizeX; x++) {
-        renderer.drawSprite(glm::vec3{x, y, 0}, 1, 1, sprites.get(GridBlock));
-    }
-    }
+    drawGrid(renderer);
+    drawEntities(renderer);
 
-    for (const auto& unit: gamestate->getUnits()) {
-        renderer.drawSprite(glm::vec3{unit.pos(), 1}, 1, 1, sprites.get(Unit));
-    }
-
-    for (const auto& monster: gamestate->getMonsters()) {
-        renderer.drawSprite(glm::vec3{monster.pos(), 1}, 1, 1, sprites.get(Monster));
-    }
-	vector<Entity> units = gamestate->getUnits();
-	if (selectedUnitIsValid())
+	const auto units = gamestate->getUnits();
+	auto it = units.find(selectedUnit);
+	if (it != units.cend())
 	{
-		renderer.drawSprite(glm::vec3{units[selectedUnit].pos(), 0.4}, 1, 1, sprites.get(SelectedBlock));
+		renderer.drawSprite(glm::vec3{it->second.pos(), 0.4}, 1, 1, sprites.get(SelectedBlock));
 	}
 }
 
 bool Map::selectedUnitIsValid()
 {
-	vector<Entity> units = gamestate->getUnits();
-	return selectedUnit >= 0 && selectedUnit < units.size();
+	return gamestate->getUnits().find(selectedUnit) != gamestate->getUnits().cend();
 }

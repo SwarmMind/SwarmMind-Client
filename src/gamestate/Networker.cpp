@@ -132,19 +132,18 @@ Gamestate* Networker::parseGamestate(string jsonString)
     
 	vector<nlohmann::json> jsonMonsters = state["npcs"];
 	vector<nlohmann::json> jsonUnits = state["units"];
-	vector<Entity> units;
-	vector<Entity> monsters;
+	EntityMap units, monsters;
 	
 	for (const nlohmann::json& jsonUnit : jsonUnits)
 	{
 		Entity unit = jsonUnit;
-		units.push_back(unit);
+		units.emplace(unit.intid(), unit);
 	}
 
 	for (const nlohmann::json& jsonMonster : jsonMonsters)
 	{
 		Entity monster = jsonMonster;
-		monsters.push_back(monster);
+		monsters.emplace(monster.intid(), monster);
 	}
 	return new Gamestate(units, monsters);
 }
