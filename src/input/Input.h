@@ -52,7 +52,7 @@ public:
 	bool isActionJustReleased(Action action);
 
 	void update();
-	glm::vec2 Input::screenToWorldCoordinate(glm::vec2 mousePosition);
+	glm::vec2 screenToWorldCoordinate(glm::vec2 mousePosition);
 	glm::vec2 mousePositionInWorld();
 
 private:
