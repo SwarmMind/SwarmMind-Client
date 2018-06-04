@@ -43,8 +43,8 @@ void Map::updateGameState(class Gamestate* newState)
 
 void Map::sendCommand(std::string action, std::string direction)
 {
-	auto unit = gamestate->getUnits().find(selectedUnit);
-	if (unit != gamestate->getUnits().end()) {
+	auto unit = gamestate->units.find(selectedUnit);
+	if (unit != gamestate->units.end()) {
 		networker.sendCommand(unit->second.id, action, direction);
 	}
 }
@@ -136,7 +136,7 @@ bool Map::isUnitClicked(glm::vec2 mousePosition) {
 
 int Map::clickedUnit(glm::vec2 mousePosition)
 {
-	EntityMap units = gamestate->getUnits();
+	EntityMap units = gamestate->units;
 	for (auto it = units.cbegin(); it != units.cend(); it++) {
 		if (glm::floor(mousePosition) == glm::vec2(it->second.posX, it->second.posY)) {
 			return it->first;
@@ -178,7 +178,7 @@ void Map::drawEntities(Renderer& renderer) {
 
 	{
 	    const auto unitsprite = sprites.get(Unit);
-	    const auto oldunits = old_gamestate->getUnits(), units = gamestate->getUnits();
+	    const auto oldunits = old_gamestate->units, units = gamestate->units;
   
 		for (auto it = units.cbegin(), oldit = oldunits.cbegin(); it != units.cend(); it++) {
 			while (oldit != oldunits.cend() && oldit->first != it->first) { oldit++; }
@@ -193,7 +193,7 @@ void Map::drawEntities(Renderer& renderer) {
 
 	{
 		const auto monstersprite = sprites.get(Monster);
-	    const auto oldmonsters = old_gamestate->getMonsters(), monsters = gamestate->getMonsters();
+	    const auto oldmonsters = old_gamestate->monsters, monsters = gamestate->monsters;
 
 		for (auto it = monsters.cbegin(), oldit = oldmonsters.cbegin(); it != monsters.cend(); it++) {
 			while (oldit != oldmonsters.cend() && oldit->first != it->first) { oldit++; }
@@ -212,7 +212,7 @@ void Map::draw(class Renderer& renderer)
     drawGrid(renderer);
     drawEntities(renderer);
 
-	const auto units = gamestate->getUnits();
+	const auto units = gamestate->units;
 	auto it = units.find(selectedUnit);
 	if (it != units.cend())
 	{
@@ -222,5 +222,5 @@ void Map::draw(class Renderer& renderer)
 
 bool Map::selectedUnitIsValid()
 {
-	return gamestate->getUnits().find(selectedUnit) != gamestate->getUnits().cend();
+	return gamestate->units.find(selectedUnit) != gamestate->units.cend();
 }

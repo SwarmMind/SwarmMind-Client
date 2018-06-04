@@ -41,9 +41,6 @@ public:
 	Gamestate() {}
 	Gamestate(const EntityMap& _units, const EntityMap& _monsters);
 	~Gamestate();
-	
-	EntityMap getUnits() const;
-	EntityMap getMonsters() const;
-private:
+
 	EntityMap units, monsters;
 };

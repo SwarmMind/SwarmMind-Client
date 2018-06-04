@@ -15,12 +15,3 @@ Gamestate::~Gamestate()
 
 }
 
-EntityMap Gamestate::getUnits() const
-{
-	return units;
-}
-
-EntityMap Gamestate::getMonsters() const
-{
-	return monsters;
-}
