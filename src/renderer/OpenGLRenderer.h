@@ -8,6 +8,7 @@
 #include <vector>
 #include <renderer/TextureRenderData.h>
 #include <renderer/ParticleRenderer.h>
+#include <renderer/CommandVisualizationRenderer.h>
 
 using namespace gl41core;
 using namespace std;
@@ -23,6 +24,7 @@ public:
 	void preDraw();
 
 	virtual void drawSprite(glm::vec3 pos, float width, float height, Sprite* sprite) override;
+	virtual void drawCommandVisualizer(glm::vec3 pos, CommandVisualizer& visualizer);
 	void draw(double deltaTime);
 
 	void addParticles(ParticleSystem particles);
@@ -47,4 +49,15 @@ private:
 	class Camera& camera;
 
 	ParticleRenderer particleRenderer;
+	CommandVisualizationRenderer commandRenderer;
+
+	//////////////////////////////////////////////////////////////////////////
+	//					command visualization
+	//////////////////////////////////////////////////////////////////////////
+	GLuint commandVisualizationVertexArray;
+	GLuint positionVertexBuffer, colorVertexBuffer;
+	GLfloat* mappedPositionBuffer = nullptr;
+	GLubyte* mappedColorBuffer = nullptr;
+
+	void mapBuffer();
 };

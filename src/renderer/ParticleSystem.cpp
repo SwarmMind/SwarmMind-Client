@@ -21,7 +21,7 @@ void ParticleSystem::addParticles(ParticleSystem particles)
 void ParticleSystem::spawnTestParticles(float x, float y, float width, float height)
 {
 	ParticleSystem particles;
-	for (size_t i = 0; i < 10; i++)
+	for (size_t i = 0; i < 100; i++)
 	{
 		GLfloat directionX = randomFloatBetween(-width, width), directionY = randomFloatBetween(-height, height);
 		GLfloat lifeTime = randomFloatBetween(0.5, 1.5);

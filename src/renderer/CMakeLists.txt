@@ -21,4 +21,8 @@ set(sources
 	"renderer/OpenGLHelpers.cpp"
 	"renderer/ParticleSystem.h"
 	"renderer/ParticleSystem.cpp"
+	"renderer/CommandVisualizer.h"
+	"renderer/CommandVisualizer.cpp"
+	"renderer/CommandVisualizationRenderer.cpp"
+	"renderer/CommandVisualizationRenderer.h"
 	PARENT_SCOPE)
