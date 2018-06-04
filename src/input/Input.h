@@ -25,7 +25,10 @@ enum Action {
 	SelectUnit3,
 	SelectUnit,
 	Debug,
-	ChooseDirection
+	MoveCameraRight,
+	MoveCameraLeft,
+	MoveCameraUp,
+	MoveCameraDown
 };
 
 typedef struct ActionStatus {
