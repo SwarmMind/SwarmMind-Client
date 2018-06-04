@@ -43,13 +43,10 @@ void Map::updateGameState(class Gamestate* newState)
 
 void Map::sendCommand(std::string action, std::string direction)
 {
-	if (!selectedUnitIsValid())
-	{
-		return;
+	auto unit = gamestate->getUnits().find(selectedUnit);
+	if (unit != gamestate->getUnits().end()) {
+		networker.sendCommand(unit->second.id, action, direction);
 	}
-
-	Entity unit = gamestate->getUnits().at(selectedUnit);
-	networker.sendCommand(unit.id, action, direction);
 }
 
 void Map::updateCommandAction(Action action, std::string command, std::string direction)
