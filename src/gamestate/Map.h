@@ -24,7 +24,8 @@ public:
 	const double moveAnimationTime = 3.0;
 
 private:
-	class Gamestate* gamestate, *old_gamestate;
+	class Gamestate* gamestate;
+	class Gamestate* old_gamestate;
 	class Sprites& sprites;
 	class Input& input;
 	class Networker& networker;
@@ -37,7 +38,6 @@ private:
 	double lastUpdate;
 
 	void updateSelection();
-	glm::vec2 getCellOfMousePosition();
 	void updateSelectionAction(Action action, int selectedPlayerNumber);
 	bool isUnitClicked(glm::vec2 mousePosition);
 	int clickedUnit(glm::vec2 mousePosition);

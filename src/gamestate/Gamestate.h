@@ -8,8 +8,9 @@
 
 #include <glm/vec2.hpp>
 
-struct Configuration 
+class Configuration 
 {
+public:
 	uint32_t sizeX;
 	uint32_t sizeY;
 };

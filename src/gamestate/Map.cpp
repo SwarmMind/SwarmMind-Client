@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cstdint>
+#include <limits>
 #include <string>
 #include <glm/glm.hpp>
 #include <cmath>
@@ -13,6 +14,8 @@
 #include <renderer/ParticleSystem.h>
 
 #include <glm/common.hpp>
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/norm.hpp>
 
 using namespace std;
 
@@ -63,6 +66,7 @@ void Map::updateMouseCommand(Action action, std::string command, double deltaTim
 	if (input.isActionJustPressed(action))
 	{
 		selectedUnit = clickedUnit(input.mousePositionInWorld());
+		cout << selectedUnit << endl;
 		mouseClickPosition = input.mousePositionInWorld();
 	}
 	if (!isUnitClicked(mouseClickPosition))
@@ -125,11 +129,6 @@ void Map::updateSelection()
 	updateSelectionAction(SelectUnit3, 2);
 }
 
-glm::vec2 Map::getCellOfMousePosition() 
-{
-	return floor(input.mousePositionInWorld());
-}
-
 bool Map::isUnitClicked(glm::vec2 mousePosition) {
 	return clickedUnit(mousePosition) != -1;
 }
@@ -137,12 +136,18 @@ bool Map::isUnitClicked(glm::vec2 mousePosition) {
 int Map::clickedUnit(glm::vec2 mousePosition)
 {
 	EntityMap units = gamestate->units;
+	auto closest = units.cend();
+	float actualDistance = std::numeric_limits<float>::infinity();
+
 	for (auto it = units.cbegin(); it != units.cend(); it++) {
-		if (glm::floor(mousePosition) == glm::vec2(it->second.posX, it->second.posY)) {
-			return it->first;
+		float distance = glm::distance2(it->second.pos(), mousePosition);
+		//cout << "Distanz: " << distance << endl;
+		if (distance < actualDistance) {
+			actualDistance = distance;
+			closest = it;
 		}
 	}
-	return -1;
+	return (closest == units.cend()) ? -1 : closest->first;
 }
 
 void Map::updateSelectionAction(Action action, int selectedPlayerNumber)
@@ -164,12 +169,12 @@ void Map::update(double deltaTime)
 
 void Map::drawGrid(Renderer& renderer) {
     const auto sprite = sprites.get(GridBlock);
-    glm::vec3 p;
+    glm::vec3 p(0, 0, 0);
 
-    for (p.x = 0; p.y < config.sizeY; p.y++) {
-    for (p.x = 0; p.x < config.sizeX; p.x++) {
-        renderer.drawSprite(p, 1, 1, sprite);
-    }
+    for (p.y = 0; p.y < config.sizeY; p.y++) {
+		for (p.x = 0; p.x < config.sizeX; p.x++) {
+			renderer.drawSprite(p, 1, 1, sprite);
+		}
     }  
 }
 
