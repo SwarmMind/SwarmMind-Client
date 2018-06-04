@@ -164,7 +164,7 @@ void Map::update(double deltaTime)
 
 void Map::drawGrid(Renderer& renderer) {
     const auto sprite = sprites.get(GridBlock);
-    glm::vec3 p(0, 0, 0);
+    glm::vec3 p {0}; 
 
     for (p.y = 0; p.y < config.sizeY; p.y++) {
     for (p.x = 0; p.x < config.sizeX; p.x++) {
