@@ -5,10 +5,11 @@
 
 const unsigned int CommandVisualizer::numVertices;
 
-CommandVisualizer::CommandVisualizer(GLubyte r, GLubyte g, GLubyte b)
+CommandVisualizer::CommandVisualizer(GLubyte r, GLubyte g, GLubyte b, float _radius /*= 0.5*/)
 	: baseRed { r }
 	, baseGreen { g }
 	, baseBlue { b }
+	, radius { _radius }
 {
 	for (size_t i = 0; i < numVertices; i++)
 	{
