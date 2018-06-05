@@ -139,8 +139,7 @@ glm::vec2 Input::screenToWorldCoordinate(glm::vec2 mousePosition) {
 	
 	mousePosition.x = mousePosition.x * _camera->getWidth() + _camera->getX();
 	mousePosition.y = mousePosition.y * _camera->getHeight() + _camera->getY();	
-	
-	cout << "mausX: " << mousePosition.x << ", mausY: " << mousePosition.y << endl;
+
 	return glm::vec2(mousePosition.x, mousePosition.y);
 }
 
