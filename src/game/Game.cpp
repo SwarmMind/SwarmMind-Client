@@ -59,7 +59,7 @@ Game::Game()
     initializeOpenGL();
 
 	camera = new Camera(window);
-	camera->setCamera(5, 5, 6);
+	camera->setCamera(10, 10, 11);
     renderer = new OpenGLRenderer(window, *camera);
     imguiRenderer = new ImGuiRenderer(window);
 	input = new Input(window, camera);
@@ -143,9 +143,12 @@ void Game::drawDebug(double timeElapsed)
 
 		ImGui::Text("Current FPS: %f", 60 / timeSum);
 
-		CommandVisualizer visualizer(0, 128, 0);
-		visualizer.setCommands({ glm::vec2(-1, 1), glm::vec2(-1, 0), glm::vec2(-1, 0.1), glm::vec2(-2, -0.5), glm::vec2(1, 0.5), glm::vec2(0, -1) });
-		renderer->drawCommandVisualizer(glm::vec3(4.5, 5.5, 1), visualizer);
+		CommandVisualizer moveVisualizer(30, 255, 30);
+		moveVisualizer.setCommands({ glm::vec2(-1, 1), glm::vec2(-1, 0), glm::vec2(-1, 0.1), glm::vec2(-2, -0.5), glm::vec2(1, 0.5), glm::vec2(0, -1) });
+		renderer->drawCommandVisualizer(glm::vec3(4.5, 5.5, 1), moveVisualizer);
+		CommandVisualizer shootVisualizer(255, 30, 30, 0.7);
+		shootVisualizer.setCommands({ glm::vec2(1, -1), glm::vec2(1, 0), glm::vec2(-1, 0.1), glm::vec2(0, -0.5), glm::vec2(1, 0.5), glm::vec2(1, -1) });
+		renderer->drawCommandVisualizer(glm::vec3(4.5, 5.5, 1), shootVisualizer);
 	}
 
 	if (input->isActionJustPressed(Debug))

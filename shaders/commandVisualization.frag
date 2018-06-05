@@ -9,7 +9,7 @@ out vec4 outputColor;
 
 float calculateAlpha()
 {
-	return min((-20 * pow(v_distanceToCenter - 0.7, 2) + 1.5) * v_color.a, 1.0);
+	return min((-40 * pow(v_distanceToCenter - 0.9, 2) + 1.5) * sin(1.7 * v_color.a), 1.0);
 	//float curveValue = sin(2.5 * pow(v_distanceToCenter, 2));
 	//return curveValue * pow(mix(v_color.a, 1.0, curveValue), 10);
 }

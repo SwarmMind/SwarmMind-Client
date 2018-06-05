@@ -9,7 +9,7 @@ using namespace gl41core;
 class CommandVisualizer
 {
 public:
-	CommandVisualizer(GLubyte r, GLubyte g, GLubyte b);
+	CommandVisualizer(GLubyte r, GLubyte g, GLubyte b, float _radius = 0.5);
 
 	~CommandVisualizer();
 
@@ -19,6 +19,7 @@ public:
 	std::array<GLubyte, numVertices * 4> vertexColors;
 	
 	GLubyte baseRed, baseGreen, baseBlue;
+	float radius;
 private:
 	size_t visualizationRadius = 2;
 	float directionAngle(glm::vec2 direction);

@@ -71,6 +71,7 @@ void CommandVisualizationRenderer::draw()
 	unmapBuffers();
 	glBindVertexArray(vertexArrayObject);
 	glUseProgram(program);
+	glDisable(GL_DEPTH_TEST);
 
 	glMultiDrawArrays(GL_TRIANGLE_FAN, offsets.data(), counts.data(), previousBufferOffset / (CommandVisualizer::numVertices + 1));
 	//glDrawArrays(GL_TRIANGLE_FAN, 0, previousBufferOffset);
@@ -94,7 +95,7 @@ void CommandVisualizationRenderer::drawCommandVisualizer(glm::vec3 pos, CommandV
 
 	memcpy(mappedColorBuffer + bufferOffset * bytesPerVertex, visualizer.vertexColors.data(), CommandVisualizer::numVertices * bytesPerVertex * sizeof(GLubyte));
 
-	glm::vec2 offset(-0.5, 0);
+	glm::vec2 offset(-visualizer.radius, 0);
 	for (size_t i = 0; i < CommandVisualizer::numVertices; i++)
 	{
 		glm::vec4 vertexPosition = glm::vec4(pos + glm::vec3(offset, 0), 1);

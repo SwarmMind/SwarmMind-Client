@@ -5,17 +5,18 @@
 
 const unsigned int CommandVisualizer::numVertices;
 
-CommandVisualizer::CommandVisualizer(GLubyte r, GLubyte g, GLubyte b)
+CommandVisualizer::CommandVisualizer(GLubyte r, GLubyte g, GLubyte b, float _radius /*= 0.5*/)
 	: baseRed { r }
 	, baseGreen { g }
 	, baseBlue { b }
+	, radius { _radius }
 {
 	for (size_t i = 0; i < numVertices; i++)
 	{
 		vertexColors.at(i * 4) = r;
 		vertexColors.at(i * 4 + 1) = g;
 		vertexColors.at(i * 4 + 2) = b;
-		vertexColors.at(i * 4 + 3) = 255;
+		vertexColors.at(i * 4 + 3) = 0;
 	}
 }
 
