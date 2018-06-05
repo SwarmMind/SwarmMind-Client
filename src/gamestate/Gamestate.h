@@ -7,6 +7,7 @@
 #include <string>
 
 #include <glm/vec2.hpp>
+#include <gamestate/Entity.h>
 
 class Configuration 
 {
@@ -15,6 +16,7 @@ public:
 	uint32_t sizeY;
 };
 
+/*
 struct Entity
 {
 	std::string id;
@@ -32,7 +34,7 @@ struct Entity
 	bool operator<(const Entity& rhs) const {
 		return intid() < rhs.intid() && is_npc() < rhs.is_npc();
 	}
-};
+};*/
 
 using EntityMap = std::map<uint32_t, Entity>;
 

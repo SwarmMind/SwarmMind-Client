@@ -7,6 +7,7 @@
 #include <mutex>
 #include <functional>
 #include <queue>
+#include <glm/fwd.hpp>
 
 class Networker
 {
@@ -25,7 +26,7 @@ public:
 	void setStateCallback(std::function<void(Gamestate *)> callback);
 	void setGameOverCallback(std::function<void()> callback);
 
-	void sendCommand(std::string unitID, std::string action, std::string direction);
+	void sendCommand(uint32_t unitID, std::string action, glm::vec2 direction);
 
 	void update();
 

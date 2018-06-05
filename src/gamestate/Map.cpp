@@ -24,7 +24,6 @@ Map::Map(Input& _input, Sprites& _sprites, Networker& _networker, const Configur
 	, config{_config}
 	, networker{_networker}
 	, gamestate{new Gamestate{}}
-    , old_gamestate{new Gamestate{}}
 	, sprites{_sprites}
 	, lastUpdate{glfwGetTime()}
 {
@@ -37,14 +36,13 @@ Map::~Map()
 
 void Map::updateGameState(class Gamestate* newState)
 {
-	delete old_gamestate;
-	old_gamestate = gamestate;
+	delete gamestate;
 	gamestate = newState;
 
 	lastUpdate = glfwGetTime();
 }
 
-void Map::sendCommand(std::string action, std::string direction)
+void Map::sendCommand(std::string action, glm::vec2 direction)
 {
 	auto unit = gamestate->units.find(selectedUnit);
 	if (unit != gamestate->units.end()) {
@@ -54,10 +52,11 @@ void Map::sendCommand(std::string action, std::string direction)
 
 void Map::updateCommandAction(Action action, std::string command, std::string direction)
 {
-	if (input.isActionJustReleased(action))
+	//#TODO
+	/*if (input.isActionJustReleased(action))
 	{
 		sendCommand(command, direction);
-	}
+	}*/
 }
 
 void Map::updateMouseCommand(Action action, std::string command, double deltaTime)
@@ -66,7 +65,7 @@ void Map::updateMouseCommand(Action action, std::string command, double deltaTim
 	if (input.isActionJustPressed(action))
 	{
 		selectedUnit = clickedUnit(input.mousePositionInWorld());
-		cout << selectedUnit << endl;
+		//cout << selectedUnit << endl;
 		mouseClickPosition = input.mousePositionInWorld();
 	}
 	if (!isUnitClicked(mouseClickPosition))
@@ -79,12 +78,7 @@ void Map::updateMouseCommand(Action action, std::string command, double deltaTim
 		glm::vec2 delta = input.mousePositionInWorld() - mouseClickPosition;
 		if (glm::length(delta) > minimumDragDistance)
 		{
-			if (std::abs(delta.x) > std::abs(delta.y)) {
-				sendCommand(command, delta.x > 0 ? "east" : "west");
-			}
-			else {
-				sendCommand(command, delta.y > 0 ? "north" : "south");
-			}
+			sendCommand(command, glm::normalize(delta));
 			ParticleSystem::spawnAcknowledgeParticles(input.mousePositionInWorld());
 		}
 	}
@@ -140,14 +134,14 @@ int Map::clickedUnit(glm::vec2 mousePosition)
 	float actualDistance = std::numeric_limits<float>::infinity();
 
 	for (auto it = units.cbegin(); it != units.cend(); it++) {
-		float distance = glm::distance2(it->second.pos(), mousePosition);
+		float distance = glm::distance(it->second.pos(glfwGetTime() - lastUpdate), mousePosition);
 		//cout << "Distanz: " << distance << endl;
 		if (distance < actualDistance) {
 			actualDistance = distance;
 			closest = it;
 		}
 	}
-	return (closest == units.cend()) ? -1 : closest->first;
+	return (closest == units.cend() || actualDistance > 0.5f) ? -1 : closest->first;
 }
 
 void Map::updateSelectionAction(Action action, int selectedPlayerNumber)
@@ -179,36 +173,28 @@ void Map::drawGrid(Renderer& renderer) {
 }
 
 void Map::drawEntities(Renderer& renderer) {
-	const double t = glm::smoothstep(lastUpdate, lastUpdate + moveAnimationTime, glfwGetTime());
+	const double t = glfwGetTime() - lastUpdate;
 
 	{
-	    const auto unitsprite = sprites.get(Unit);
-	    const auto oldunits = old_gamestate->units, units = gamestate->units;
-  
-		for (auto it = units.cbegin(), oldit = oldunits.cbegin(); it != units.cend(); it++) {
-			while (oldit != oldunits.cend() && oldit->first != it->first) { oldit++; }
-	        if (oldit != oldunits.cend() && oldit->first == it->first) {
-	            const glm::vec3 p { glm::mix(oldit->second.pos(), it->second.pos(), t), 1 };
-	            renderer.drawSprite(p, 1, 1, unitsprite);
-	        } else {
-		        renderer.drawSprite(glm::vec3{it->second.pos(), 1}, 1, 1, unitsprite);
-	        }
-	    }
+		const EntityMap& units = gamestate->units;
+		Sprite* unitSprite = sprites.get(Unit);
+		
+		for (auto it = units.begin(); it != units.end(); it++)
+		{
+			glm::vec2 position = it->second.pos(t) - glm::vec2(0.5f, 0.5f);
+			renderer.drawSprite(glm::vec3(position, 1), 1, 1, unitSprite);
+		}
 	}
 
 	{
-		const auto monstersprite = sprites.get(Monster);
-	    const auto oldmonsters = old_gamestate->monsters, monsters = gamestate->monsters;
+		const EntityMap& monsters = gamestate->monsters;
+		Sprite* monsterSprite = sprites.get(Monster);
 
-		for (auto it = monsters.cbegin(), oldit = oldmonsters.cbegin(); it != monsters.cend(); it++) {
-			while (oldit != oldmonsters.cend() && oldit->first != it->first) { oldit++; }
-	        if (oldit != oldmonsters.cend() && oldit->first == it->first) {
-	            const glm::vec3 p { glm::mix(oldit->second.pos(), it->second.pos(), t), 1 };
-	            renderer.drawSprite(p, 1, 1, monstersprite);
-	        } else {
-		        renderer.drawSprite(glm::vec3{it->second.pos(), 1}, 1, 1, monstersprite);
-	        }
-	    }
+		for (auto it = monsters.begin(); it != monsters.end(); it++)
+		{
+			glm::vec2 position = it->second.pos(t);
+			renderer.drawSprite(glm::vec3(position - glm::vec2(0.5, 0.5), 1), 1, 1, monsterSprite);
+		}
 	}
 }
 
@@ -221,7 +207,7 @@ void Map::draw(class Renderer& renderer)
 	auto it = units.find(selectedUnit);
 	if (it != units.cend())
 	{
-		renderer.drawSprite(glm::vec3{it->second.pos(), 0.4}, 1, 1, sprites.get(SelectedBlock));
+		renderer.drawSprite(glm::vec3{it->second.pos(glfwGetTime() - lastUpdate) - glm::vec2(0.5f, 0.5f), 0.4}, 1, 1, sprites.get(SelectedBlock));
 	}
 }
 

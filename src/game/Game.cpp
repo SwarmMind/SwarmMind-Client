@@ -59,7 +59,7 @@ Game::Game()
     initializeOpenGL();
 
 	camera = new Camera(window);
-	camera->setCamera(5, 5, 6);
+	camera->setCamera(10, 10, 11);
     renderer = new OpenGLRenderer(window, *camera);
     imguiRenderer = new ImGuiRenderer(window);
 	input = new Input(window, camera);

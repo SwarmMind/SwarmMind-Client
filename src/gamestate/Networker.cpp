@@ -2,6 +2,7 @@
 #include <nlohmann/json.hpp>
 #include <mutex>
 #include <iostream>
+#include <glm/glm.hpp>
 
 using namespace std;
 
@@ -94,15 +95,19 @@ void Networker::setGameOverCallback(std::function<void()> callback)
 	gameOverCallback = callback;
 }
 
-void Networker::sendCommand(std::string unitID, std::string action, std::string direction)
+void Networker::sendCommand(uint32_t unitID, std::string action, glm::vec2 direction)
 {
 	if (!isConnected())
 		return;
 
 	sio::message::list arguments;
-	arguments.push(sio::string_message::create(unitID));
+	arguments.push(sio::string_message::create(std::to_string(unitID)));
 	arguments.push(sio::string_message::create(action));
-	arguments.push(sio::string_message::create(direction));
+	
+	nlohmann::json directionJSON;
+	directionJSON["x"] = direction.x;
+	directionJSON["y"] = direction.y;
+	arguments.push(sio::string_message::create(directionJSON.dump()));
 
 	sioSocket->emit("command", arguments);
 }
@@ -120,9 +125,10 @@ void Networker::update()
 
 void from_json(const nlohmann::json& json, Entity& entity)
 {
-	entity.posX = json["posX"];
-	entity.posY = json["posY"];
-	string id = json["ID"];
+	entity.oldPos.x = json["x"];
+	entity.oldPos.y = json["y"];
+	entity.targetPos = entity.oldPos;
+	uint32_t id = json["ID"];
 	entity.id = id; //For some reason the id string is necessary to avoid a compiler error
 }
 
@@ -131,7 +137,7 @@ Gamestate* Networker::parseGamestate(string jsonString)
 	nlohmann::json state = nlohmann::json::parse(jsonString);
     
 	vector<nlohmann::json> jsonMonsters = state["npcs"];
-	vector<nlohmann::json> jsonUnits = state["units"];
+	vector<nlohmann::json> jsonUnits = state["players"];
 	EntityMap units, monsters;
 	
 	for (const nlohmann::json& jsonUnit : jsonUnits)
@@ -145,6 +151,25 @@ Gamestate* Networker::parseGamestate(string jsonString)
 		Entity monster = jsonMonster;
 		monsters.emplace(monster.intid(), monster);
 	}
+
+	vector<nlohmann::json> commands = state["commands"];
+	for (const nlohmann::json& jsonCommand : commands)
+	{
+		/*if (jsonCommand["type"] == std::string("move"))
+		{
+			uint32_t ID = jsonCommand["ID"];
+			nlohmann::json jsonDirection = jsonCommand["direction"];
+			glm::vec2 direction(jsonDirection["x"], jsonDirection["y"]);
+			if (units.find(ID) != units.end())
+			{
+				units.at(ID).targetPos = units.at(ID).oldPos += direction;
+			}
+			if (monsters.find(ID) != monsters.end())
+			{
+				monsters.at(ID).targetPos = units.at(ID).oldPos += direction;
+			}
+		}*/
+	}
 	return new Gamestate(units, monsters);
 }
 
@@ -153,8 +178,8 @@ Configuration Networker::parseConfiguration(std::string jsonString)
 {
 	const nlohmann::json jsonConfig = nlohmann::json::parse(jsonString);
 	Configuration config;
-	config.sizeX = jsonConfig["sizeX"];
-	config.sizeY = jsonConfig["sizeY"];
+	config.sizeX = jsonConfig["width"];
+	config.sizeY = jsonConfig["height"];
 	return config;
 }
 
