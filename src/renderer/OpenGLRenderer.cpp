@@ -28,6 +28,7 @@ OpenGLRenderer::OpenGLRenderer(GLFWwindow* _window, Camera& _camera)
 	: window{_window}
 	, particleRenderer{ _window, _camera }
 	, camera {_camera}
+	, commandRenderer {_camera}
 {
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -101,6 +102,11 @@ void OpenGLRenderer::drawSprite(glm::vec3 pos, float width, float height, Sprite
 	}
 }
 
+void OpenGLRenderer::drawCommandVisualizer(glm::vec3 pos, CommandVisualizer& visualizer)
+{
+	commandRenderer.drawCommandVisualizer(pos, visualizer);
+}
+
 void OpenGLRenderer::drawTexture(Texture* texture)
 {
 	TextureRenderData& textureData = renderData[texture];
@@ -109,12 +115,6 @@ void OpenGLRenderer::drawTexture(Texture* texture)
 	textureData.draw();
 }
 
-/**
-	\brief set the view, the renderer should display
-	The width is calculated automatically according to the current aspect ratio
-	This command is best called before calling preDraw in the current frame, as otherwise the camera will not be updated for the current frame
-*/
-
 void OpenGLRenderer::preDraw()
 {
 	this->uploadCamera();
@@ -122,6 +122,8 @@ void OpenGLRenderer::preDraw()
 	glClearDepth(0.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	renderData.clear();
+
+	commandRenderer.preDraw();
 }
 
 void OpenGLRenderer::draw(double deltaTime)
@@ -140,6 +142,7 @@ void OpenGLRenderer::draw(double deltaTime)
 		drawTexture(iterator->first);
 	}
 
+	commandRenderer.draw();
 	particleRenderer.draw(deltaTime);
 }
 

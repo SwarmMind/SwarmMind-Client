@@ -21,6 +21,7 @@
 
 #include <renderer/Sprites.h>
 #include <renderer/Textures.h>
+#include <renderer/CommandVisualizer.h>
 
 
 void Game::createWindow() {
@@ -141,11 +142,15 @@ void Game::drawDebug(double timeElapsed)
 			timeSum += frameTime;
 
 		ImGui::Text("Current FPS: %f", 60 / timeSum);
+
+		CommandVisualizer visualizer(0, 128, 0);
+		visualizer.setCommands({ glm::vec2(-1, 1), glm::vec2(-1, 0), glm::vec2(-1, 0.1), glm::vec2(-2, -0.5), glm::vec2(1, 0.5), glm::vec2(0, -1) });
+		renderer->drawCommandVisualizer(glm::vec3(4.5, 5.5, 1), visualizer);
 	}
 
 	if (input->isActionJustPressed(Debug))
 	{
-		ParticleSystem::spawnBloodParticles(5.5, 5.5);
+		ParticleSystem::spawnTestParticles(5, 5, 5, 5);
 	}
 }
 
