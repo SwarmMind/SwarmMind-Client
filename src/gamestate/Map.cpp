@@ -96,7 +96,7 @@ void Map::updateMouseCommand(Action action, std::string command, double deltaTim
 void Map::updateCommands(double deltaTime)
 {
 	updateMouseCommand(Move, "move", deltaTime);
-	updateMouseCommand(Shoot, "shoot", deltaTime);
+	updateMouseCommand(Shoot, "attack", deltaTime);
 
 	if (!selectedUnitIsValid())
 	{
@@ -109,10 +109,10 @@ void Map::updateCommands(double deltaTime)
 	updateCommandAction(MoveLeft, "move", "west");
 	//updateCommandAction(Move, "move", "north");	
 
-	updateCommandAction(ShootDown, "shoot", "south");
-	updateCommandAction(ShootUp, "shoot", "north");
-	updateCommandAction(ShootRight, "shoot", "east");
-	updateCommandAction(ShootLeft, "shoot", "west");
+	updateCommandAction(ShootDown, "attack", "south");
+	updateCommandAction(ShootUp, "attack", "north");
+	updateCommandAction(ShootRight, "attack", "east");
+	updateCommandAction(ShootLeft, "attack", "west");
 	//updateCommandAction(Shoot, "shoot", "north");	
 }
 

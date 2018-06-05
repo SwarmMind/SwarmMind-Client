@@ -16,7 +16,7 @@ CommandVisualizer::CommandVisualizer(GLubyte r, GLubyte g, GLubyte b, float _rad
 		vertexColors.at(i * 4) = r;
 		vertexColors.at(i * 4 + 1) = g;
 		vertexColors.at(i * 4 + 2) = b;
-		vertexColors.at(i * 4 + 3) = 255;
+		vertexColors.at(i * 4 + 3) = 0;
 	}
 }
 

@@ -155,7 +155,7 @@ Gamestate* Networker::parseGamestate(string jsonString)
 	vector<nlohmann::json> commands = state["commands"];
 	for (const nlohmann::json& jsonCommand : commands)
 	{
-		/*if (jsonCommand["type"] == std::string("move"))
+		if (jsonCommand["type"] == std::string("move"))
 		{
 			uint32_t ID = jsonCommand["ID"];
 			nlohmann::json jsonDirection = jsonCommand["direction"];
@@ -168,7 +168,7 @@ Gamestate* Networker::parseGamestate(string jsonString)
 			{
 				monsters.at(ID).targetPos = units.at(ID).oldPos += direction;
 			}
-		}*/
+		}
 	}
 	return new Gamestate(units, monsters);
 }
