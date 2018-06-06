@@ -31,7 +31,6 @@ Input::Input(GLFWwindow* window, Camera* camera)
 	actionStatus[MoveCameraUp] = ActionStatus({ GLFW_KEY_UP });
 	actionStatus[MoveCameraDown] = ActionStatus({ GLFW_KEY_DOWN });
 
-
 	actionStatus[Debug] = ActionStatus({ GLFW_KEY_PERIOD });
 }
 
