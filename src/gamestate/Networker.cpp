@@ -104,6 +104,7 @@ void Networker::sendCommand(uint32_t unitID, std::string action, glm::vec2 direc
 	arguments.push(sio::string_message::create(std::to_string(unitID)));
 	arguments.push(sio::string_message::create(action));
 	
+	direction = glm::normalize(direction);
 	nlohmann::json directionJSON;
 	directionJSON["x"] = direction.x;
 	directionJSON["y"] = direction.y;
@@ -160,13 +161,16 @@ Gamestate* Networker::parseGamestate(string jsonString)
 			uint32_t ID = jsonCommand["ID"];
 			nlohmann::json jsonDirection = jsonCommand["direction"];
 			glm::vec2 direction(jsonDirection["x"], jsonDirection["y"]);
+			
 			if (units.find(ID) != units.end())
 			{
-				units.at(ID).targetPos = units.at(ID).oldPos += direction;
+				Entity& unit = units.at(ID);
+				unit.targetPos = unit.oldPos + direction;
 			}
 			if (monsters.find(ID) != monsters.end())
 			{
-				monsters.at(ID).targetPos = units.at(ID).oldPos += direction;
+				Entity& monster = monsters.at(ID);
+				monster.targetPos = monster.oldPos + direction;
 			}
 		}
 	}
