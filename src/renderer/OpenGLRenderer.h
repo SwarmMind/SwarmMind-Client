@@ -24,7 +24,7 @@ public:
 	void preDraw();
 
 	virtual void drawSprite(glm::vec3 pos, float width, float height, Sprite* sprite) override;
-	virtual void drawCommandVisualizer(glm::vec3 pos, CommandVisualizer& visualizer);
+	virtual void drawCommandVisualizer(glm::vec3 pos, CommandVisualizer& visualizer) override;
 	void draw(double deltaTime);
 
 	void addParticles(ParticleSystem particles);

@@ -15,13 +15,13 @@ public:
 
 	void setCommands(std::vector<glm::vec2> directions);
 	
-	static const unsigned int numVertices = 25;
+	static const unsigned int numVertices = 50;
 	std::array<GLubyte, numVertices * 4> vertexColors;
 	
 	GLubyte baseRed, baseGreen, baseBlue;
 	float radius;
 private:
-	size_t visualizationRadius = 2;
+	size_t visualizationRadius = 4;
 	float directionAngle(glm::vec2 direction);
 	size_t lowerIndex(glm::vec2 direction);
 	size_t higherIndex(glm::vec2 direction);

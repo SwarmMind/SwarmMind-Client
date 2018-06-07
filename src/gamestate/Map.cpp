@@ -16,6 +16,7 @@
 #include <glm/common.hpp>
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/norm.hpp>
+#include <renderer/CommandVisualizer.h>
 
 using namespace std;
 
@@ -179,8 +180,8 @@ void Map::drawEntities(Renderer& renderer) {
 		
 		for (auto it = units.begin(); it != units.end(); it++)
 		{
-			glm::vec2 position = it->second.pos(t) - glm::vec2(0.5f, 0.5f);
-			renderer.drawSprite(glm::vec3(position, 1), 1, 1, unitSprite);
+			glm::vec2 position = it->second.pos(t);
+			renderer.drawSprite(glm::vec3(position - glm::vec2(0.5f, 0.5f), 1), 1, 1, unitSprite);
 		}
 	}
 
