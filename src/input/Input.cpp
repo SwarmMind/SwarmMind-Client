@@ -27,11 +27,18 @@ Input::Input(GLFWwindow* window, Camera* camera)
 	actionStatus[SelectUnit]  = ActionStatus({ GLFW_MOUSE_BUTTON_LEFT });
 
 	actionStatus[MoveCameraRight] = ActionStatus({ GLFW_KEY_RIGHT });
-	actionStatus[MoveCameraLeft] = ActionStatus({ GLFW_KEY_LEFT });
-	actionStatus[MoveCameraUp] = ActionStatus({ GLFW_KEY_UP });
-	actionStatus[MoveCameraDown] = ActionStatus({ GLFW_KEY_DOWN });
+	actionStatus[MoveCameraLeft]  = ActionStatus({ GLFW_KEY_LEFT });
+	actionStatus[MoveCameraUp]    = ActionStatus({ GLFW_KEY_UP });
+	actionStatus[MoveCameraDown]  = ActionStatus({ GLFW_KEY_DOWN });
 
 	actionStatus[Debug] = ActionStatus({ GLFW_KEY_PERIOD });
+
+	glfwSetWindowUserPointer(_window, this);
+	auto scrollLambda = [](GLFWwindow* window, double xoffset, double yoffset) {
+		static_cast<Input*>(glfwGetWindowUserPointer(window))->scrollCallback(window, xoffset, yoffset);
+		
+	};
+	glfwSetScrollCallback(_window, scrollLambda);
 }
 
 Input::~Input() 
@@ -62,9 +69,37 @@ bool Input::isActionJustReleased(Action action)
 void Input::update()
 {
 	setMousePosition();
+	moveCamera();
+	
 	for (auto& actionPair: actionStatus)
 	{
 		this->updateAction(actionPair.first);
+	}
+}
+
+void Input::scrollCallback(GLFWwindow* window, double xoffset, double yoffset) 
+{
+	if (yoffset == -1) { // scrolling up means zooming in
+		_camera->setCamera(_camera->getX(), _camera->getY(), _camera->getHeight()*1.3);
+	}
+	else { // scrolling down means zooming out
+		_camera->setCamera(_camera->getX(), _camera->getY(), _camera->getHeight()*0.7);
+	}
+}
+
+void Input::moveCamera() {
+
+	if (isActionJustPressed(MoveCameraDown)) {
+		_camera->setCamera(_camera->getX(), _camera->getY() - 1, _camera->getHeight());
+	}
+	if (isActionJustReleased(MoveCameraUp)) {
+		_camera->setCamera(_camera->getX(), _camera->getY() + 1, _camera->getHeight());
+	}
+	if (isActionJustReleased(MoveCameraRight)) {
+		_camera->setCamera(_camera->getX() + 1, _camera->getY(), _camera->getHeight());
+	}
+	if (isActionJustReleased(MoveCameraLeft)) {
+		_camera->setCamera(_camera->getX() - 1, _camera->getY(), _camera->getHeight());
 	}
 }
 

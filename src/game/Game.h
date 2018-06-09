@@ -7,6 +7,8 @@
 #include <menu/MenuState.h>
 #include <game/Camera.h>
 
+//static bool g_isZoomingEnabled;
+
 class Game {
     void createWindow();
     void initializeOpenGL();
@@ -17,7 +19,7 @@ class Game {
 	void drawDebug(double timeElapsed);
 
 	void initializeImGui();
-
+	
 	std::unique_ptr<MenuState> menu;
 
 protected:
@@ -27,7 +29,7 @@ protected:
     ImGuiRenderer *imguiRenderer;
     Input *input;
 	Camera *camera;
-
+	
 	class Textures* textures;
 	class Sprites* sprites;
 
@@ -38,6 +40,6 @@ public:
 
 	void connectTo(std::string address, unsigned int port = 3000);
 	void openMainMenu();
-
-    void loop();
+	
+	void loop();
 };

@@ -3,6 +3,7 @@
 #include <string>
 #include <stdexcept>
 #include <iostream>
+#include <math.h>
 
 #include <glbinding/gl41core/gl.h>
 #include <glbinding/Binding.h>
@@ -14,54 +15,54 @@
 #include <renderer/OpenGLRenderer.h>
 #include <renderer/ParticleSystem.h>
 #include <renderer/ImGuiRenderer.h>
+#include <renderer/Sprites.h>
+#include <renderer/Textures.h>
+#include <renderer/CommandVisualizer.h>
 #include <input/Input.h>
 #include <functional>
 #include <menu/MainMenuState.h>
 #include <menu/ConnectedState.h>
 
-#include <renderer/Sprites.h>
-#include <renderer/Textures.h>
-#include <renderer/CommandVisualizer.h>
-
+using namespace std;
 
 void Game::createWindow() {
-    /* Create a windowed mode window and its OpenGL context */
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+	/* Create a windowed mode window and its OpenGL context */
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    window = glfwCreateWindow(720, 720, "SwarmMind", NULL, NULL);
-    if (!window)
-    {
-        throw std::runtime_error {
-            "GLFW window could not be created!" \
-            "Please check your graphics driver. OpenGL v4.0 is required!\n"
-        };
-    }
+	window = glfwCreateWindow(720, 720, "SwarmMind", NULL, NULL);
+	if (!window)
+	{
+		throw std::runtime_error{
+			"GLFW window could not be created!" \
+			"Please check your graphics driver. OpenGL v4.0 is required!\n"
+		};
+	}
 }
 
 void Game::initializeOpenGL() {
-    glfwMakeContextCurrent(window);
-    glfwSwapInterval(0);
-    glbinding::Binding::initialize();
+	glfwMakeContextCurrent(window);
+	glfwSwapInterval(0);
+	glbinding::Binding::initialize();
 
-    glbinding::setCallbackMaskExcept(glbinding::CallbackMask::After, { "glGetError" });
-    glbinding::setAfterCallback([](const glbinding::FunctionCall &)
-    {
-        const auto error = glGetError();
-        if (error != 0)
-            std::cout << "error: " << std::hex << error << std::endl;
-    });
+	glbinding::setCallbackMaskExcept(glbinding::CallbackMask::After, { "glGetError" });
+	glbinding::setAfterCallback([](const glbinding::FunctionCall &)
+	{
+		const auto error = glGetError();
+		if (error != 0)
+			std::cout << "error: " << std::hex << error << std::endl;
+	});
 }
 
 Game::Game()
 {
-    createWindow();
-    initializeOpenGL();
+	createWindow();
+	initializeOpenGL();
 
 	camera = new Camera(window);
 	camera->setCamera(10, 10, 11);
-    renderer = new OpenGLRenderer(window, *camera);
-    imguiRenderer = new ImGuiRenderer(window);
+	renderer = new OpenGLRenderer(window, *camera);
+	imguiRenderer = new ImGuiRenderer(window);
 	input = new Input(window, camera);
 
 	textures = new Textures();
@@ -71,7 +72,6 @@ Game::Game()
 
 	openMainMenu();
 }
-
 
 void Game::connectTo(std::string address, unsigned int port)
 {
@@ -96,7 +96,7 @@ Game::~Game() {
 	delete textures;
 
     delete input;
-    delete renderer;
+	delete renderer;
     delete camera;
     delete imguiRenderer;
 }
@@ -159,7 +159,7 @@ void Game::drawDebug(double timeElapsed)
 
 void Game::loop() {
     /* Loop until the user closes the window */
-    double lastTime = glfwGetTime();
+    double lastTime = glfwGetTime(); 
     while (!glfwWindowShouldClose(window))
     {
         const double current = glfwGetTime();
@@ -171,3 +171,4 @@ void Game::loop() {
         lastTime = current;
     }
 }
+
