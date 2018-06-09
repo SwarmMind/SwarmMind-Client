@@ -80,16 +80,17 @@ public:
 int main(void)
 {
 	{
-		myEventListener myListener(_system);
-		AnotherListener anotherListener(_system);
+	myEventListener myListener(_system);
 
-		CommandEvent _event;
-		_event.myString = "hello world!";
+	CommandEvent _event;
+	_event.myString = "hello world!";
 
-		_system.processEvent(&_event);
+	_system.processEvent(&_event);
 		
-		Event _noEvent;
-		_system.processEvent(&_noEvent);
 	}
+	AnotherListener anotherListener(_system);
+	
+	Event _noEvent;
+	_system.processEvent(&_noEvent);
 
 }

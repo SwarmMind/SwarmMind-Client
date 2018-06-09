@@ -3,7 +3,7 @@
 #include <events/Event.h>
 #include <string>
 
-class CommandEvent : Event
+class CommandEvent : public Event
 {
 public:
 	CommandEvent() = default;
