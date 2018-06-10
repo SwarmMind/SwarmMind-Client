@@ -26,8 +26,8 @@ void main(void)
     outputColor = vec4(v_color.rgb, alpha);
 }
 
-/*
-float restoredAlpha()
+
+/*float restoredAlpha()
 {
 	return v_color.a / v_distanceToCenter;
 }
