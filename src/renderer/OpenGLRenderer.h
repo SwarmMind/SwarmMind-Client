@@ -29,6 +29,9 @@ public:
 
 	void addParticles(ParticleSystem particles);
 
+
+	virtual void drawSprite(glm::vec3 pos, float width, float height, SpriteEnum sprite) override;
+
 private:
 	virtual void uploadCamera();
 
@@ -58,6 +61,9 @@ private:
 	GLuint positionVertexBuffer, colorVertexBuffer;
 	GLfloat* mappedPositionBuffer = nullptr;
 	GLubyte* mappedColorBuffer = nullptr;
+
+	Textures textures;
+	Sprites sprites;
 
 	void mapBuffer();
 };

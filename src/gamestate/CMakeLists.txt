@@ -8,4 +8,6 @@ set(sources
 	gamestate/Map.cpp
 	gamestate/Entity.h
 	gamestate/Entity.cpp
+	gamestate/Command.h
+	gamestate/Command.cpp
 	PARENT_SCOPE)

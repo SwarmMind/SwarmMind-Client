@@ -3,6 +3,7 @@
 #include <mutex>
 #include <iostream>
 #include <glm/glm.hpp>
+#include <gamestate/Entity.h>
 
 using namespace std;
 
@@ -124,14 +125,7 @@ void Networker::update()
 	}
 }
 
-void from_json(const nlohmann::json& json, Entity& entity)
-{
-	entity.oldPos.x = json["x"];
-	entity.oldPos.y = json["y"];
-	entity.targetPos = entity.oldPos;
-	uint32_t id = json["ID"];
-	entity.id = id; //For some reason the id string is necessary to avoid a compiler error
-}
+
 
 Gamestate* Networker::parseGamestate(string jsonString)
 {
@@ -139,18 +133,19 @@ Gamestate* Networker::parseGamestate(string jsonString)
     
 	vector<nlohmann::json> jsonMonsters = state["npcs"];
 	vector<nlohmann::json> jsonUnits = state["players"];
-	EntityMap units, monsters;
+	std::map<uint32_t, Unit> units;
+	std::map<uint32_t, Monster> monsters;
 	
 	for (const nlohmann::json& jsonUnit : jsonUnits)
 	{
-		Entity unit = jsonUnit;
-		units.emplace(unit.intid(), unit);
+		Unit unit(jsonUnit);
+		units.emplace(unit.id(), unit);
 	}
 
 	for (const nlohmann::json& jsonMonster : jsonMonsters)
 	{
-		Entity monster = jsonMonster;
-		monsters.emplace(monster.intid(), monster);
+		Monster monster(jsonMonster);
+		monsters.emplace(monster.id(), monster);
 	}
 
 	vector<nlohmann::json> commands = state["commands"];
@@ -161,16 +156,16 @@ Gamestate* Networker::parseGamestate(string jsonString)
 			uint32_t ID = jsonCommand["ID"];
 			nlohmann::json jsonDirection = jsonCommand["direction"];
 			glm::vec2 direction(jsonDirection["x"], jsonDirection["y"]);
-			
+
 			if (units.find(ID) != units.end())
 			{
-				Entity& unit = units.at(ID);
-				unit.targetPos = unit.oldPos + direction;
+				Unit& unit = units.at(ID);
+				unit.moveTo(unit.position() + direction);
 			}
 			if (monsters.find(ID) != monsters.end())
 			{
-				Entity& monster = monsters.at(ID);
-				monster.targetPos = monster.oldPos + direction;
+				Monster& monster = monsters.at(ID);
+				monster.moveTo(monster.position() + direction);
 			}
 		}
 	}

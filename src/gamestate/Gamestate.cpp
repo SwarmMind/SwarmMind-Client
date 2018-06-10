@@ -4,7 +4,7 @@
 
 using namespace std;
 
-Gamestate::Gamestate(const EntityMap& _units, const EntityMap& _monsters)
+Gamestate::Gamestate(const std::map<uint32_t, Unit>& _units, const std::map<uint32_t, Monster>& _monsters)
 	: units{_units}
 	, monsters{_monsters}
 {
@@ -13,5 +13,44 @@ Gamestate::Gamestate(const EntityMap& _units, const EntityMap& _monsters)
 Gamestate::~Gamestate()
 {
 
+}
+
+void Gamestate::update(double deltaTime)
+{
+	for (auto& unit : units)
+	{
+		unit.second.update(deltaTime);
+	}
+
+	for (auto& monster : monsters)
+	{
+		monster.second.update(deltaTime);
+	}
+}
+
+void Gamestate::draw(class Renderer& renderer)
+{
+	for (auto& unit : units)
+	{
+		unit.second.draw(renderer);
+	}
+
+	for (auto& monster : monsters)
+	{
+		monster.second.draw(renderer);
+	}
+}
+
+Entity* Gamestate::getEntityByID(uint32_t ID)
+{
+	if (units.find(ID) != units.end())
+	{
+		return &units.at(ID);
+	}
+	if (monsters.find(ID) != monsters.end())
+	{
+		return &monsters.at(ID);
+	}
+	return nullptr;
 }
 

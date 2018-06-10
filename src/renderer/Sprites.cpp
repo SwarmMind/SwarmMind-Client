@@ -46,9 +46,9 @@ class Sprite* Sprites::get(SpriteEnum sprite)
 std::map <SpriteEnum, SpriteInitList> Sprites::spriteTextures()
 {
 	return map<SpriteEnum, SpriteInitList>({
-		{GridBlock, {GridSpriteSheet, 0, 0.5, 0.5, 0.5}},
-		{SelectedBlock, {GridSpriteSheet, 0.5, 0, 0.5, 0.5}},
-		{Unit, {GridSpriteSheet, 0.5, 0.5, 0.5, 0.5}},
-		{Monster, {GridSpriteSheet, 0, 0, 0.5, 0.5}}
+		{ SpriteEnum::GridBlock, {GridSpriteSheet, 0, 0.5, 0.5, 0.5}},
+		{ SpriteEnum::SelectedBlock, {GridSpriteSheet, 0.5, 0, 0.5, 0.5}},
+		{ SpriteEnum::Unit, {GridSpriteSheet, 0.5, 0.5, 0.5, 0.5}},
+		{ SpriteEnum::Monster, {GridSpriteSheet, 0, 0, 0.5, 0.5}}
 	});
 }

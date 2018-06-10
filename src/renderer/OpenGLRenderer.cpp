@@ -29,6 +29,8 @@ OpenGLRenderer::OpenGLRenderer(GLFWwindow* _window, Camera& _camera)
 	, particleRenderer{ _window, _camera }
 	, camera {_camera}
 	, commandRenderer {_camera}
+	, textures{}
+	, sprites{textures}
 {
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -100,6 +102,11 @@ void OpenGLRenderer::drawSprite(glm::vec3 pos, float width, float height, Sprite
 		drawTexture(texture);
 		textureData.addData(floatsPerSprite, data.data());
 	}
+}
+
+void OpenGLRenderer::drawSprite(glm::vec3 pos, float width, float height, SpriteEnum sprite)
+{
+	drawSprite(pos, width, height, sprites.get(sprite));
 }
 
 void OpenGLRenderer::drawCommandVisualizer(glm::vec3 pos, CommandVisualizer& visualizer)

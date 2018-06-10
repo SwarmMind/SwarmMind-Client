@@ -4,7 +4,7 @@
 
 using namespace std;
 
-enum SpriteEnum
+enum class SpriteEnum
 {
 	GridBlock,
 	SelectedBlock,

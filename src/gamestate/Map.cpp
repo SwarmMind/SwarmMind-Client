@@ -47,7 +47,7 @@ void Map::sendCommand(std::string action, glm::vec2 direction)
 {
 	auto unit = gamestate->units.find(selectedUnit);
 	if (unit != gamestate->units.end()) {
-		networker.sendCommand(unit->second.id, action, direction);
+		networker.sendCommand(unit->second.id(), action, direction);
 	}
 }
 
@@ -129,12 +129,12 @@ bool Map::isUnitClicked(glm::vec2 mousePosition) {
 
 int Map::clickedUnit(glm::vec2 mousePosition)
 {
-	EntityMap units = gamestate->units;
+	std::map<uint32_t, Unit> units = gamestate->units;
 	auto closest = units.cend();
 	float actualDistance = std::numeric_limits<float>::infinity();
 
 	for (auto it = units.cbegin(); it != units.cend(); it++) {
-		float distance = glm::distance(it->second.pos(glfwGetTime() - lastUpdate), mousePosition);
+		float distance = glm::distance(it->second.position(), mousePosition);
 		if (distance < actualDistance) {
 			actualDistance = distance;
 			closest = it;
@@ -156,12 +156,13 @@ void Map::update(double deltaTime)
 	if (gamestate == nullptr)
 		return;
 
+	gamestate->update(deltaTime);
 	updateSelection();
 	updateCommands(deltaTime);
 }
 
 void Map::drawGrid(Renderer& renderer) {
-    const auto sprite = sprites.get(GridBlock);
+    const auto sprite = sprites.get(SpriteEnum::GridBlock);
 	glm::vec3 p{ 0 };
 
     for (p.y = 0; p.y < config.sizeY; p.y++) {
@@ -172,29 +173,7 @@ void Map::drawGrid(Renderer& renderer) {
 }
 
 void Map::drawEntities(Renderer& renderer) {
-	const double t = glfwGetTime() - lastUpdate;
-
-	{
-		const EntityMap& units = gamestate->units;
-		Sprite* unitSprite = sprites.get(Unit);
-		
-		for (auto it = units.begin(); it != units.end(); it++)
-		{
-			glm::vec2 position = it->second.pos(t);
-			renderer.drawSprite(glm::vec3(position - glm::vec2(0.5f, 0.5f), 1), 1, 1, unitSprite);
-		}
-	}
-
-	{
-		const EntityMap& monsters = gamestate->monsters;
-		Sprite* monsterSprite = sprites.get(Monster);
-
-		for (auto it = monsters.begin(); it != monsters.end(); it++)
-		{
-			glm::vec2 position = it->second.pos(t);
-			renderer.drawSprite(glm::vec3(position - glm::vec2(0.5, 0.5), 1), 1, 1, monsterSprite);
-		}
-	}
+	gamestate->draw(renderer);
 }
 
 void Map::draw(class Renderer& renderer)
@@ -206,7 +185,7 @@ void Map::draw(class Renderer& renderer)
 	auto it = units.find(selectedUnit);
 	if (it != units.cend())
 	{
-		renderer.drawSprite(glm::vec3{it->second.pos(glfwGetTime() - lastUpdate) - glm::vec2(0.5f, 0.5f), 0.4}, 1, 1, sprites.get(SelectedBlock));
+		renderer.drawSprite(glm::vec3{it->second.position() - glm::vec2(0.5f, 0.5f), 0.4}, 1, 1, sprites.get(SpriteEnum::SelectedBlock));
 	}
 }
 
