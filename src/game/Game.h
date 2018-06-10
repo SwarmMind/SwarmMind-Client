@@ -6,6 +6,7 @@
 #include <memory>
 #include <menu/MenuState.h>
 #include <game/Camera.h>
+#include <events/EventSystem.h>
 
 //static bool g_isZoomingEnabled;
 
@@ -32,6 +33,7 @@ protected:
 	
 	class Textures* textures;
 	class Sprites* sprites;
+	EventSystem eventSystem;
 
 public:
     Game();

@@ -9,6 +9,9 @@
 #include <glm/vec2.hpp>
 #include <gamestate/Entity.h>
 
+#include <events/EventListener.h>
+#include <events/CommandEvent.h>
+
 class Configuration 
 {
 public:
@@ -16,17 +19,19 @@ public:
 	uint32_t sizeY;
 };
 
-class Gamestate
+class Gamestate : public EventListener<CommandEvent>
 {
 public:
-	Gamestate() {}
-	Gamestate(const std::map<uint32_t, Unit>& _units, const std::map<uint32_t, Monster>& _monsters);
+	Gamestate(class EventSystem& eventSystem);
+	Gamestate(class EventSystem& eventSystem, std::map<uint32_t, Unit>& _units, const std::map<uint32_t, Monster>& _monsters);
 	~Gamestate();
 
 	void update(double deltaTime);
 	void draw(class Renderer& renderer);
 
 	Entity* getEntityByID(uint32_t ID);
+
+	void receiveEvent(CommandEvent* event) override;
 
 	std::map<uint32_t, Unit> units;
 	std::map<uint32_t, Monster> monsters;

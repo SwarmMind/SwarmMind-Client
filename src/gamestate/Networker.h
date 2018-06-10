@@ -12,7 +12,7 @@
 class Networker
 {
 public:
-	Networker();
+	Networker(class EventSystem& _eventSystem);
 
 	~Networker();
 
@@ -31,6 +31,8 @@ public:
 	void update();
 
 private:
+	class EventSystem& eventSystem;
+
 	sio::client sioClient;
 	std::shared_ptr<sio::socket> sioSocket;
 	unsigned reconnectAttempts = -1;
@@ -48,6 +50,7 @@ private:
 	void onStateReceive(sio::event event);
 	void onInitStateReceive(sio::event event);
 
-	Gamestate* parseGamestate(std::string jsonString);
+	Gamestate* parseGamestate(nlohmann::json state);
 	Configuration parseConfiguration(std::string jsonString);
+	void processCommands(nlohmann::json& commands);
 };

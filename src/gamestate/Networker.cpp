@@ -4,11 +4,15 @@
 #include <iostream>
 #include <glm/glm.hpp>
 #include <gamestate/Entity.h>
+#include <events/EventSystem.h>
+#include <memory>
+#include <gamestate/Command.h>
 
 using namespace std;
 
-Networker::Networker()
+Networker::Networker(EventSystem& _eventSystem)
 	: sioSocket{nullptr}
+	, eventSystem{_eventSystem}
 {
 	sioClient.set_reconnect_attempts(reconnectAttempts);
 
@@ -127,9 +131,8 @@ void Networker::update()
 
 
 
-Gamestate* Networker::parseGamestate(string jsonString)
+Gamestate* Networker::parseGamestate(nlohmann::json state)
 {
-	nlohmann::json state = nlohmann::json::parse(jsonString);
     
 	vector<nlohmann::json> jsonMonsters = state["npcs"];
 	vector<nlohmann::json> jsonUnits = state["players"];
@@ -148,7 +151,7 @@ Gamestate* Networker::parseGamestate(string jsonString)
 		monsters.emplace(monster.id(), monster);
 	}
 
-	vector<nlohmann::json> commands = state["commands"];
+	/*vector<nlohmann::json> commands = state["commands"];
 	for (const nlohmann::json& jsonCommand : commands)
 	{
 		if (jsonCommand["type"] == std::string("move"))
@@ -168,8 +171,8 @@ Gamestate* Networker::parseGamestate(string jsonString)
 				monster.moveTo(monster.position() + direction);
 			}
 		}
-	}
-	return new Gamestate(units, monsters);
+	}*/
+	return new Gamestate(eventSystem, units, monsters);
 }
 
 
@@ -182,12 +185,41 @@ Configuration Networker::parseConfiguration(std::string jsonString)
 	return config;
 }
 
+
+void Networker::processCommands(nlohmann::json& jsonCommands)
+{
+	std::vector<std::shared_ptr<Command>> commands;
+	for (const nlohmann::json& jsonCommand : jsonCommands)
+	{
+		std::string type = jsonCommand["type"];
+		if (type == "move")
+		{
+			nlohmann::json direction = jsonCommand["direction"];
+			auto command = std::make_shared<MoveCommand>(jsonCommand["ID"], glm::vec2(direction["x"], direction["y"]));
+			commands.push_back(command);
+		}
+	}
+	
+	{
+		std::lock_guard<std::mutex> queueGuard(queueLock);
+		eventQueue.push([=]() {
+			for (std::shared_ptr<Command> command : commands)
+			{
+				CommandEvent event;
+				event.command = command;
+				eventSystem.processEvent(&event);
+			}
+		});
+	}
+}
+
 void Networker::onStateReceive(sio::event _event)
 {
 	if (!stateCallback) return;
 
 	const string jsonMessage = _event.get_message()->get_string();
-	Gamestate* state = parseGamestate(jsonMessage);
+	nlohmann::json jsonState = nlohmann::json::parse(jsonMessage);
+	Gamestate* state = parseGamestate(jsonState);
 		
 	{
 		lock_guard<mutex> queueGuard(queueLock);
@@ -195,6 +227,8 @@ void Networker::onStateReceive(sio::event _event)
 			stateCallback(state);
 		});
 	}
+
+	processCommands(jsonState["commands"]);
 }
 
 void Networker::onInitStateReceive(sio::event _event)
@@ -203,7 +237,7 @@ void Networker::onInitStateReceive(sio::event _event)
 	const string jsonMessage = _event.get_message()->get_string();
 	const nlohmann::json initState = nlohmann::json::parse(jsonMessage);
 	const Configuration config = parseConfiguration(initState["config"].dump());
-	Gamestate* state = parseGamestate(initState["state"].dump());
+	Gamestate* state = parseGamestate(initState["state"]);
 
 	{
 		lock_guard<mutex> queueGuard(queueLock);

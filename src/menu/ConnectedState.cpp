@@ -3,12 +3,15 @@
 #include <imgui/imgui.h>
 #include <game/Game.h>
 #include <renderer/Sprites.h>
+#include <events/EventSystem.h>
 
-ConnectedState::ConnectedState(Game& _game, Sprites& _sprites, Input& _input, std::string address, unsigned port)
+ConnectedState::ConnectedState(Game& _game, Sprites& _sprites, Input& _input, EventSystem& _eventSystem, std::string address, unsigned port)
 	: input{ _input }
 	, map{nullptr}
 	, game{_game}
 	, sprites{_sprites}
+	, networker{_eventSystem}
+	, eventSystem{_eventSystem}
 {
 	enableCallbacks();
 	networker.connect(address, port);
@@ -84,7 +87,7 @@ void ConnectedState::enableCallbacks()
 void ConnectedState::onInitState(Configuration config, Gamestate *gamestate) {
 	//renderer->setCamera(config.sizeX / 2, config.sizeY / 2, config.sizeY / 2);
 
-	map = new Map{ input, sprites, networker, config };
+	map = new Map{ input, sprites, networker, eventSystem, config };
 	map->updateGameState(gamestate);
 }
 

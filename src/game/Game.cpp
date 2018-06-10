@@ -74,7 +74,7 @@ Game::Game()
 
 void Game::connectTo(std::string address, unsigned int port)
 {
-	menu = std::make_unique<ConnectedState>(*this, *sprites, *input, address, port);
+	menu = std::make_unique<ConnectedState>(*this, *sprites, *input, eventSystem, address, port);
 }
 
 void Game::openMainMenu()

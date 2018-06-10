@@ -1,14 +1,19 @@
 #include <algorithm>
 
 #include <gamestate/Gamestate.h>
+#include <events/EventSystem.h>
 
 using namespace std;
 
-Gamestate::Gamestate(const std::map<uint32_t, Unit>& _units, const std::map<uint32_t, Monster>& _monsters)
-	: units{_units}
-	, monsters{_monsters}
-{
-}
+Gamestate::Gamestate(class EventSystem& eventSystem, std::map<uint32_t, Unit>& _units, const std::map<uint32_t, Monster>& _monsters)
+	: EventListener<CommandEvent>(eventSystem)
+	, units{ _units }
+	, monsters{ _monsters }
+{}
+
+Gamestate::Gamestate(EventSystem& eventSystem)
+	: EventListener<CommandEvent>(eventSystem)
+{}
 
 Gamestate::~Gamestate()
 {
@@ -52,5 +57,11 @@ Entity* Gamestate::getEntityByID(uint32_t ID)
 		return &monsters.at(ID);
 	}
 	return nullptr;
+}
+
+void Gamestate::receiveEvent(CommandEvent* event)
+{
+
+	event->command->executeOn(*this);
 }
 

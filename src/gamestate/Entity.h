@@ -9,7 +9,7 @@
 class Entity
 {
 public:
-	virtual ~Entity();
+	virtual ~Entity() = default;
 
 	glm::vec2 position() const;
 	uint32_t id() const;

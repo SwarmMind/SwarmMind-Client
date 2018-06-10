@@ -17,16 +17,18 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/norm.hpp>
 #include <renderer/CommandVisualizer.h>
+#include <events/EventSystem.h>
 
 using namespace std;
 
-Map::Map(Input& _input, Sprites& _sprites, Networker& _networker, const Configuration& _config) 
+Map::Map(Input& _input, Sprites& _sprites, Networker& _networker, EventSystem& _eventSystem, const Configuration& _config)
 	: input{ _input }
 	, config{_config}
 	, networker{_networker}
-	, gamestate{new Gamestate{}}
+	, gamestate{new Gamestate{_eventSystem}}
 	, sprites{_sprites}
 	, lastUpdate{glfwGetTime()}
+	, eventSystem{_eventSystem}
 {
 }
 

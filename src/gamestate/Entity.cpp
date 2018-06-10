@@ -8,10 +8,6 @@ Entity::Entity(std::uint32_t _id, glm::vec2 _position)
 	, targetPos{_position}
 {}
 
-Entity::~Entity()
-{
-
-}
 
 glm::vec2 Entity::position() const
 {

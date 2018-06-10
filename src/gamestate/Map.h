@@ -13,7 +13,7 @@
 class Map
 {
 public:
-	Map(class Input& _input, class Sprites& _sprites, Networker& _networker, const class Configuration& config);
+	Map(class Input& _input, class Sprites& _sprites, Networker& _networker, class EventSystem& _eventSystem, const class Configuration& config);
 
 	~Map();
 
@@ -29,6 +29,7 @@ private:
 	class Sprites& sprites;
 	class Input& input;
 	class Networker& networker;
+	class EventSystem& eventSystem;
     class Configuration config;
 	
 	uint32_t selectedUnit = 0;

@@ -2,6 +2,8 @@
 
 #include <events/Event.h>
 #include <string>
+#include <gamestate/Command.h>
+#include <memory>
 
 class CommandEvent : public Event
 {
@@ -10,7 +12,7 @@ public:
 
 	virtual ~CommandEvent() = default;
 
-	std::string myString;
+	std::shared_ptr<Command> command;
 private:
 
 };
