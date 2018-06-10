@@ -2,6 +2,8 @@
 #include <imgui/imgui.h>
 #include <glm/glm.hpp>
 #include <iostream>
+#include <algorithm>
+#include <functional>
 
 using namespace std;
 
@@ -13,13 +15,13 @@ Input::Input(GLFWwindow* window, Camera* camera)
 	actionStatus[MoveLeft]   =	ActionStatus({ GLFW_KEY_A });
 	actionStatus[MoveUp]  	 =	ActionStatus({ GLFW_KEY_W });
 	actionStatus[MoveDown]   =	ActionStatus({ GLFW_KEY_S });
-	actionStatus[Move]       = ActionStatus({ GLFW_MOUSE_BUTTON_LEFT });
+	actionStatus[Move]       =  ActionStatus({ GLFW_MOUSE_BUTTON_LEFT });
 
 	actionStatus[ShootRight] =	ActionStatus({ GLFW_KEY_H });
 	actionStatus[ShootLeft]  =	ActionStatus({ GLFW_KEY_F });
-	actionStatus[ShootUp]    = 		ActionStatus({ GLFW_KEY_T });
+	actionStatus[ShootUp]    =  ActionStatus({ GLFW_KEY_T });
 	actionStatus[ShootDown]  =	ActionStatus({ GLFW_KEY_G });
-	actionStatus[Shoot]      = ActionStatus({ GLFW_MOUSE_BUTTON_RIGHT });
+	actionStatus[Shoot]      =  ActionStatus({ GLFW_MOUSE_BUTTON_RIGHT });
 
 	actionStatus[SelectUnit1] = ActionStatus({ GLFW_KEY_1 });
 	actionStatus[SelectUnit2] = ActionStatus({ GLFW_KEY_2 });
@@ -35,15 +37,14 @@ Input::Input(GLFWwindow* window, Camera* camera)
 
 	glfwSetWindowUserPointer(_window, this);
 	auto scrollLambda = [](GLFWwindow* window, double xoffset, double yoffset) {
-		static_cast<Input*>(glfwGetWindowUserPointer(window))->scrollCallback(window, xoffset, yoffset);
-		
+		static_cast<Input*>(glfwGetWindowUserPointer(window))->scrollCallback(window, xoffset, yoffset);		
 	};
 	glfwSetScrollCallback(_window, scrollLambda);
 }
 
 Input::~Input() 
 {
-
+	glfwSetScrollCallback(_window, nullptr);
 }
 
 bool Input::isActionReleased(Action action)
@@ -66,10 +67,10 @@ bool Input::isActionJustReleased(Action action)
 	return actionStatus[action].isJustReleased;
 }
 
-void Input::update()
+void Input::update(double deltaTime)
 {
 	setMousePosition();
-	moveCamera();
+	moveCamera(deltaTime);
 	
 	for (auto& actionPair: actionStatus)
 	{
@@ -79,27 +80,31 @@ void Input::update()
 
 void Input::scrollCallback(GLFWwindow* window, double xoffset, double yoffset) 
 {
-	if (yoffset == -1) { // scrolling up means zooming in
-		_camera->setCamera(_camera->getX(), _camera->getY(), _camera->getHeight()*1.3);
+	if (yoffset < 0) { // scrolling up
+		_camera->setCamera(_camera->getX(), _camera->getY(), std::min(_camera->getHeight()*1.3, 20.0));
 	}
-	else { // scrolling down means zooming out
-		_camera->setCamera(_camera->getX(), _camera->getY(), _camera->getHeight()*0.7);
+	else { // scrolling down
+		_camera->setCamera(_camera->getX(), _camera->getY(), std::max(_camera->getHeight()*0.7, 2.0));
 	}
 }
 
-void Input::moveCamera() {
+float Input::cameraMovementSpeed() {
+	return _camera->getHeight();
+}
 
-	if (isActionJustPressed(MoveCameraDown)) {
-		_camera->setCamera(_camera->getX(), _camera->getY() - 1, _camera->getHeight());
+void Input::moveCamera(double deltaTime) 
+{
+	if (isActionPressed(MoveCameraDown)) {
+		_camera->setCamera(_camera->getX(), _camera->getY() - cameraMovementSpeed() * deltaTime, _camera->getHeight());
 	}
-	if (isActionJustReleased(MoveCameraUp)) {
-		_camera->setCamera(_camera->getX(), _camera->getY() + 1, _camera->getHeight());
+	if (isActionPressed(MoveCameraUp)) {
+		_camera->setCamera(_camera->getX(), _camera->getY() + cameraMovementSpeed() * deltaTime, _camera->getHeight());
 	}
-	if (isActionJustReleased(MoveCameraRight)) {
-		_camera->setCamera(_camera->getX() + 1, _camera->getY(), _camera->getHeight());
+	if (isActionPressed(MoveCameraRight)) {
+		_camera->setCamera(_camera->getX() + cameraMovementSpeed() * deltaTime, _camera->getY(), _camera->getHeight());
 	}
-	if (isActionJustReleased(MoveCameraLeft)) {
-		_camera->setCamera(_camera->getX() - 1, _camera->getY(), _camera->getHeight());
+	if (isActionPressed(MoveCameraLeft)) {
+		_camera->setCamera(_camera->getX() - cameraMovementSpeed() * deltaTime, _camera->getY(), _camera->getHeight());
 	}
 }
 

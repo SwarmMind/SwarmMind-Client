@@ -3,7 +3,6 @@
 #include <string>
 #include <stdexcept>
 #include <iostream>
-#include <math.h>
 
 #include <glbinding/gl41core/gl.h>
 #include <glbinding/Binding.h>
@@ -102,11 +101,11 @@ Game::~Game() {
 }
 
 
-void Game::processInputs()
+void Game::processInputs(double deltaTime)
 {
     /* Poll for and process events */
     glfwPollEvents();
-	input->update();
+	input->update(deltaTime);
 }
 
 void Game::update(double time)
@@ -164,7 +163,7 @@ void Game::loop() {
     {
         const double current = glfwGetTime();
         const double elapsed = current - lastTime;
-        processInputs();
+        processInputs(elapsed);
 
         update(elapsed);
         render(elapsed);

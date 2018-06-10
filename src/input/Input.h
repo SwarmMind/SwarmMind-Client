@@ -54,7 +54,7 @@ public:
 	bool isActionJustPressed(Action action);
 	bool isActionJustReleased(Action action);
 
-	void update();
+	void update(double deltaTime);
 	
 	glm::vec2 screenToWorldCoordinate(glm::vec2 mousePosition);
 	glm::vec2 mousePositionInWorld();
@@ -74,5 +74,6 @@ private:
 	bool isMousePressed(std::vector<int> glfwKeys);	
 
 	void scrollCallback(GLFWwindow* window, double xoffset, double yoffset);
-	void moveCamera();
+	void moveCamera(double deltaTime);
+	float cameraMovementSpeed();
 };

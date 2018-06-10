@@ -13,7 +13,7 @@ class Game {
     void createWindow();
     void initializeOpenGL();
 
-    void processInputs();
+    void processInputs(double deltaTime);
     void update(double time);
     void render(double timeElapsed);
 	void drawDebug(double timeElapsed);
