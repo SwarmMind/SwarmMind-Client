@@ -2,7 +2,6 @@ set(sources
 	${sources}
 	events/Event.h
 	events/EventListener.h
-	events/EventListener.cpp
 	events/EventSystem.h
 	events/EventSystem.cpp
 	events/CommandEvent.h

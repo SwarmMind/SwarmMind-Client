@@ -19,10 +19,7 @@ void EventSystem::registerListener(ListenerFunction* listener)
 
 void EventSystem::removeListener(ListenerFunction* listener)
 {
-	auto iterator = std::find_if(listeners.begin(), listeners.end(), [=](const ListenerFunction* otherListener) {
-		//this will only work if the std::function object is always passed per reference, so the pointers stay intact
-		return listener == otherListener;
-	});
+	auto iterator = std::find(listeners.begin(), listeners.end(), listener);
 	if (iterator != listeners.end())
 	{
 		listeners.erase(iterator);
