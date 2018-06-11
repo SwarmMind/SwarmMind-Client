@@ -7,12 +7,14 @@ using namespace std;
 
 Gamestate::Gamestate(class EventSystem& eventSystem, std::map<uint32_t, Unit>& _units, const std::map<uint32_t, Monster>& _monsters)
 	: EventListener<CommandEvent>(eventSystem)
+	, EventListener<AccumulatedCommandsEvent>(eventSystem)
 	, units{ _units }
 	, monsters{ _monsters }
 {}
 
 Gamestate::Gamestate(EventSystem& eventSystem)
 	: EventListener<CommandEvent>(eventSystem)
+	, EventListener<AccumulatedCommandsEvent>(eventSystem)
 {}
 
 Gamestate::~Gamestate()
@@ -59,9 +61,26 @@ Entity* Gamestate::getEntityByID(uint32_t ID)
 	return nullptr;
 }
 
+void Gamestate::deleteEntity(uint32_t ID)
+{
+	units.erase(ID);
+	monsters.erase(ID);
+}
+
 void Gamestate::receiveEvent(CommandEvent* event)
 {
-
 	event->command->executeOn(*this);
 }
 
+void Gamestate::receiveEvent(AccumulatedCommandsEvent* event)
+{
+	for (AccumulatedCommands commands : event->commands)
+	{
+		Unit* unit = dynamic_cast<Unit*>(getEntityByID(commands.ID));
+		if (unit != nullptr)
+		{
+			unit->setAttackCommands(commands.attackDirections);
+			unit->setMoveCommands(commands.moveDirections);
+		}
+	}
+}

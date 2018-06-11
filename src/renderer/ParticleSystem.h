@@ -33,7 +33,7 @@ public:
 
 	static void addParticles(ParticleSystem particles);
 	static void spawnTestParticles(float x, float y, float width, float height);
-	static void spawnBloodParticles(float x, float y);
+	static void spawnBloodParticles(glm::vec2 position, glm::vec2 direction);
 	static void mouseDragParticles(glm::vec2 mousePosition, glm::vec2 target, glm::vec4 color, double deltaTime);
 	static void spawnAcknowledgeParticles(glm::vec2 position);
 

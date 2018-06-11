@@ -5,4 +5,5 @@ set(sources
 	events/EventSystem.h
 	events/EventSystem.cpp
 	events/CommandEvent.h
+	events/AccumulatedCommandsEvent.h
 	PARENT_SCOPE)

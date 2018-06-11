@@ -7,6 +7,7 @@
 #include <events/EventSystem.h>
 #include <memory>
 #include <gamestate/Command.h>
+#include <events/AccumulatedCommandsEvent.h>
 
 using namespace std;
 
@@ -19,6 +20,7 @@ Networker::Networker(EventSystem& _eventSystem)
 	sioSocket = sioClient.socket();
 	sioSocket->on("initState", bind(&Networker::onInitStateReceive, this, placeholders::_1));
 	sioSocket->on("state", bind(&Networker::onStateReceive, this, placeholders::_1));
+	sioSocket->on("accumulatedCommands", bind(&Networker::onAccumulatedCommandsReceive, this, placeholders::_1));
 	sioSocket->on("gameOver", [=](sio::event _event) {
 		if (gameOverCallback)
 		{
@@ -186,16 +188,43 @@ Configuration Networker::parseConfiguration(std::string jsonString)
 }
 
 
+std::shared_ptr<Command> Networker::parseCommand(const nlohmann::json& jsonCommand)
+{
+	std::string type = jsonCommand["type"];
+	if (type == "move")
+	{
+		nlohmann::json direction = jsonCommand["direction"];
+		auto command = std::make_shared<MoveCommand>(jsonCommand["ID"], glm::vec2(direction["x"], direction["y"]));
+		return command;
+	}
+	else if (type == "attack")
+	{
+		nlohmann::json direction = jsonCommand["direction"];
+		auto command = std::make_shared<AttackCommand>(jsonCommand["ID"], glm::vec2(direction["x"], direction["y"]));
+		return command;
+	}
+	else if (type == "damage")
+	{
+		nlohmann::json direction = jsonCommand["direction"];
+		auto command = std::make_shared<DamageCommand>(jsonCommand["ID"], glm::vec2(direction["x"], direction["y"]));
+		return command;
+	}
+	else if (type == "die")
+	{
+		auto command = std::make_shared<DieCommand>(jsonCommand["ID"].get<uint32_t>());
+		return command;
+	}
+	return nullptr;
+}
+
 void Networker::processCommands(nlohmann::json& jsonCommands)
 {
 	std::vector<std::shared_ptr<Command>> commands;
 	for (const nlohmann::json& jsonCommand : jsonCommands)
 	{
-		std::string type = jsonCommand["type"];
-		if (type == "move")
+		std::shared_ptr<Command> command = parseCommand(jsonCommand);
+		if (command != nullptr)
 		{
-			nlohmann::json direction = jsonCommand["direction"];
-			auto command = std::make_shared<MoveCommand>(jsonCommand["ID"], glm::vec2(direction["x"], direction["y"]));
 			commands.push_back(command);
 		}
 	}
@@ -243,6 +272,41 @@ void Networker::onInitStateReceive(sio::event _event)
 		lock_guard<mutex> queueGuard(queueLock);
 		eventQueue.push([=]() {
 			initStateCallback(config, state);
+		});
+	}
+}
+
+void Networker::onAccumulatedCommandsReceive(sio::event _event)
+{
+	const std::string jsonMessage = _event.get_message()->get_string();
+	nlohmann::json json = nlohmann::json::parse(jsonMessage);
+	std::vector<AccumulatedCommands> commandsList;
+	
+	for (nlohmann::json::iterator it = json.begin(); it != json.end(); it++)
+	{
+		AccumulatedCommands commands;
+		commands.ID = std::stoi(it.key());
+		std::vector<nlohmann::json> jsonAttackCommands = it.value()["attack"];
+		for (nlohmann::json jsonCommand : jsonAttackCommands)
+		{
+			commands.attackDirections.push_back(glm::vec2(jsonCommand["x"], jsonCommand["y"]));
+		}
+
+		std::vector<nlohmann::json> jsonMoveCommands = it.value()["move"];
+		for (nlohmann::json jsonCommand : jsonMoveCommands)
+		{
+			commands.moveDirections.push_back(glm::vec2(jsonCommand["x"], jsonCommand["y"]));
+		}
+
+		commandsList.push_back(commands);
+	}
+	
+	{
+		std::lock_guard<std::mutex> queueGuard(queueLock);
+		eventQueue.push([=]() {
+			AccumulatedCommandsEvent accumulatedCommandsEvent;
+			accumulatedCommandsEvent.commands = commandsList;
+			eventSystem.processEvent(&accumulatedCommandsEvent);
 		});
 	}
 }

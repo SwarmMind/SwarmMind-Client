@@ -60,17 +60,30 @@ void Entity::draw(class Renderer& renderer)
 //////////////////////////////////////////////////////////////////////////
 Unit::Unit(std::uint32_t _id, glm::vec2 _position)
 	: Entity(_id, _position)
-{
-
-}
+	, attackVisualizer(255, 30, 30)
+	, moveVisualizer(30, 255, 30, 0.7)
+{}
 
 Unit::Unit(const nlohmann::json& json)
 	: Unit(json["ID"], glm::vec2(json["x"], json["y"]))
 {}
 
-Unit::~Unit()
+void Unit::setAttackCommands(std::vector<glm::vec2> directions)
 {
+	attackVisualizer.setCommands(directions);
+}
 
+void Unit::setMoveCommands(std::vector<glm::vec2> directions)
+{
+	moveVisualizer.setCommands(directions);
+}
+
+void Unit::draw(Renderer& renderer)
+{
+	Entity::draw(renderer);
+
+	renderer.drawCommandVisualizer(glm::vec3(position(), 1.f), attackVisualizer);
+	renderer.drawCommandVisualizer(glm::vec3(position(), 1.f), moveVisualizer);
 }
 
 SpriteEnum Unit::sprite()
@@ -96,9 +109,6 @@ Monster::Monster(const nlohmann::json& json)
 {
 
 }
-
-Monster::~Monster()
-{}
 
 SpriteEnum Monster::sprite()
 {

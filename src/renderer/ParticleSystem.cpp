@@ -32,24 +32,24 @@ void ParticleSystem::spawnTestParticles(float x, float y, float width, float hei
 	addParticles(particles);
 }
 
-void ParticleSystem::spawnBloodParticles(float x, float y)
+void ParticleSystem::spawnBloodParticles(glm::vec2 position, glm::vec2 direction)
 {
+	direction = glm::normalize(direction);
 	ParticleSystem particles;
-	for (size_t i = 0; i <200; i++)
+	for (size_t i = 0; i < 200; i++)
 	{
 		glm::vec2 offset(randomFloatBetween(-1, 1), randomFloatBetween(-1, 1));
 		offset = glm::normalize(offset);
-		glm::vec2 direction = offset;
+		glm::vec2 particleDirection = offset + direction * randomFloatBetween(1.f, 2.f);
 
 		offset *= randomFloatBetween(0, 0.3);
-		direction *= randomFloatBetween(0.5, 1);
-		
+		particleDirection *= randomFloatBetween(0.5, 1);
+
 		GLfloat lifeTime = randomFloatBetween(0.2, 0.7);
-		
-		
+
 		GLubyte r = 200, g = 10, b = 20;
 		randomizeColor(r, g, b, 30);
-		particles.addParticle(x + offset.x, y + offset.y, direction.x, direction.y, lifeTime, r, g, b, 255);
+		particles.addParticle(position + offset, particleDirection, lifeTime, glm::vec4((float)r / 255, (float)g/255, (float)b/255, 1.f));
 	}
 	addParticles(particles);
 }

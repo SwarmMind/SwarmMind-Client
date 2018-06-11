@@ -81,12 +81,10 @@ void ConnectedState::enableCallbacks()
 	networker.setDisconnectCallback(std::bind(&ConnectedState::onDisconnect, this));
 	networker.setInitStateCallback(std::bind(&ConnectedState::onInitState, this, _1, _2));
 	networker.setStateCallback(std::bind(&ConnectedState::onState, this, _1));
-	networker.setGameOverCallback(std::bind(&ConnectedState::onDisconnect, this));
+	//networker.setGameOverCallback(std::bind(&ConnectedState::onDisconnect, this));
 }
 
 void ConnectedState::onInitState(Configuration config, Gamestate *gamestate) {
-	//renderer->setCamera(config.sizeX / 2, config.sizeY / 2, config.sizeY / 2);
-
 	map = new Map{ input, sprites, networker, eventSystem, config };
 	map->updateGameState(gamestate);
 }

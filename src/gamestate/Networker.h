@@ -49,8 +49,10 @@ private:
 
 	void onStateReceive(sio::event event);
 	void onInitStateReceive(sio::event event);
+	void onAccumulatedCommandsReceive(sio::event event);
 
 	Gamestate* parseGamestate(nlohmann::json state);
 	Configuration parseConfiguration(std::string jsonString);
+	std::shared_ptr<class Command> parseCommand(const nlohmann::json& jsonCommand);
 	void processCommands(nlohmann::json& commands);
 };

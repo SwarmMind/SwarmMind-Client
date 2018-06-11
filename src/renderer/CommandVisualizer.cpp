@@ -29,15 +29,14 @@ CommandVisualizer::~CommandVisualizer()
 
 void CommandVisualizer::setCommands(std::vector<glm::vec2> directions)
 {
-	if (directions.size() == 0)
-	{
-		return;
-	}
-
 	//Reset all alpha values
 	for (size_t i = 0; i < numVertices; i++)
 	{
 		vertexColors.at(i * 4 + 3) = 0;
+	}
+	if (directions.size() == 0)
+	{
+		return;
 	}
 
 	/*GLubyte alpha = 255 / directions.size();

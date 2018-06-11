@@ -16,6 +16,21 @@ protected:
 private:
 };
 
+class DieCommand : public Command
+{
+public:
+	DieCommand(uint32_t _ID);
+	virtual ~DieCommand() = default;
+
+	virtual void executeOn(Gamestate& state) override;
+protected:
+	
+private:
+};
+
+
+
+
 class DirectionalCommand : public Command
 {
 public:
@@ -23,8 +38,6 @@ public:
 protected:
 	DirectionalCommand(uint32_t _ID, glm::vec2 _direction);
 	glm::vec2 direction;
-	
-private:
 };
 
 class MoveCommand : public DirectionalCommand
@@ -34,7 +47,22 @@ public:
 	virtual ~MoveCommand() = default;
 
 	virtual void executeOn(Gamestate& state) override;
-protected:
-	
-private:
+};
+
+class AttackCommand : public DirectionalCommand
+{
+public:
+	AttackCommand(uint32_t _ID, glm::vec2 _direction);
+	virtual ~AttackCommand() = default;
+
+	virtual void executeOn(Gamestate& state) override;
+};
+
+class DamageCommand : public DirectionalCommand
+{
+public:
+	DamageCommand(uint32_t _ID, glm::vec2 _direction);
+	virtual ~DamageCommand() = default;
+
+	virtual void executeOn(Gamestate& state) override;
 };

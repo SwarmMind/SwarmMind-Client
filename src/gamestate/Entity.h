@@ -4,6 +4,7 @@
 #include <glm/glm.hpp>
 #include <renderer/Sprites.h>
 #include <nlohmann/json_fwd.hpp>
+#include <renderer/CommandVisualizer.h>
 
 
 class Entity
@@ -19,7 +20,7 @@ public:
 	void moveTo(glm::vec2 position);
 
 	void update(float deltaTime);
-	void draw(class Renderer& renderer);
+	virtual void draw(class Renderer& renderer);
 protected:
 	Entity(std::uint32_t _id, glm::vec2 _position);
 	virtual SpriteEnum sprite() = 0;
@@ -38,10 +39,16 @@ class Unit : public Entity
 public:
 	Unit(const nlohmann::json& json);
 	Unit(std::uint32_t _id, glm::vec2 _position);
-	virtual ~Unit();
+	virtual ~Unit() = default;
+
+	void setAttackCommands(std::vector<glm::vec2> directions);
+	void setMoveCommands(std::vector<glm::vec2> directions);
+
+	virtual void draw(Renderer& renderer) override;
 protected:
 	virtual SpriteEnum sprite() override;
 private:
+	CommandVisualizer attackVisualizer, moveVisualizer;
 };
 
 class Monster : public Entity
@@ -49,7 +56,7 @@ class Monster : public Entity
 public:
 	Monster(const nlohmann::json& json);
 	Monster(std::uint32_t _id, glm::vec2 _position);
-	virtual ~Monster();
+	virtual ~Monster() = default;
 protected:
 	virtual SpriteEnum sprite() override;
 private:
