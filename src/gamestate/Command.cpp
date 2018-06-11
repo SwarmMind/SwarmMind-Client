@@ -49,7 +49,11 @@ AttackCommand::AttackCommand(uint32_t _ID, glm::vec2 _direction)
 
 void AttackCommand::executeOn(Gamestate& state)
 {
-	//#TODO
+	Unit* unit = dynamic_cast<Unit*>(state.getEntityByID(ID));
+	if (unit != nullptr)
+	{
+		ParticleSystem::spawnShootParticles(unit->position() + glm::normalize(direction) * 0.3f, direction);
+	}
 }
 
 

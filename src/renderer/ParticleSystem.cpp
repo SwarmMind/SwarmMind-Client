@@ -1,6 +1,8 @@
 #include <renderer/ParticleSystem.h>
 #include <random>
 #include <glm/glm.hpp>
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/rotate_vector.hpp>
 #include <algorithm>
 
 ParticleSystem::ParticleSystem()
@@ -51,6 +53,37 @@ void ParticleSystem::spawnBloodParticles(glm::vec2 position, glm::vec2 direction
 		randomizeColor(r, g, b, 30);
 		particles.addParticle(position + offset, particleDirection, lifeTime, glm::vec4((float)r / 255, (float)g/255, (float)b/255, 1.f));
 	}
+	addParticles(particles);
+}
+
+void ParticleSystem::spawnShootParticles(glm::vec2 position, glm::vec2 direction)
+{
+	direction = glm::normalize(direction);
+	ParticleSystem particles;
+
+	//Bullet
+	float bulletSpeed = 20;
+	float bulletLifeTime = 1;
+	glm::vec4 bulletColor(0.1f, 0.1f, 0.1f, 1.0f);
+	particles.addParticle(position, direction * bulletSpeed, bulletLifeTime, bulletColor);
+
+	//Muzzle flash
+	for (size_t i = 0; i < 200; i++)
+	{
+		float angle = randomFloatBetween(-10, 10);
+		glm::vec2 randomizedDirection = glm::rotate(direction, glm::radians(angle));
+		glm::vec2 velocity = randomizedDirection * randomFloatBetween(0.2f, 1.f);
+		glm::vec2 offset = glm::normalize(glm::vec2(randomFloatBetween(-1.f, -1.f), randomFloatBetween(-1.f, 1.f))) * randomFloatBetween(0, 0.2f);
+		offset += randomizedDirection * randomFloatBetween(0.f, 0.3f);
+
+		GLfloat lifeTime = randomFloatBetween(0.2, 0.7);
+
+		glm::vec4 color(1.f, 0.64f, 0.f, 0.5f);
+		color = randomizeColor(color, 0.2f, true);
+		particles.addParticle(position + offset, velocity, lifeTime, color);
+	}
+
+
 	addParticles(particles);
 }
 
@@ -105,6 +138,18 @@ void ParticleSystem::randomizeColor(GLubyte& r, GLubyte& g, GLubyte b, GLubyte m
 	r = clamp(r + randomFloatBetween(-maximumDeviation, maximumDeviation), 0.f, 255.f);
 	g = clamp(g + randomFloatBetween(-maximumDeviation, maximumDeviation), 0.f, 255.f);
 	b = clamp(b + randomFloatBetween(-maximumDeviation, maximumDeviation), 0.f, 255.f);
+}
+
+glm::vec4 ParticleSystem::randomizeColor(glm::vec4 color, float maximumDeviation, bool randomizeAlpha /*= false*/)
+{
+	return glm::vec4(
+		clamp(color.r + randomFloatBetween(-maximumDeviation, maximumDeviation), 0.f, 1.f),
+		clamp(color.g + randomFloatBetween(-maximumDeviation, maximumDeviation), 0.f, 1.f),
+		clamp(color.b + randomFloatBetween(-maximumDeviation, maximumDeviation), 0.f, 1.f),
+		randomizeAlpha ?
+			clamp(color.a + randomFloatBetween(-maximumDeviation, maximumDeviation), 0.f, 1.f) :
+			color.a
+	);
 }
 
 float ParticleSystem::randomFloatBetween(float minimum, float maximum)

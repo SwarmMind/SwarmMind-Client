@@ -152,7 +152,7 @@ void Game::drawDebug(double timeElapsed)
 
 	if (input->isActionJustPressed(Debug))
 	{
-		ParticleSystem::spawnTestParticles(5, 5, 5, 5);
+		ParticleSystem::spawnShootParticles(glm::vec2(5, 5), glm::vec2(0.5, 0.5));
 	}
 }
 
