@@ -27,10 +27,16 @@ For SwarmMind-developers on Windows:
 For SwarmMind-developers on Unix:
 1. Install [boost](boost.org) (using your favorite package manager or by building it from scratch)
 2. clone the [socket.IO c++ client](https://github.com/socketio/socket.io-client-cpp)
-3. build the library using cmake
-4. compile the library
-5. you should now have a sioclient.a file and the include directory for the socket.IO client
-6. create a folder and copy the files so they form the following folder structure:
+3. you must execute:
+  ``` shell
+  cd socket.io-client-cpp/lib/websocketpp
+  git pull origin master
+  cd ../..
+  ```
+4. build the library using cmake
+5. compile the library
+6. you should now have a sioclient.a file and the include directory for the socket.IO client
+7. create a folder and copy the files so they form the following folder structure:
 * include
   * sio_client.h
   * sio_message.h
