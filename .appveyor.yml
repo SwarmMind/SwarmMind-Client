@@ -6,7 +6,10 @@ configuration:
 install:
   - mkdir C:\glfw
   - git clone --depth 1 https://github.com/glfw/glfw.git C:\projects\glfw
-  - cd C:\projects\glfw && git checkout 3.2.1 && mkdir build && cd build
+  - cd C:\projects\glfw
+  - git fetch --tags
+  - git checkout 3.2.1
+  - mkdir build && cd build
   - cmake .. -DCMAKE_INSTALL_DIR=C:\glfw && cmake --build
 before_build:
   - cmd: |
@@ -16,6 +19,6 @@ before_build:
       cmake .. -DGLFW_DIR=C:\glfw -G "Visual Studio 15 2017 Win64"
 build:
   project: build\SwarmMind.sln
-  verbosity: minimal
+#  verbosity: minimal
   parallel: true
 
