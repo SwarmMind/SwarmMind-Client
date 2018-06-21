@@ -6,7 +6,7 @@ configuration:
 install:
   - mkdir C:\glfw
   - git clone --depth 1 https://github.com/glfw/glfw.git C:\projects\glfw
-  - cd C:\projects\glfw && git checkout v3.2.1 && mkdir build && cd build
+  - cd C:\projects\glfw && git checkout 3.2.1 && mkdir build && cd build
   - cmake .. -DCMAKE_INSTALL_DIR=C:\glfw && cmake --build
 before_build:
   - cmd: |
