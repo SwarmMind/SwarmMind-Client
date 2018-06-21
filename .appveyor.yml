@@ -4,19 +4,24 @@ configuration:
   - Release
   - Debug
 install:
-  - mkdir C:\glfw
+  - mkdir C:\deps\glfw
   - git clone --depth 1 https://github.com/glfw/glfw.git C:\projects\glfw
   - cd C:\projects\glfw
   - git fetch --tags
   - git checkout 3.2.1
   - mkdir build && cd build
-  - cmake .. -DCMAKE_INSTALL_DIR=C:\glfw && cmake --build .
+  - cmake .. -DCMAKE_INSTALL_DIR=C:\deps\glfw -G "Visual Studio 15 2017 Win64"
+  - cmake --build .
+  - git clone --depth 1 https://github.com/g-truc/glm.git C:\projects\glm
+  - cd C:\projects\glm
+  - git fetch --tags
+  - git checkout 0.9.9.0
 before_build:
   - cmd: |
       mkdir build
       cd build
       cmake --version
-      cmake .. -DGLFW_DIR=C:\glfw -G "Visual Studio 15 2017 Win64"
+      cmake .. -DGLFW_DIR=C:\deps\glfw -G "Visual Studio 15 2017 Win64"
 build:
   project: build\SwarmMind.sln
 #  verbosity: minimal
