@@ -10,7 +10,7 @@ install:
   - git fetch --tags
   - git checkout 3.2.1
   - mkdir build && cd build
-  - cmake .. -DCMAKE_INSTALL_DIR=C:\glfw && cmake --build
+  - cmake .. -DCMAKE_INSTALL_DIR=C:\glfw && cmake --build ..
 before_build:
   - cmd: |
       mkdir build
