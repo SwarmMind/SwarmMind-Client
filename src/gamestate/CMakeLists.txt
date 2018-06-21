@@ -10,4 +10,6 @@ set(sources
 	gamestate/Entity.cpp
 	gamestate/Command.h
 	gamestate/Command.cpp
+	gamestate/ChatSystem.h
+	gamestate/ChatSystem.cpp
 	PARENT_SCOPE)

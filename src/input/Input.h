@@ -15,17 +15,21 @@ enum Action {
 	MoveUp,
 	MoveDown,
 	Move,
-	ShootLeft,
+	
+    ShootLeft,
 	ShootRight,
 	ShootUp,
 	ShootDown,
 	Shoot,
-	SelectUnit1,
+	
+    SelectUnit1,
 	SelectUnit2,
 	SelectUnit3,
 	SelectUnit,
-	Debug,
-	MoveCameraRight,
+	
+    Debug,
+	
+    MoveCameraRight,
 	MoveCameraLeft,
 	MoveCameraUp,
 	MoveCameraDown

@@ -32,6 +32,8 @@ public:
 
 	virtual void drawSprite(glm::vec3 pos, float width, float height, SpriteEnum sprite) override;
 
+    virtual Camera& camera() override;
+
 private:
 	virtual void uploadCamera();
 
@@ -49,7 +51,8 @@ private:
 	GLint yLocation;
 	GLint widthLocation;
 	GLint heightLocation;
-	class Camera& camera;
+	class Camera& m_camera;
+    
 
 	ParticleRenderer particleRenderer;
 	CommandVisualizationRenderer commandRenderer;

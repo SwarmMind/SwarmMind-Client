@@ -88,6 +88,9 @@ void Game::initializeImGui()
 	io.Fonts->AddFontFromFileTTF("fonts/DroidSans.ttf", 30);
 	io.FontGlobalScale = 1.0f;
 	ImGui::StyleColorsDark();
+	ImGuiStyle& style = ImGui::GetStyle();
+	style.WindowRounding = 0;
+	
 }
 
 Game::~Game() {
@@ -110,12 +113,13 @@ void Game::processInputs(double deltaTime)
 
 void Game::update(double time)
 {
-	menu->update(time);
+    imguiRenderer->preRender(); //Required before any update in order for popups to work!
+    menu->update(time);
 }
 
 void Game::render(double timeElapsed)
 {
-    imguiRenderer->preRender();
+    
     renderer->preDraw();
 
 	menu->draw(*renderer);
@@ -142,12 +146,29 @@ void Game::drawDebug(double timeElapsed)
 
 		ImGui::Text("Current FPS: %f", 60 / timeSum);
 
-		CommandVisualizer moveVisualizer(30, 255, 30);
-		moveVisualizer.setCommands({ glm::vec2(-1, 1), glm::vec2(-1, 0), glm::vec2(-1, 0.1), glm::vec2(-2, -0.5), glm::vec2(1, 0.5), glm::vec2(0, -1) });
-		renderer->drawCommandVisualizer(glm::vec3(4.5, 5.5, 1), moveVisualizer);
-		CommandVisualizer shootVisualizer(255, 30, 30, 0.7);
-		shootVisualizer.setCommands({ glm::vec2(1, -1), glm::vec2(1, 0), glm::vec2(-1, 0.1), glm::vec2(0, -0.5), glm::vec2(1, 0.5), glm::vec2(1, -1) });
-		renderer->drawCommandVisualizer(glm::vec3(4.5, 5.5, 1), shootVisualizer);
+		float width, height;
+
+		ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiCond_Always);
+		ImGui::SetNextWindowBgAlpha(0.5);
+		if(ImGui::Begin("Test", nullptr,
+			ImGuiWindowFlags_NoTitleBar
+			| ImGuiWindowFlags_NoResize
+			| ImGuiWindowFlags_NoMove
+			| ImGuiWindowFlags_NoScrollbar
+			| ImGuiWindowFlags_NoSavedSettings
+			| ImGuiWindowFlags_NoInputs));
+		{
+			width = ImGui::GetWindowWidth();
+			height = ImGui::GetWindowHeight();
+			ImGui::TextColored(ImVec4(0.7, 0.1, 0.1, 0.5), "Leon");
+			ImGui::Separator();
+			ImGui::TextColored(ImVec4(0.8, 0.8, 0.8, 0.5), "My Fancy chat window!");
+		}
+		ImGui::End();
+
+		ImGui::Text("width: %f", width);
+		ImGui::Text("height: %f", ImGui::GetTextLineHeightWithSpacing() * 2);
+
 	}
 
 	if (input->isActionJustPressed(Debug))

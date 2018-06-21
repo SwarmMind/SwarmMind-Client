@@ -9,6 +9,7 @@
 #include <game/Camera.h>
 #include <string>
 #include <glm/vec2.hpp>
+#include <gamestate/ChatSystem.h>
 
 class Map
 {
@@ -25,6 +26,7 @@ public:
 	const double moveAnimationTime = 3.0;
 
 private:
+    ChatSystem m_chats;
 	class Gamestate* gamestate;
 	class Sprites& sprites;
 	class Input& input;

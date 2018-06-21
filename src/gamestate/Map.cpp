@@ -29,6 +29,7 @@ Map::Map(Input& _input, Sprites& _sprites, Networker& _networker, EventSystem& _
 	, sprites{_sprites}
 	, lastUpdate{glfwGetTime()}
 	, eventSystem{_eventSystem}
+    , m_chats{_input}
 {
 }
 
@@ -158,12 +159,14 @@ void Map::update(double deltaTime)
 	if (gamestate == nullptr)
 		return;
 
+    m_chats.update(deltaTime);
 	gamestate->update(deltaTime);
 	updateSelection();
 	updateCommands(deltaTime);
 }
 
-void Map::drawGrid(Renderer& renderer) {
+void Map::drawGrid(Renderer& renderer) 
+{
     const auto sprite = sprites.get(SpriteEnum::GridBlock);
 	glm::vec3 p{ 0 };
 
@@ -174,12 +177,14 @@ void Map::drawGrid(Renderer& renderer) {
     }  
 }
 
-void Map::drawEntities(Renderer& renderer) {
+void Map::drawEntities(Renderer& renderer) 
+{
 	gamestate->draw(renderer);
 }
 
 void Map::draw(class Renderer& renderer)
 {
+    m_chats.draw(renderer);
     drawGrid(renderer);
     drawEntities(renderer);
 

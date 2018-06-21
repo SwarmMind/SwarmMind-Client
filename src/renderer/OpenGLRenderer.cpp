@@ -27,7 +27,7 @@ void OpenGLRenderer::findUniformLocations()
 OpenGLRenderer::OpenGLRenderer(GLFWwindow* _window, Camera& _camera)
 	: window{_window}
 	, particleRenderer{ _window, _camera }
-	, camera {_camera}
+	, m_camera {_camera}
 	, commandRenderer {_camera}
 	, textures{}
 	, sprites{textures}
@@ -59,11 +59,11 @@ OpenGLRenderer::~OpenGLRenderer()
 void OpenGLRenderer::uploadCamera()
 {
 	glUseProgram(program);
-	glUniform1f(xLocation, camera.getX());
-	glUniform1f(yLocation, camera.getY());
+	glUniform1f(xLocation, m_camera.getX());
+	glUniform1f(yLocation, m_camera.getY());
 
-	glUniform1f(widthLocation, camera.getWidth());
-	glUniform1f(heightLocation, camera.getHeight());
+	glUniform1f(widthLocation, m_camera.getWidth());
+	glUniform1f(heightLocation, m_camera.getHeight());
 }
 
 std::array<GLfloat, 6*5> spriteVertices(glm::vec3 pos, float width, float height, Sprite* sprite) {
@@ -107,6 +107,11 @@ void OpenGLRenderer::drawSprite(glm::vec3 pos, float width, float height, Sprite
 void OpenGLRenderer::drawSprite(glm::vec3 pos, float width, float height, SpriteEnum sprite)
 {
 	drawSprite(pos, width, height, sprites.get(sprite));
+}
+
+Camera& OpenGLRenderer::camera()
+{
+    return m_camera;
 }
 
 void OpenGLRenderer::drawCommandVisualizer(glm::vec3 pos, CommandVisualizer& visualizer)
