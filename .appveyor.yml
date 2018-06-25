@@ -52,11 +52,12 @@ install:
   - cd .. && mkdir build-sioclient && cd build-sioclient
   - cmake \
     -DCMAKE_INSTALL_PREFIX=C:\deps\sioclient \
+    -DBOOST_ROOT=C:\Libraries\boost_1_67_0 \
     -G "Visual Studio 15 2017 Win64" \
     ../sioclient
   - cmake --build .
   - cmake --build . --target install
-#C:\Libraries\boost_1_67_0
+
 before_build:
   - cmd: |
       cd C:\projects\swarmmind-client
