@@ -40,7 +40,7 @@ install:
   - cmake --build . --target install
 before_build:
   - cmd: |
-      cd C:\projects\glfw
+      cd C:\projects\SwarmMind
       mkdir build
       cd build
       cmake --version
