@@ -40,7 +40,7 @@ install:
   - cmake --build . --target install
 before_build:
   - cmd: |
-      cd C:\projects\SwarmMind
+      cd C:\projects\swarmmind-client
       mkdir build
       cd build
       cmake --version
