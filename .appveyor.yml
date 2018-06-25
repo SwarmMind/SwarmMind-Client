@@ -32,6 +32,7 @@ install:
   - cd .. && mkdir build-glbinding && cd build-glbinding
   - cmake \
     -DCMAKE_CXX_FLAGS=/D_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING \
+    -DCMAKE_PREFIX_PATH=C:\deps\glfw \
     -DCMAKE_INSTALL_PREFIX=C:\deps\glbinding \
     -G "Visual Studio 15 2017 Win64" \
     ../glbinding
@@ -39,6 +40,7 @@ install:
   - cmake --build . --target install
 before_build:
   - cmd: |
+      cd C:\projects\glfw
       mkdir build
       cd build
       cmake --version
