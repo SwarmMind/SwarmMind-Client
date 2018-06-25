@@ -44,13 +44,24 @@ install:
     ../glbinding
   - cmake --build .
   - cmake --build . --target install
+
+  - git clone --depth 1 https://github.com/socketio/socket.io-client-cpp C:\projects\sioclient
+  - cd C:\projects\sioclient
+  - cd .. && mkdir build-sioclient && cd build-sioclient
+  - cmake \
+    -DCMAKE_INSTALL_PREFIX=C:\deps\sioclient \
+    -G "Visual Studio 15 2017 Win64" \
+    ../sioclient
+  - cmake --build .
+  - cmake --build . --target install
+#C:\Libraries\boost_1_67_0
 before_build:
   - cmd: |
       cd C:\projects\swarmmind-client
       mkdir build
       cd build
       cmake --version
-      cmake .. -DCMAKE_PREFIX_PATH=C:\deps\glfw -G "Visual Studio 15 2017 Win64"
+      cmake -Dglfw3_DIR=C:\deps\glfw -Dglbinding_DIR=C:\deps\glbinding -DSIOCLIENT_DIR=C:\deps\sioclient -G "Visual Studio 15 2017 Win64" ..
 build:
   project: build\SwarmMind.sln
 #  verbosity: minimal
