@@ -43,8 +43,8 @@ private:
 	//Callbacks
 	std::function<void()> connectCallback;
 	std::function<void()> disconnectCallback;
-	std::function<void(Configuration, Gamestate*)> initStateCallback;
-	std::function<void(Gamestate*)> stateCallback;
+	//std::function<void(Configuration, Gamestate*)> initStateCallback;
+	//std::function<void(Gamestate*)> stateCallback;
 	std::function<void()> gameOverCallback;
 
 	void onStateReceive(sio::event event);

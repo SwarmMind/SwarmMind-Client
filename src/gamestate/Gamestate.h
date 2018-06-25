@@ -33,8 +33,8 @@ public:
 	Entity* getEntityByID(uint32_t ID);
 	void deleteEntity(uint32_t ID);
 
-	void receiveEvent(CommandEvent* event) override;
-	void receiveEvent(AccumulatedCommandsEvent* event) override;
+	virtual void receiveEvent(CommandEvent* event) override;
+	virtual void receiveEvent(AccumulatedCommandsEvent* event) override;
 
 	std::map<uint32_t, Unit> units;
 	std::map<uint32_t, Monster> monsters;

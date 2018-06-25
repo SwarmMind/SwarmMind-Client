@@ -8,6 +8,8 @@
 #include <memory>
 #include <gamestate/Command.h>
 #include <events/AccumulatedCommandsEvent.h>
+#include <events/InitStateEvent.h>
+#include <events/StateEvent.h>
 
 using namespace std;
 
@@ -87,6 +89,7 @@ void Networker::setDisconnectCallback(std::function<void()> callback)
 	disconnectCallback = callback;
 }
 
+/*
 void Networker::setInitStateCallback(std::function<void(Configuration, Gamestate *)> callback)
 {
 	initStateCallback = callback;
@@ -96,6 +99,7 @@ void Networker::setStateCallback(std::function<void(Gamestate *)> callback)
 {
 	stateCallback = callback;
 }
+*/
 
 void Networker::setGameOverCallback(std::function<void()> callback)
 {
@@ -130,8 +134,6 @@ void Networker::update()
 		eventQueue.pop();
 	}
 }
-
-
 
 Gamestate* Networker::parseGamestate(nlohmann::json state)
 {
@@ -187,10 +189,9 @@ Configuration Networker::parseConfiguration(std::string jsonString)
 	return config;
 }
 
-
 std::shared_ptr<Command> Networker::parseCommand(const nlohmann::json& jsonCommand)
 {
-	std::string type = jsonCommand["type"];
+    std::string type = jsonCommand["type"];
 	if (type == "move")
 	{
 		nlohmann::json direction = jsonCommand["direction"];
@@ -253,7 +254,9 @@ void Networker::onStateReceive(sio::event _event)
 	{
 		lock_guard<mutex> queueGuard(queueLock);
 		eventQueue.push([=]() {
-			stateCallback(state);
+            StateEvent stateEvent;
+            stateEvent.state = state;
+            eventSystem.processEvent(&stateEvent);
 		});
 	}
 
@@ -271,7 +274,10 @@ void Networker::onInitStateReceive(sio::event _event)
 	{
 		lock_guard<mutex> queueGuard(queueLock);
 		eventQueue.push([=]() {
-			initStateCallback(config, state);
+            InitStateEvent initStateEvent;
+            initStateEvent.config = config;
+            initStateEvent.state = state;
+            eventSystem.processEvent(&initStateEvent);
 		});
 	}
 }

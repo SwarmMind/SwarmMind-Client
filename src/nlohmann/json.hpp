@@ -12902,8 +12902,8 @@ class basic_json
     {
         // at only works for objects
         if (JSON_LIKELY(is_object()))
-        {
-            assert(m_value.object->find(key) != m_value.object->end());
+        {            
+			assert(m_value.object->find(key) != m_value.object->end());
             return m_value.object->find(key)->second;
         }
 
