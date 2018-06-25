@@ -24,6 +24,12 @@ install:
   - cd C:\projects\glm
   - git fetch --depth 1 --tags
   - git checkout 0.9.9.0
+  - cd .. && mkdir build-glm && cd build-glm
+  - cmake \
+    -DCMAKE_INSTALL_PREFIX=C:\deps\glm \
+    -DGLM_INSTALL_ENABLE=true \
+    -G "Visual Studio 15 2017 Win64" \
+    ../glm
 
   - git clone --depth 1 https://github.com/cginternals/glbinding C:\projects\glbinding
   - cd C:\projects\glbinding
