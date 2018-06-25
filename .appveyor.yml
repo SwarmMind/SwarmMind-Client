@@ -30,6 +30,8 @@ install:
     -DGLM_INSTALL_ENABLE=true \
     -G "Visual Studio 15 2017 Win64" \
     ../glm
+  - cmake --build .
+  - cmake --build . --target install
 
   - git clone --depth 1 https://github.com/cginternals/glbinding C:\projects\glbinding
   - cd C:\projects\glbinding
