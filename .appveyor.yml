@@ -3,13 +3,20 @@ image:
 configuration:
   - Release
   - Debug
+cache:
+  - C:\projects\glfw
+  - C:\projects\glbinding
+  - C:\projects\glm
 install:
   - git clone --depth 1 https://github.com/glfw/glfw.git C:\projects\glfw
   - cd C:\projects\glfw
   - git fetch --depth 1 --tags
   - git checkout 3.2.1
-  - mkdir build && cd build
-  - cmake .. -DCMAKE_INSTALL_DIR=C:\deps\glfw -G "Visual Studio 15 2017 Win64"
+  - mkdir ../build-glfw && cd ../build-glfw
+  - cmake \
+    -DCMAKE_INSTALL_PREFIX=C:\deps\glfw \
+    -G "Visual Studio 15 2017 Win64" \
+    ../glfw
   - cmake --build .
 
   - git clone --depth 1 https://github.com/g-truc/glm.git C:\projects\glm
@@ -21,8 +28,12 @@ install:
   - cd C:\projects\glbinding
   - git fetch --depth 1 --tags
   - git checkout v2.1.4
-  - mkdir build && cd build
-  - cmake .. -DCMAKE_CXX_FLAGS=/D_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING -DCMAKE_INSTALL_DIR=C:\deps\glbinding -G "Visual Studio 15 2017 Win64"
+  - mkdir ../build-glbinding && cd ../build-glbinding
+  - cmake \
+    -DCMAKE_CXX_FLAGS=/D_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING \
+    -DCMAKE_INSTALL_PREFIX=C:\deps\glbinding \
+    -G "Visual Studio 15 2017 Win64" \
+    ../glbinding
   - cmake --build .
 before_build:
   - cmd: |
