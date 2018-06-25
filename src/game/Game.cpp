@@ -111,10 +111,10 @@ void Game::processInputs(double deltaTime)
 	input->update(deltaTime);
 }
 
-void Game::update(double time)
+void Game::update(double time, double timeStamp)
 {
     imguiRenderer->preRender(); //Required before any update in order for popups to work!
-    menu->update(time);
+    menu->update(time, timeStamp);
 }
 
 void Game::render(double timeElapsed)
@@ -186,7 +186,7 @@ void Game::loop() {
         const double elapsed = current - lastTime;
         processInputs(elapsed);
 
-        update(elapsed);
+        update(elapsed, current);
         render(elapsed);
         lastTime = current;
     }

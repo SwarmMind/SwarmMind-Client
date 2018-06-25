@@ -15,7 +15,7 @@ class Game {
     void initializeOpenGL();
 
     void processInputs(double deltaTime);
-    void update(double time);
+    void update(double time, double timeStamp);
     void render(double timeElapsed);
 	void drawDebug(double timeElapsed);
 

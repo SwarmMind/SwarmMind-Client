@@ -32,6 +32,7 @@ Input::Input(GLFWwindow* window, Camera* camera)
 	actionStatus[MoveCameraLeft]  = ActionStatus({ GLFW_KEY_LEFT });
 	actionStatus[MoveCameraUp]    = ActionStatus({ GLFW_KEY_UP });
 	actionStatus[MoveCameraDown]  = ActionStatus({ GLFW_KEY_DOWN });
+    actionStatus[MoveCamera] = ActionStatus({ GLFW_MOUSE_BUTTON_MIDDLE });
 
 	actionStatus[Debug] = ActionStatus({ GLFW_KEY_PERIOD });
 
@@ -106,6 +107,17 @@ void Input::moveCamera(double deltaTime)
 	if (isActionPressed(MoveCameraLeft)) {
 		_camera->setCamera(_camera->getX() - cameraMovementSpeed() * deltaTime, _camera->getY(), _camera->getHeight());
 	}
+
+
+    if (isActionJustPressed(MoveCamera))
+    {
+        m_mouseMoveClickPosition = mousePositionInWorld();
+    }
+    if (isActionPressed(MoveCamera))
+    {
+        glm::vec2 delta = mousePositionInWorld() - m_mouseMoveClickPosition;
+        _camera->setCamera(_camera->getX() - delta.x, _camera->getY() - delta.y, _camera->getHeight());
+    }
 }
 
 void Input::updateAction(Action action)

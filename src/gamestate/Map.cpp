@@ -29,7 +29,7 @@ Map::Map(Input& _input, Sprites& _sprites, Networker& _networker, EventSystem& _
 	, sprites{_sprites}
 	, lastUpdate{glfwGetTime()}
 	, eventSystem{_eventSystem}
-    , m_chats{_input}
+    , m_chats{_input, _networker}
 {
 }
 
@@ -154,12 +154,12 @@ void Map::updateSelectionAction(Action action, int selectedPlayerNumber)
 	}
 }
 
-void Map::update(double deltaTime)
+void Map::update(double deltaTime, double timeStamp)
 {
 	if (gamestate == nullptr)
 		return;
 
-    m_chats.update(deltaTime);
+    m_chats.update(deltaTime, timeStamp);
 	gamestate->update(deltaTime);
 	updateSelection();
 	updateCommands(deltaTime);

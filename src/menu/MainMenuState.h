@@ -8,7 +8,7 @@ public:
 	MainMenuState(class Game* _game);
 	virtual ~MainMenuState() override;
 
-	virtual void update(double deltaTime) override;
+	virtual void update(double deltaTime, double timeStamp) override;
 	virtual void draw(Renderer& renderer) override;
 private:
 	class Game* game;

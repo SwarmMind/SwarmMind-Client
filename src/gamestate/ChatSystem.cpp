@@ -3,14 +3,21 @@
 #include <renderer/Renderer.h>
 #include <glm/glm.hpp>
 
-ChatSystem::ChatSystem(Input& input)
+ChatSystem::ChatSystem(Input& input, Networker& networker)
     : m_input{input}
+    , m_networker{networker}
 {}
 
 
-void ChatSystem::update(double deltaTime)
+void ChatSystem::update(double deltaTime, double timeStamp)
 {
-    drawPopup();
+    drawPopup(timeStamp);
+
+    while (m_chats.size() > 0 && timeStamp - m_chats.front().m_timeStamp > m_chatVisibilityTimeout)
+    {
+        m_chats.pop_front();
+    }
+
 
     if (m_doubleClickTimeout >= 0)
     {
@@ -39,7 +46,7 @@ void ChatSystem::openPopup()
     ImGui::OpenPopup("ChatInputPopup");
 }
 
-void ChatSystem::drawPopup()
+void ChatSystem::drawPopup(double timeStamp)
 {
     ImGui::SetNextWindowFocus();
     if (ImGui::BeginPopup("ChatInputPopup",
@@ -55,12 +62,12 @@ void ChatSystem::drawPopup()
         }
         if (ImGui::InputText("##ChatInput", m_chatInput, 50, ImGuiInputTextFlags_EnterReturnsTrue))
         {
-            buildChatEntry();
+            buildChatEntry(timeStamp);
             ImGui::CloseCurrentPopup();
         }
         if (ImGui::SmallButton("Ok"))
         {
-            buildChatEntry();
+            buildChatEntry(timeStamp);
             ImGui::CloseCurrentPopup();
         }
         ImGui::SameLine();
@@ -73,9 +80,10 @@ void ChatSystem::drawPopup()
     }
 }
 
-void ChatSystem::buildChatEntry()
+void ChatSystem::buildChatEntry(double timeStamp)
 {
     ChatEntry chat;
+    chat.m_timeStamp = timeStamp;
     chat.m_position = m_clickPosition;
     chat.m_text = m_chatInput;
     chat.m_user = "this";
@@ -123,7 +131,7 @@ void ChatSystem::draw(Renderer& renderer)
         if (ImGui::Begin((std::string("ChatWindow") + to_string(i)).data(),
             nullptr,
             ImGuiWindowFlags_NoTitleBar
-            | ImGuiWindowFlags_NoResize
+            | ImGuiWindowFlags_AlwaysAutoResize
             | ImGuiWindowFlags_NoMove
             | ImGuiWindowFlags_NoScrollbar
             | ImGuiWindowFlags_NoSavedSettings

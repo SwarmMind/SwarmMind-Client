@@ -13,7 +13,7 @@ public:
 	virtual ~ConnectedState() override;
 
 
-	virtual void update(double deltaTime) override;
+	virtual void update(double deltaTime, double timeStamp) override;
 	virtual void draw(Renderer& renderer) override;
 
 	std::string statusString() const;

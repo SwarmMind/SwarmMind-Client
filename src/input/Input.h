@@ -5,7 +5,7 @@
 #include <map>
 #include <vector>
 #include <game/Camera.h>
-#include <glm/fwd.hpp>
+#include <glm/vec2.hpp>
 
 using namespace std;
 
@@ -32,7 +32,8 @@ enum Action {
     MoveCameraRight,
 	MoveCameraLeft,
 	MoveCameraUp,
-	MoveCameraDown
+	MoveCameraDown,
+    MoveCamera
 };
 
 typedef struct ActionStatus {
@@ -68,6 +69,7 @@ private:
 	GLFWwindow* _window;
 	Camera* _camera;
 
+    glm::vec2 m_mouseMoveClickPosition;
 	double _xMousePosition, _yMousePosition;
 	glm::vec2 getMousePosition();
 	

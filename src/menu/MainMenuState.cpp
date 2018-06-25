@@ -15,7 +15,7 @@ MainMenuState::~MainMenuState()
 
 }
 
-void MainMenuState::update(double deltaTime)
+void MainMenuState::update(double deltaTime, double timeStamp)
 {
 	
 }

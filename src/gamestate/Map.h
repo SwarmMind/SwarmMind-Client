@@ -20,7 +20,7 @@ public:
 
 	void updateGameState(class Gamestate* newState);
 
-	void update(double deltaTime);
+	void update(double deltaTime, double timeStamp);
 	void draw(class Renderer& renderer);
 
 	const double moveAnimationTime = 3.0;

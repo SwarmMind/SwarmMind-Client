@@ -22,12 +22,12 @@ ConnectedState::~ConnectedState()
 	delete map;
 }
 
-void ConnectedState::update(double deltaTime)
+void ConnectedState::update(double deltaTime, double timeStamp)
 {
 	networker.update();
 	if (map != nullptr)
 	{
-		map->update(deltaTime);
+		map->update(deltaTime, timeStamp);
 	}
 }
 
