@@ -29,9 +29,12 @@ before_build:
       mkdir build
       cd build
       cmake --version
-      cmake .. -DGLFW_DIR=C:\deps\glfw -G "Visual Studio 15 2017 Win64"
+      cmake .. -Dglfw3_DIR=C:\deps\glfw -G "Visual Studio 15 2017 Win64"
 build:
   project: build\SwarmMind.sln
 #  verbosity: minimal
   parallel: true
-
+artifacts:
+  - path: build
+    name: Build output
+    type: zip
