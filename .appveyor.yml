@@ -12,7 +12,7 @@ install:
   - cd C:\projects\glfw
   - git fetch --depth 1 --tags
   - git checkout 3.2.1
-  - mkdir ../build-glfw && cd ../build-glfw
+  - cd .. && mkdir build-glfw && cd build-glfw
   - cmake \
     -DCMAKE_INSTALL_PREFIX=C:\deps\glfw \
     -G "Visual Studio 15 2017 Win64" \
@@ -28,7 +28,7 @@ install:
   - cd C:\projects\glbinding
   - git fetch --depth 1 --tags
   - git checkout v2.1.4
-  - mkdir ../build-glbinding && cd ../build-glbinding
+  - cd .. && mkdir build-glbinding && cd build-glbinding
   - cmake \
     -DCMAKE_CXX_FLAGS=/D_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING \
     -DCMAKE_INSTALL_PREFIX=C:\deps\glbinding \
