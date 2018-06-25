@@ -18,7 +18,7 @@ install:
     -G "Visual Studio 15 2017 Win64" \
     ../glfw
   - cmake --build .
-  - cmake --build . --target=install
+  - cmake --build . --target install
 
   - git clone --depth 1 https://github.com/g-truc/glm.git C:\projects\glm
   - cd C:\projects\glm
@@ -36,7 +36,7 @@ install:
     -G "Visual Studio 15 2017 Win64" \
     ../glbinding
   - cmake --build .
-  - cmake --build . --target=install
+  - cmake --build . --target install
 before_build:
   - cmd: |
       mkdir build
