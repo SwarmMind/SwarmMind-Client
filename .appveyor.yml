@@ -47,19 +47,15 @@ install:
   - cmake --build .
   - cmake --build . --target install
 
-  - git clone --depth 1 --recurse-submodules https://github.com/socketio/socket.io-client-cpp C:\projects\sioclient
+  - git clone --depth 1 --recurse-submodules https://github.com/SwarmMind/socket.io-client-cpp.git C:\projects\sioclient
   - cd C:\projects\sioclient
   - git fetch --depth 1 --tags
-  - cd lib/websocketpp
-  - git checkout master
-  - cd ../..
-#  - git submodule init && git submodule update --depth 1
   - cd .. && mkdir build-sioclient && cd build-sioclient
   - cmake \
     -DCMAKE_INSTALL_PREFIX=C:\deps\sioclient \
     -DBOOST_ROOT=C:\Libraries\boost_1_67_0 \
     -DBOOST_VER=1.67.0 \
-    -DCMAKE_CXX_FLAGS=/D_WEBSOCKETPP_CPP11_STRICT_ \
+    -DCMAKE_CXX_FLAGS=/D_SCL_SECURE_NO_WARNINGS \
     -G "Visual Studio 15 2017 Win64" \
     ../sioclient
   - cmake --build .
