@@ -78,8 +78,8 @@ before_build:
   - cmake --version
   - cmake \
     -DCMAKE_BUILD_TYPE=%CONFIGURATION% \
-    -DCMAKE_PREFIX_PATH=C:\deps\glfw;C:\deps\glbinding \
-    -DSIOCLIENT_DIR=C:\deps\sioclient \
+    -DCMAKE_PREFIX_PATH=C:\deps\glfw;C:\deps\glbinding;C:\deps\sioclient \
+    -DSIOCLIENT_USE_FIND_PACKAGE=ON \
     -G "Visual Studio 15 2017 Win64" \
     ..
 build:
