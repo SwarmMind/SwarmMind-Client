@@ -56,7 +56,7 @@ install:
     -DCMAKE_INSTALL_PREFIX=C:\deps\sioclient \
     -DBOOST_ROOT=C:\Libraries\boost_1_67_0 \
     -DBOOST_VER=1.67.0 \
-    -DCMAKE_CXX_FLAGS=/Ze \
+    -DCMAKE_CXX_FLAGS=/D_WEBSOCKETPP_CPP11_STRICT_ \
     -G "Visual Studio 15 2017 Win64" \
     ../sioclient
   - cmake --build .
