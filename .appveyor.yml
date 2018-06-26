@@ -7,6 +7,11 @@ cache:
   - C:\projects\glfw
   - C:\projects\glbinding
   - C:\projects\glm
+  - C:\projects\sioclient
+  - C:\projects\build-glfw -> appveyor.yml
+  - C:\projects\build-glbinding -> appveyor.yml
+  - C:\projects\build-glm -> appveyor.yml
+  - C:\projects\build-sioclient -> appveyor.yml
 install:
   - git clone --depth 1 https://github.com/glfw/glfw.git C:\projects\glfw
   - cd C:\projects\glfw
@@ -75,8 +80,9 @@ before_build:
     -DSIOCLIENT_DIR=C:\deps\sioclient \
     -G "Visual Studio 15 2017 Win64" \
     ..
+  - dir
 build:
-  project: build\SwarmMind.sln
+  project: build\swarmmind.sln
 #  verbosity: minimal
   parallel: true
 artifacts:
