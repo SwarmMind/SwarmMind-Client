@@ -67,7 +67,7 @@ before_build:
       mkdir build
       cd build
       cmake --version
-      cmake -Dglfw3_DIR=C:\deps\glfw -Dglbinding_DIR=C:\deps\glbinding -DSIOCLIENT_DIR=C:\deps\sioclient -G "Visual Studio 15 2017 Win64" ..
+      cmake -DCMAKE_PREFIX_PATH=C:\deps\glfw;C:\deps\glbinding -DSIOCLIENT_DIR=C:\deps\sioclient -G "Visual Studio 15 2017 Win64" ..
 build:
   project: build\SwarmMind.sln
 #  verbosity: minimal
