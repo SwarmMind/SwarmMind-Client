@@ -82,9 +82,8 @@ before_build:
     -DSIOCLIENT_DIR=C:\deps\sioclient \
     -G "Visual Studio 15 2017 Win64" \
     ..
-  - dir
 build:
-  project: build\swarmmind.sln
+  project: build\SwarmMind-Client.sln
 #  verbosity: minimal
   parallel: true
 artifacts:
