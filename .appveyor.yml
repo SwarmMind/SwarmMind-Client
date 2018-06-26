@@ -50,6 +50,9 @@ install:
   - git clone --depth 1 --recurse-submodules https://github.com/socketio/socket.io-client-cpp C:\projects\sioclient
   - cd C:\projects\sioclient
   - git fetch --depth 1 --tags
+  - cd lib/websocketpp
+  - git checkout master
+  - cd ../..
 #  - git submodule init && git submodule update --depth 1
   - cd .. && mkdir build-sioclient && cd build-sioclient
   - cmake \
