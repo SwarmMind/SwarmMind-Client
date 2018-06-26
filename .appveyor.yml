@@ -47,7 +47,7 @@ install:
   - cmake --build .
   - cmake --build . --target install
 
-  - git clone --depth 1 --recurse-submodules https://github.com/SwarmMind/socket.io-client-cpp.git C:\projects\sioclient
+  - git clone --depth 1 --branch fixes https://github.com/SwarmMind/socket.io-client-cpp.git C:\projects\sioclient
   - cd C:\projects\sioclient
   - git fetch --depth 1 --tags
   - cd .. && mkdir build-sioclient && cd build-sioclient
