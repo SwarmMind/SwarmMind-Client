@@ -14,6 +14,7 @@ install:
   - git checkout 3.2.1
   - cd .. && mkdir build-glfw && cd build-glfw
   - cmake \
+    -DCMAKE_BUILD_TYPE=%CONFIGURATION% \
     -DCMAKE_INSTALL_PREFIX=C:\deps\glfw \
     -G "Visual Studio 15 2017 Win64" \
     ../glfw
@@ -26,6 +27,7 @@ install:
   - git checkout 0.9.9.0
   - cd .. && mkdir build-glm && cd build-glm
   - cmake \
+    -DCMAKE_BUILD_TYPE=%CONFIGURATION% \
     -DCMAKE_INSTALL_PREFIX=C:\deps\glm \
     -DGLM_INSTALL_ENABLE=true \
     -G "Visual Studio 15 2017 Win64" \
@@ -39,6 +41,7 @@ install:
   - git checkout v2.1.4
   - cd .. && mkdir build-glbinding && cd build-glbinding
   - cmake \
+    -DCMAKE_BUILD_TYPE=%CONFIGURATION% \
     -DCMAKE_CXX_FLAGS=/D_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING \
     -DCMAKE_PREFIX_PATH=C:\deps\glfw \
     -DCMAKE_INSTALL_PREFIX=C:\deps\glbinding \
@@ -52,6 +55,7 @@ install:
   - git fetch --depth 1 --tags
   - cd .. && mkdir build-sioclient && cd build-sioclient
   - cmake \
+    -DCMAKE_BUILD_TYPE=%CONFIGURATION% \
     -DCMAKE_INSTALL_PREFIX=C:\deps\sioclient \
     -DBOOST_ROOT=C:\Libraries\boost_1_67_0 \
     -DBOOST_VER=1.67.0 \
@@ -62,12 +66,15 @@ install:
   - cmake --build . --target install
 
 before_build:
-  - cmd: |
-      cd C:\projects\swarmmind-client
-      mkdir build
-      cd build
-      cmake --version
-      cmake -DCMAKE_PREFIX_PATH=C:\deps\glfw;C:\deps\glbinding -DSIOCLIENT_DIR=C:\deps\sioclient -G "Visual Studio 15 2017 Win64" ..
+  - cd C:\projects\swarmmind-client
+  - mkdir build && cd build
+  - cmake --version
+  - cmake \
+    -DCMAKE_BUILD_TYPE=%CONFIGURATION% \
+    -DCMAKE_PREFIX_PATH=C:\deps\glfw;C:\deps\glbinding \
+    -DSIOCLIENT_DIR=C:\deps\sioclient \
+    -G "Visual Studio 15 2017 Win64" \
+    ..
 build:
   project: build\SwarmMind.sln
 #  verbosity: minimal
