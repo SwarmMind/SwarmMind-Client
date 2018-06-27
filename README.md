@@ -2,20 +2,20 @@
 
 [![Build status](https://ci.appveyor.com/api/projects/status/1bdud8dmgn9i03l6?svg=true)](https://ci.appveyor.com/project/hesiod/swarmmind-client)
 
-The Client for the SwarmMind game, written in OpenGL and C++, connects to the server via Socket.IO
+The client for the SwarmMind game, written in OpenGL and C++, connects to the server via Socket.IO
 
 ## Build Instructions
-The SwarmMind-Client uses CMake (v.3.8 required) as its build system and has the following dependencies:
+The client uses CMake (v3.8 required) as its build system and has the following dependencies:
 1. [GLFW 3.2.1](http://www.glfw.org/)
 2. [glbinding](https://github.com/cginternals/glbinding)
-3. [socket.IO c++ client](https://github.com/socketio/socket.io-client-cpp)
+3. A [fork](https://github.com/SwarmMind/socket.io-client-cpp) (with some fixes and build systems improvements) of the [socket.io C++ client](https://github.com/socketio/socket.io-client-cpp)
 4. [glm](https://glm.g-truc.net/0.9.9/index.html)
 
 ### Building GLFW
 Follow the [build instructions](http://www.glfw.org/docs/latest/compile_guide.html#compile_generate) on the GLFW site to build the library using Cmake.
 
 On Windows:
-* Make sure to set the CMAKE_INSTALL_DIR to the directory, you want your generated Cmake files to be copied to.
+* Make sure to set the `CMAKE_INSTALL_DIR` to the directory, you want your generated Cmake files to be copied to.
 * Build the INSTALL project in Visual Studio on Release (x64/x32 depending on your operating system)
 
 ### Building glbinding
@@ -23,23 +23,17 @@ Download [glbinding 2.1.4](https://github.com/cginternals/glbinding/releases/tag
 In this directory create a /build folder and build glbinding into it.
 Compile glbinding using your favorite compiler.
 
-### Building the socket.IO C++ client
-For SwarmMind-developers on Windows:
-1. Please visit our slack and download and unzip sioclient.zip
+### Building the socket.io C++ client
+## Instructions for Windows
+1. Please visit our Slack and download and unzip sioclient.zip
 
-For SwarmMind-developers on Unix:
-1. Install [boost](boost.org) (using your favorite package manager or by building it from scratch)
-2. clone the [socket.IO c++ client](https://github.com/socketio/socket.io-client-cpp)
-3. you must execute:
-  ``` shell
-  cd socket.io-client-cpp/lib/websocketpp
-  git pull origin master
-  cd ../..
-  ```
-4. build the library using cmake
-5. compile the library
-6. you should now have a sioclient.a file and the include directory for the socket.IO client
-7. create a folder and copy the files so they form the following folder structure:
+## Instructions for Linux/macOS
+1. Install [boost](https://boost.org) (using your favorite package manager or by building it from scratch)
+2. Clone the [socket.io C++ client fork](https://github.com/SwarmMind/socket.io-client-cpp)
+3. build the library using cmake
+4. compile the library
+5. Ensure you have the library (`sioclient.a`) and the include directory
+6. Create a new folder and copy the files so they form the following folder structure:
 * include
   * sio_client.h
   * sio_message.h
@@ -62,7 +56,7 @@ Note: on Windows, the folder structure should look the same but all files ending
 Just download and unzip Version 0.9.9.0 of [glm](https://glm.g-truc.net/0.9.9/index.html).
 Run Cmake in the folder you unzipped glm to, make sure to set GLM_INSTALL_ENABLE to true.
 
-### Adding the libraries and building the SwarmMind-Client
+### Adding the libraries and building the client
 1. Download the repository (either by pulling from the repository or downloading the zip file).
 2. Go to the repositories directory and run cmake.
 3. Set the glfw3_DIR variable to "your-glfw3-install-dir"/lib/cmake/glfw3
