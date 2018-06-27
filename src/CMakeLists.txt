@@ -54,3 +54,7 @@ find_package(glfw3 REQUIRED)
 find_package(glbinding REQUIRED)
 
 target_link_libraries(SwarmMind-Client PUBLIC glbinding::glbinding glfw)
+if(MSVC)
+target_compile_options(SwarmMind-Client PRIVATE /wd4251)
+endif()
+
