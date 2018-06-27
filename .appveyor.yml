@@ -15,7 +15,9 @@ cache:
 install:
   - call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat"
 
-  - git clone --depth 1 https://github.com/glfw/glfw.git C:\projects\glfw
+  - if not exist "C:\projects\glfw" \
+    git clone --depth 1 --no-checkout \
+    https://github.com/glfw/glfw.git C:\projects\glfw
   - cd C:\projects\glfw
   - git fetch --depth 1 --tags
   - git checkout 3.2.1
@@ -28,7 +30,9 @@ install:
   - cmake --build . --config %CONFIGURATION%
   - cmake --build . --config %CONFIGURATION% --target install
 
-  - git clone --depth 1 https://github.com/g-truc/glm.git C:\projects\glm
+  - if not exist "C:\projects\glm" \
+    git clone --depth 1 --no-checkout \
+    https://github.com/g-truc/glm.git C:\projects\glm
   - cd C:\projects\glm
   - git fetch --depth 1 --tags
   - git checkout 0.9.9.0
@@ -42,7 +46,9 @@ install:
   - cmake --build . --config %CONFIGURATION%
   - cmake --build . --config %CONFIGURATION% --target install
 
-  - git clone --depth 1 https://github.com/cginternals/glbinding C:\projects\glbinding
+  - if not exist "C:\projects\glbinding" \
+    git clone --depth 1 --no-checkout \
+    https://github.com/cginternals/glbinding C:\projects\glbinding
   - cd C:\projects\glbinding
   - git fetch --depth 1 --tags
   - git checkout v2.1.4
@@ -57,7 +63,9 @@ install:
   - cmake --build . --config %CONFIGURATION%
   - cmake --build . --config %CONFIGURATION% --target install
 
-  - git clone --depth 1 --branch fixes https://github.com/SwarmMind/socket.io-client-cpp.git C:\projects\sioclient
+  - if not exist "C:\projects\sioclient" \
+    git clone --depth 1 --no-checkout --branch fixes \
+    https://github.com/SwarmMind/socket.io-client-cpp.git C:\projects\sioclient
   - cd C:\projects\sioclient
   - git fetch --depth 1 --tags
   - cd .. && mkdir build-sioclient && cd build-sioclient
