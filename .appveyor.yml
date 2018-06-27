@@ -50,7 +50,7 @@ install:
   - cmake \
     -DCMAKE_BUILD_TYPE=%CONFIGURATION% \
     -DCMAKE_INSTALL_PREFIX=C:\deps\glbinding \
-    -DCMAKE_CXX_FLAGS=/D_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING;/EHsc \
+    -DCMAKE_CXX_FLAGS="/D_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING;/EHsc" \
     -DCMAKE_PREFIX_PATH=C:\deps\glfw \
     -G "Visual Studio 15 2017 Win64" \
     ../glbinding
@@ -64,7 +64,7 @@ install:
   - cmake \
     -DCMAKE_BUILD_TYPE=%CONFIGURATION% \
     -DCMAKE_INSTALL_PREFIX=C:\deps\sioclient \
-    -DCMAKE_CXX_FLAGS=/D_SCL_SECURE_NO_WARNINGS;/EHsc \
+    -DCMAKE_CXX_FLAGS="/D_SCL_SECURE_NO_WARNINGS;/EHsc" \
     -DBOOST_ROOT=C:\Libraries\boost_1_67_0 \
     -DBOOST_VER=1.67.0 \
     -G "Visual Studio 15 2017 Win64" \
