@@ -1,4 +1,7 @@
 # SwarmMind-Client
+
+[![Build status](https://ci.appveyor.com/api/projects/status/1bdud8dmgn9i03l6?svg=true)](https://ci.appveyor.com/project/hesiod/swarmmind-client)
+
 The Client for the SwarmMind game, written in OpenGL and C++, connects to the server via Socket.IO
 
 ## Build Instructions
