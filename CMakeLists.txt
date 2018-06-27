@@ -3,6 +3,10 @@ project(SwarmMind-Client)
 
 set(CMAKE_CXX_STANDARD 14)
 
+foreach(path ${CMAKE_PREFIX_PATH})
+  message("Using Prefix Path: " ${path})
+endforeach(path)
+
 include_directories(src)
 add_subdirectory(src)
 
