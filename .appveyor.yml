@@ -64,6 +64,7 @@ install:
     -DCMAKE_INSTALL_PREFIX=C:\deps\glbinding \
     -DCMAKE_CXX_FLAGS="/D_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING /EHsc" \
     -DCMAKE_PREFIX_PATH=C:\deps\glfw \
+    -DBUILD_SHARED_LIBS=OFF \
     -G "Visual Studio 15 2017 Win64" \
     ../glbinding
   - cmake --build . --config %CONFIGURATION%
