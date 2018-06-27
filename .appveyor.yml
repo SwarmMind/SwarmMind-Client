@@ -31,6 +31,8 @@ install:
   - cmake \
     -DCMAKE_BUILD_TYPE=%CONFIGURATION% \
     -DCMAKE_INSTALL_PREFIX=C:\deps\glfw \
+    -DGLFW_BUILD_EXAMPLES=OFF \
+    -DGLFW_BUILD_TESTS=OFF \
     -G "Visual Studio 15 2017 Win64" \
     ../glfw
   - cmake --build . --config %CONFIGURATION%
@@ -65,6 +67,9 @@ install:
     -DCMAKE_CXX_FLAGS="/D_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING /EHsc" \
     -DCMAKE_PREFIX_PATH=C:\deps\glfw \
     -DBUILD_SHARED_LIBS=OFF \
+    -DOPTION_BUILD_TESTS=OFF \
+    -DOPTION_BUILD_GPU_TESTS=OFF \
+    -DOPTION_BUILD_TOOLS=OFF \
     -G "Visual Studio 15 2017 Win64" \
     ../glbinding
   - cmake --build . --config %CONFIGURATION%
@@ -98,7 +103,7 @@ before_build:
     ..
 build:
   project: build\SwarmMind-Client.sln
-#  verbosity: minimal
+  verbosity: minimal
   parallel: true
 artifacts:
   - path: build
