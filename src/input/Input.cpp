@@ -175,7 +175,7 @@ glm::vec2 Input::mousePositionInWorld() {
 glm::vec2 Input::screenToWorldCoordinate(glm::vec2 mousePosition) {
 
 	int bufferWidth, bufferHeight;
-	glfwGetFramebufferSize(_window, &bufferWidth, &bufferHeight);
+	glfwGetWindowSize(_window, &bufferWidth, &bufferHeight);
 	
 	// set origin to lower left corner
 	mousePosition.y = bufferHeight - mousePosition.y;

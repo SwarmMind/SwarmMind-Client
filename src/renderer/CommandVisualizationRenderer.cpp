@@ -8,102 +8,131 @@
 #include <iostream>
 
 CommandVisualizationRenderer::CommandVisualizationRenderer(Camera& _camera)
-	: camera{_camera}
+    : camera{ _camera }
 {
-	for (size_t i = 0; i < offsets.size(); i++)
-	{
-		offsets.at(i) = i * (CommandVisualizer::numVertices + 1);
-	}
+    for (size_t i = 0; i < offsets.size(); i++)
+    {
+        offsets.at(i) = i * (CommandVisualizer::numVertices + 1);
+    }
 
-	for (auto& count : counts)
-	{
-		count = CommandVisualizer::numVertices + 1;
-	}
-	
-	program = loadProgram("shaders/commandVisualization.vert", "shaders/commandVisualization.frag");
-	glGenVertexArrays(1, &vertexArrayObject);
-	glBindVertexArray(vertexArrayObject);
+    for (auto& count : counts)
+    {
+        count = CommandVisualizer::numVertices + 1;
+    }
 
-	glGenBuffers(1, &positionBuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, positionBuffer);
-	glBufferStorage(GL_ARRAY_BUFFER, CommandVisualizationRenderer::bufferSize * floatsPerVertex * sizeof(GLfloat), nullptr, GL_MAP_WRITE_BIT);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, floatsPerVertex * sizeof(GLfloat), 0);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, floatsPerVertex * sizeof(GLfloat), reinterpret_cast<void*>(3 * sizeof(GLfloat)));
-	glEnableVertexAttribArray(2);
-	
-	glGenBuffers(1, &colorBuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, colorBuffer);
-	glBufferStorage(GL_ARRAY_BUFFER, CommandVisualizationRenderer::bufferSize * bytesPerVertex * sizeof(GLubyte), nullptr, GL_MAP_WRITE_BIT);
-	glVertexAttribPointer(1, 4, GL_UNSIGNED_BYTE, GL_TRUE, bytesPerVertex * sizeof(GLubyte), 0);
-	glEnableVertexAttribArray(1);
+    program = loadProgram("shaders/commandVisualization.vert", "shaders/commandVisualization.frag");
+    glGenVertexArrays(1, &vertexArrayObject);
+    glBindVertexArray(vertexArrayObject);
 
+    glGenBuffers(1, &positionBuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, positionBuffer);
+    glBufferData(GL_ARRAY_BUFFER, CommandVisualizationRenderer::bufferSize * floatsPerVertex * sizeof(GLfloat), nullptr, GL_DYNAMIC_DRAW);
 
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, floatsPerVertex * sizeof(GLfloat), 0);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, floatsPerVertex * sizeof(GLfloat), reinterpret_cast<void*>(3 * sizeof(GLfloat)));
+    glEnableVertexAttribArray(2);
+
+    glGenBuffers(1, &colorBuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, colorBuffer);
+    glBufferData(GL_ARRAY_BUFFER, CommandVisualizationRenderer::bufferSize * bytesPerVertex * sizeof(GLubyte), nullptr, GL_DYNAMIC_DRAW);
+
+    glVertexAttribPointer(1, 4, GL_UNSIGNED_BYTE, GL_TRUE, bytesPerVertex * sizeof(GLubyte), 0);
+    glEnableVertexAttribArray(1);
 }
 
 CommandVisualizationRenderer::~CommandVisualizationRenderer()
 {
-	if(mappedPositionBuffer != nullptr)
-		unmapBuffers();
+    if (mappedPositionBuffer != nullptr)
+        unmapBuffers();
 
-	glDeleteProgram(program);
-	glDeleteVertexArrays(1, &vertexArrayObject);
-	glDeleteBuffers(1, &colorBuffer);
-	glDeleteBuffers(1, &positionBuffer);
+    glDeleteProgram(program);
+    glDeleteVertexArrays(1, &vertexArrayObject);
+    glDeleteBuffers(1, &colorBuffer);
+    glDeleteBuffers(1, &positionBuffer);
 
 }
 
 void CommandVisualizationRenderer::preDraw()
 {
-	mapBuffers();
+    mapBuffers();
 
-	glUseProgram(program);
-	GLuint positionLocation = glGetUniformLocation(program, "camPosition");
-	GLuint sizeLocation = glGetUniformLocation(program, "camSize");
+    glUseProgram(program);
+    GLuint positionLocation = glGetUniformLocation(program, "camPosition");
+    GLuint sizeLocation = glGetUniformLocation(program, "camSize");
 
-	glUniform2f(positionLocation, camera.getX(), camera.getY());
-	glUniform2f(sizeLocation, camera.getWidth(), camera.getHeight());
+    glUniform2f(positionLocation, camera.getX(), camera.getY());
+    glUniform2f(sizeLocation, camera.getWidth(), camera.getHeight());
 }
 
 void CommandVisualizationRenderer::draw()
 {
-	unsigned int previousBufferOffset = bufferOffset;
-	unmapBuffers();
-	glBindVertexArray(vertexArrayObject);
-	glUseProgram(program);
-	glDisable(GL_DEPTH_TEST);
+    unsigned int previousBufferOffset = bufferOffset;
+    unmapBuffers();
+    glBindVertexArray(vertexArrayObject);
+    glUseProgram(program);
+    glDisable(GL_DEPTH_TEST);
 
-	glMultiDrawArrays(GL_TRIANGLE_FAN, offsets.data(), counts.data(), previousBufferOffset / (CommandVisualizer::numVertices + 1));
-	//glDrawArrays(GL_TRIANGLE_FAN, 0, previousBufferOffset);
+    glMultiDrawArrays(GL_TRIANGLE_FAN, offsets.data(), counts.data(), previousBufferOffset / (CommandVisualizer::numVertices + 1));
+    //glDrawArrays(GL_TRIANGLE_FAN, 0, previousBufferOffset);
 }
 
 void CommandVisualizationRenderer::drawCommandVisualizer(glm::vec3 pos, CommandVisualizer& visualizer)
 {
-	if (bufferOffset >= CommandVisualizationRenderer::bufferSize - CommandVisualizer::numVertices - 1)
-	{
-		draw();
-		mapBuffers();
-	}
+    if (bufferOffset >= CommandVisualizationRenderer::bufferSize - CommandVisualizer::numVertices - 1)
+    {
+        draw();
+        mapBuffers();
+    }
 
-	GLfloat position[floatsPerVertex] = { pos.x, pos.y, pos.z, 0 };
-	memcpy(mappedPositionBuffer + bufferOffset * floatsPerVertex, position, floatsPerVertex * sizeof(GLfloat));
-	
-	GLubyte color[bytesPerVertex] = { visualizer.baseRed, visualizer.baseGreen, visualizer.baseBlue, 0 };
-	memcpy(mappedColorBuffer + bufferOffset * bytesPerVertex, color, bytesPerVertex * sizeof(GLubyte));
-	
-	bufferOffset++;
+    GLfloat position[floatsPerVertex] = { pos.x, pos.y, pos.z, 0 };
+    if (mappedPositionBuffer)
+    {
+        memcpy(mappedPositionBuffer + bufferOffset * floatsPerVertex, position, floatsPerVertex * sizeof(GLfloat));
+    }
+    else {
+        glBindBuffer(GL_ARRAY_BUFFER, positionBuffer);
+        glBufferSubData(GL_ARRAY_BUFFER, bufferOffset * floatsPerVertex * sizeof(GLfloat), floatsPerVertex * sizeof(GLfloat), position);
+    }
 
-	memcpy(mappedColorBuffer + bufferOffset * bytesPerVertex, visualizer.vertexColors.data(), CommandVisualizer::numVertices * bytesPerVertex * sizeof(GLubyte));
 
-	glm::vec2 offset(-visualizer.radius, 0);
-	for (size_t i = 0; i < CommandVisualizer::numVertices; i++)
-	{
-		glm::vec4 vertexPosition = glm::vec4(pos + glm::vec3(offset, 0), 1);
-		memcpy(mappedPositionBuffer + bufferOffset * floatsPerVertex, glm::value_ptr(vertexPosition), floatsPerVertex * sizeof(GLfloat));
-		bufferOffset++;
+    GLubyte color[bytesPerVertex] = { visualizer.baseRed, visualizer.baseGreen, visualizer.baseBlue, 0 };
+    if (mappedColorBuffer)
+    {
+        memcpy(mappedColorBuffer + bufferOffset * bytesPerVertex, color, bytesPerVertex * sizeof(GLubyte));
+    }
+    else {
+        glBindBuffer(GL_ARRAY_BUFFER, colorBuffer);
+        glBufferSubData(GL_ARRAY_BUFFER, bufferOffset * bytesPerVertex * sizeof(GLubyte), bytesPerVertex * sizeof(GLubyte), color);
+    }
 
-		offset = glm::rotate(offset, glm::radians(360.f / (CommandVisualizer::numVertices - 1)));
-	}
+
+    bufferOffset++;
+    if (mappedColorBuffer)
+    {
+        memcpy(mappedColorBuffer + bufferOffset * bytesPerVertex, visualizer.vertexColors.data(), CommandVisualizer::numVertices * bytesPerVertex * sizeof(GLubyte));
+    }
+    else {
+        glBindBuffer(GL_ARRAY_BUFFER, colorBuffer);
+        glBufferSubData(GL_ARRAY_BUFFER, bufferOffset * bytesPerVertex * sizeof(GLubyte), CommandVisualizer::numVertices * bytesPerVertex * sizeof(GLubyte), color);
+    }
+
+    glm::vec2 offset(-visualizer.radius, 0);
+    for (size_t i = 0; i < CommandVisualizer::numVertices; i++)
+    {
+        glm::vec4 vertexPosition = glm::vec4(pos + glm::vec3(offset, 0.f), 1);
+        if (mappedColorBuffer)
+        {
+            memcpy(mappedPositionBuffer + bufferOffset * floatsPerVertex, glm::value_ptr(vertexPosition), floatsPerVertex * sizeof(GLfloat));
+        }
+        else {
+            glBindBuffer(GL_ARRAY_BUFFER, positionBuffer);
+            glBufferSubData(GL_ARRAY_BUFFER, bufferOffset * floatsPerVertex * sizeof(GLfloat), floatsPerVertex * sizeof(GLfloat), glm::value_ptr(vertexPosition));
+        }
+        bufferOffset++;
+
+        offset = glm::rotate(offset, glm::radians(360.f / (CommandVisualizer::numVertices - 1)));
+    }
 }
 
 const unsigned CommandVisualizationRenderer::bufferSize;
@@ -114,24 +143,24 @@ const unsigned CommandVisualizationRenderer::bytesPerVertex;
 
 void CommandVisualizationRenderer::mapBuffers()
 {
-	glBindBuffer(GL_ARRAY_BUFFER, colorBuffer);
-	mappedColorBuffer = (GLubyte*) glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
-	glBindBuffer(GL_ARRAY_BUFFER, positionBuffer);
-	mappedPositionBuffer = (GLfloat*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
+    glBindBuffer(GL_ARRAY_BUFFER, colorBuffer);
+    mappedColorBuffer = (GLubyte*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
+    glBindBuffer(GL_ARRAY_BUFFER, positionBuffer);
+    mappedPositionBuffer = (GLfloat*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
 
-	bufferOffset = 0;
+    bufferOffset = 0;
 }
 
 void CommandVisualizationRenderer::unmapBuffers()
 {
-	glBindBuffer(GL_ARRAY_BUFFER, colorBuffer);
-	glUnmapBuffer(GL_ARRAY_BUFFER);
+    glBindBuffer(GL_ARRAY_BUFFER, colorBuffer);
+    glUnmapBuffer(GL_ARRAY_BUFFER);
 
-	glBindBuffer(GL_ARRAY_BUFFER, positionBuffer);
-	glUnmapBuffer(GL_ARRAY_BUFFER);
+    glBindBuffer(GL_ARRAY_BUFFER, positionBuffer);
+    glUnmapBuffer(GL_ARRAY_BUFFER);
 
-	mappedPositionBuffer = nullptr;
-	mappedColorBuffer = nullptr;
-	bufferOffset = 0;
+    mappedPositionBuffer = nullptr;
+    mappedColorBuffer = nullptr;
+    bufferOffset = 0;
 }
 

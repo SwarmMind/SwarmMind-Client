@@ -34,8 +34,8 @@ void Game::createWindow() {
 	if (!window)
 	{
 		throw std::runtime_error{
-			"GLFW window could not be created!" \
-			"Please check your graphics driver. OpenGL v4.0 is required!\n"
+			"GLFW window could not be created!\n"
+			"Please check your graphics driver. OpenGL v4.1 is required!\n"
 		};
 	}
 }
