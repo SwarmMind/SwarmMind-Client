@@ -18,7 +18,7 @@ TextureRenderData::TextureRenderData()
 
 	glGenBuffers(1, &vertexBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-	glBufferStorage(GL_ARRAY_BUFFER, vertexBufferSize * sizeof(GLfloat), nullptr, GL_MAP_WRITE_BIT);
+    glBufferData(GL_ARRAY_BUFFER, vertexBufferSize * sizeof(GLfloat), nullptr, GL_DYNAMIC_DRAW);
 	
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, 0);
 	glEnableVertexAttribArray(0);
@@ -31,7 +31,7 @@ TextureRenderData::TextureRenderData()
 
 	glGenBuffers(1, &secondBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, secondBuffer);
-	glBufferStorage(GL_ARRAY_BUFFER, vertexBufferSize * sizeof(GLfloat), nullptr, GL_MAP_WRITE_BIT);
+    glBufferData(GL_ARRAY_BUFFER, vertexBufferSize * sizeof(GLfloat), nullptr, GL_DYNAMIC_DRAW);
 
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, 0);
 	glEnableVertexAttribArray(0);
@@ -65,7 +65,14 @@ bool TextureRenderData::addData(unsigned int size, const GLfloat* data)
 	}
 	else
 	{
-		memcpy(mappedBuffer + bufferOffset, data, size * sizeof(GLfloat));
+        if (bufferIsMapped()) {
+            memcpy(mappedBuffer + bufferOffset, data, size * sizeof(GLfloat));
+        }
+        else {
+            glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
+            glBufferSubData(GL_ARRAY_BUFFER, bufferOffset * sizeof(GLfloat), size * sizeof(GLfloat), data);
+        }
+
 		bufferOffset += size;
 		return true;
 	}

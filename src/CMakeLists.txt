@@ -27,8 +27,8 @@ set(SIOCLIENT_USE_FIND_PACKAGE OFF CACHE BOOL "Use find_package for sioclient")
 
 if(SIOCLIENT_USE_FIND_PACKAGE)
     find_package(sioclient 1.6.0 REQUIRED)
-    target_include_directories(SwarmMind-Client PRIVATE ${sioclient_INCLUDE_DIRS})
-    target_link_libraries(SwarmMind-Client PRIVATE ${sioclient_LIBRARIES})
+    target_include_directories(SwarmMind-Client PRIVATE sioclient)
+    target_link_libraries(SwarmMind-Client PRIVATE sioclient)
 else()
 if(EXISTS ${SIOCLIENT_DIR})
 	target_include_directories(SwarmMind-Client PUBLIC ${SIOCLIENT_DIR}/include)
@@ -57,4 +57,8 @@ endif()
 endif()
 
 target_link_libraries(SwarmMind-Client PUBLIC glbinding::glbinding glfw glm)
+
+if(MSVC)
+target_compile_options(SwarmMind-Client PRIVATE /wd4251)
+endif()
 
