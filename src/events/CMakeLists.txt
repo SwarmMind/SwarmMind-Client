@@ -8,4 +8,5 @@ set(sources
 	events/AccumulatedCommandsEvent.h
 	events/InitStateEvent.h
 	events/StateEvent.h
+	events/DisconnectEvent.h
 	PARENT_SCOPE)

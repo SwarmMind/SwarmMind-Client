@@ -12,6 +12,6 @@ public:
 
     virtual ~StateEvent() = default;
 
-    Gamestate* state;
+    Gamestate* m_state;
 
 };

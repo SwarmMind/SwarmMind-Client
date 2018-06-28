@@ -12,8 +12,11 @@ ConnectedState::ConnectedState(Game& _game, Sprites& _sprites, Input& _input, Ev
 	, sprites{_sprites}
 	, networker{_eventSystem}
 	, eventSystem{_eventSystem}
+    , EventListener<InitStateEvent>(_eventSystem)
+    , EventListener<StateEvent>(_eventSystem)
+    , EventListener<DisconnectEvent>(_eventSystem)
+
 {
-	enableCallbacks();
 	networker.connect(address, port);
 }
 
@@ -75,31 +78,16 @@ void ConnectedState::draw(Renderer& renderer)
 
 using namespace std::placeholders;
 
-void ConnectedState::enableCallbacks()
-{
-	networker.setConnectCallback(std::bind(&ConnectedState::onConnect, this));
-	networker.setDisconnectCallback(std::bind(&ConnectedState::onDisconnect, this));
-	networker.setInitStateCallback(std::bind(&ConnectedState::onInitState, this, _1, _2));
-	networker.setStateCallback(std::bind(&ConnectedState::onState, this, _1));
-	//networker.setGameOverCallback(std::bind(&ConnectedState::onDisconnect, this));
+void ConnectedState::receiveEvent(StateEvent* event){
+    map->updateGameState(event->m_state);
 }
 
-void ConnectedState::onInitState(Configuration config, Gamestate *gamestate) {
-	map = new Map{ input, sprites, networker, eventSystem, config };
-	map->updateGameState(gamestate);
+void ConnectedState::receiveEvent(InitStateEvent* event) {
+    map = new Map{ input, sprites, networker, eventSystem, event->m_config };
+    map->updateGameState(event->m_state);
 }
 
-void ConnectedState::onState(Gamestate *state)
-{
-	map->updateGameState(state);
-}
-
-void ConnectedState::onConnect()
-{
-}
-
-void ConnectedState::onDisconnect()
-{
-	delete map;
-	map = nullptr;
+void ConnectedState::receiveEvent(DisconnectEvent* event) {
+    delete map;
+    map = nullptr;
 }

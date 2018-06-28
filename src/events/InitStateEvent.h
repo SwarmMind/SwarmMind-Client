@@ -5,7 +5,6 @@
 #include <gamestate/Gamestate.h>
 #include <memory>
 
-
 class InitStateEvent : public Event
 {
 public:
@@ -13,7 +12,7 @@ public:
 
     virtual ~InitStateEvent() = default;
 
-    Configuration config;
-    Gamestate* state;
+    Configuration m_config;
+    Gamestate* m_state;
 
 };

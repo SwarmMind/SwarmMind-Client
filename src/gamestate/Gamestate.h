@@ -23,6 +23,7 @@ public:
 class Gamestate : public EventListener<CommandEvent>, public EventListener<AccumulatedCommandsEvent>
 {
 public:
+    Gamestate(const Gamestate& state) = default;
 	Gamestate(class EventSystem& eventSystem);
 	Gamestate(class EventSystem& eventSystem, std::map<uint32_t, Unit>& _units, const std::map<uint32_t, Monster>& _monsters);
 	~Gamestate();

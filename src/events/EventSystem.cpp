@@ -28,9 +28,15 @@ void EventSystem::removeListener(ListenerFunction* listener)
 
 void EventSystem::processEvent(Event* _event)
 {
-	for (ListenerFunction* listener : listeners)
-	{
-		(*listener)(_event);
-	}
+    std::vector<ListenerFunction*> finishedListeners;
+    std::vector<ListenerFunction*>::iterator found;
+    while ((found = std::find_if(listeners.begin(), listeners.end(), [=](ListenerFunction* listener) {
+        return std::find(finishedListeners.begin(), finishedListeners.end(), listener) == finishedListeners.end();
+    })) != listeners.end())
+    {
+        ListenerFunction* listener = *found;
+        (*listener)(_event);
+        finishedListeners.push_back(listener);
+    }
 }
 

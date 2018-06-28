@@ -10,6 +10,7 @@
 #include <events/AccumulatedCommandsEvent.h>
 #include <events/InitStateEvent.h>
 #include <events/StateEvent.h>
+#include <events/DisconnectEvent.h>
 
 using namespace std;
 
@@ -23,27 +24,13 @@ Networker::Networker(EventSystem& _eventSystem)
 	sioSocket->on("initState", bind(&Networker::onInitStateReceive, this, placeholders::_1));
 	sioSocket->on("state", bind(&Networker::onStateReceive, this, placeholders::_1));
 	sioSocket->on("accumulatedCommands", bind(&Networker::onAccumulatedCommandsReceive, this, placeholders::_1));
-	sioSocket->on("gameOver", [=](sio::event _event) {
-		if (gameOverCallback)
-		{
-			lock_guard<mutex> eventGuard(queueLock);
-			eventQueue.push(gameOverCallback);
-		}
-	});
-	sioClient.set_open_listener([=]() {
-		if (connectCallback)
-		{
-			lock_guard<mutex> eventGuard(queueLock);
-			eventQueue.push(connectCallback);
-		}
-	});
-
+	
 	sioClient.set_reconnecting_listener([=]() {
-		if (disconnectCallback)
-		{
-			lock_guard<mutex> eventGuard(queueLock);
-			eventQueue.push(disconnectCallback);
-		}
+        lock_guard<mutex> queueGuard(queueLock);
+        eventQueue.push([=]() {
+            DisconnectEvent disconnectEvent;
+            eventSystem.processEvent(&disconnectEvent);
+        });
 	});
 }
 
@@ -77,33 +64,6 @@ void Networker::disconnect()
 bool Networker::isConnected() const
 {
 	return sioClient.opened();
-}
-
-void Networker::setConnectCallback(std::function<void()> callback)
-{
-	connectCallback = callback;
-}
-
-void Networker::setDisconnectCallback(std::function<void()> callback)
-{
-	disconnectCallback = callback;
-}
-
-/*
-void Networker::setInitStateCallback(std::function<void(Configuration, Gamestate *)> callback)
-{
-	initStateCallback = callback;
-}
-
-void Networker::setStateCallback(std::function<void(Gamestate *)> callback)
-{
-	stateCallback = callback;
-}
-*/
-
-void Networker::setGameOverCallback(std::function<void()> callback)
-{
-	gameOverCallback = callback;
 }
 
 void Networker::sendCommand(uint32_t unitID, std::string action, glm::vec2 direction)
@@ -179,7 +139,6 @@ Gamestate* Networker::parseGamestate(nlohmann::json state)
 	return new Gamestate(eventSystem, units, monsters);
 }
 
-
 Configuration Networker::parseConfiguration(std::string jsonString)
 {
 	const nlohmann::json jsonConfig = nlohmann::json::parse(jsonString);
@@ -245,8 +204,6 @@ void Networker::processCommands(nlohmann::json& jsonCommands)
 
 void Networker::onStateReceive(sio::event _event)
 {
-	if (!stateCallback) return;
-
 	const string jsonMessage = _event.get_message()->get_string();
 	nlohmann::json jsonState = nlohmann::json::parse(jsonMessage);
 	Gamestate* state = parseGamestate(jsonState);
@@ -255,7 +212,7 @@ void Networker::onStateReceive(sio::event _event)
 		lock_guard<mutex> queueGuard(queueLock);
 		eventQueue.push([=]() {
             StateEvent stateEvent;
-            stateEvent.state = state;
+            stateEvent.m_state = state;
             eventSystem.processEvent(&stateEvent);
 		});
 	}
@@ -265,7 +222,6 @@ void Networker::onStateReceive(sio::event _event)
 
 void Networker::onInitStateReceive(sio::event _event)
 {
-	if (!initStateCallback) return;
 	const string jsonMessage = _event.get_message()->get_string();
 	const nlohmann::json initState = nlohmann::json::parse(jsonMessage);
 	const Configuration config = parseConfiguration(initState["config"].dump());
@@ -275,8 +231,8 @@ void Networker::onInitStateReceive(sio::event _event)
 		lock_guard<mutex> queueGuard(queueLock);
 		eventQueue.push([=]() {
             InitStateEvent initStateEvent;
-            initStateEvent.config = config;
-            initStateEvent.state = state;
+            initStateEvent.m_state = state;
+            initStateEvent.m_config = config;
             eventSystem.processEvent(&initStateEvent);
 		});
 	}

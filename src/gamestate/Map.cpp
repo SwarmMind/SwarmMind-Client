@@ -40,7 +40,7 @@ Map::~Map()
 
 void Map::updateGameState(class Gamestate* newState)
 {
-	delete gamestate;
+    delete gamestate;
 	gamestate = newState;
 
 	lastUpdate = glfwGetTime();
