@@ -2,6 +2,7 @@
 #include <imgui/imgui.h>
 #include <renderer/Renderer.h>
 #include <glm/glm.hpp>
+#include <gamestate/Networker.h>
 
 ChatSystem::ChatSystem(Input& input, Networker& networker)
     : m_input{input}
@@ -52,7 +53,8 @@ void ChatSystem::drawPopup(double timeStamp)
     if (ImGui::BeginPopup("ChatInputPopup",
         ImGuiWindowFlags_NoMove
         | ImGuiWindowFlags_NoCollapse
-        | ImGuiWindowFlags_NoSavedSettings))
+        | ImGuiWindowFlags_NoSavedSettings
+        | ImGuiWindowFlags_AlwaysAutoResize))
     {
         ImGui::Text("Chat:");
         
@@ -60,7 +62,7 @@ void ChatSystem::drawPopup(double timeStamp)
         {
             ImGui::SetKeyboardFocusHere();
         }
-        if (ImGui::InputText("##ChatInput", m_chatInput, 50, ImGuiInputTextFlags_EnterReturnsTrue))
+        if (ImGui::InputText("##ChatInput", m_chatInput, m_chatInputBufferSize, ImGuiInputTextFlags_EnterReturnsTrue))
         {
             buildChatEntry(timeStamp);
             ImGui::CloseCurrentPopup();
@@ -86,19 +88,42 @@ void ChatSystem::buildChatEntry(double timeStamp)
     chat.m_timeStamp = timeStamp;
     chat.m_position = m_clickPosition;
     chat.m_text = m_chatInput;
-    chat.m_user = "this";
+    chat.m_user = m_userName;
 
     //only add chat if its not empty
-    if(chat.m_text.size() > 0)
+    if (chat.m_text.size() > 0)
+    {
         addChat(chat);
+    }
 }
 
 void ChatSystem::addChat(ChatEntry chat)
 {
     m_chats.push_back(chat);
+    m_networker.sendChatMessage(chat);
 }
 
 void ChatSystem::draw(Renderer& renderer)
+{
+    ImVec2 imGuiDisplaySize = ImGui::GetIO().DisplaySize;
+    glm::vec2 displaySize(imGuiDisplaySize.x, imGuiDisplaySize.y);
+
+    float alpha = calculateAlpha(renderer.camera());
+
+    if (alpha > 0.05)
+    {
+        drawChats(renderer);
+    }
+
+    drawNameInput(renderer);
+}
+
+float ChatSystem::calculateAlpha(Camera &camera)
+{
+    return 1.0 - glm::smoothstep(8.f, 10.f, camera.getHeight());
+}
+
+void ChatSystem::drawChats(Renderer& renderer)
 {
     ImVec2 imGuiDisplaySize = ImGui::GetIO().DisplaySize;
     glm::vec2 displaySize(imGuiDisplaySize.x, imGuiDisplaySize.y);
@@ -107,18 +132,14 @@ void ChatSystem::draw(Renderer& renderer)
     glm::vec2 cameraPosition = glm::vec2(camera.getX(), camera.getY());
     glm::vec2 cameraView = glm::vec2(camera.getWidth(), camera.getHeight());
 
-    float alpha = 1.0 - glm::smoothstep(8.f, 10.f, camera.getHeight());
-    if (alpha <= 0.05)
-    {
-        return;
-    }
+    float alpha = calculateAlpha(renderer.camera());
 
     for (size_t i = 0; i < m_chats.size(); i++)
     {
         ChatEntry& chat = m_chats[i];
 
         //transfer position to [-1, 1]
-        glm::vec2 position = (chat.m_position - cameraPosition) / cameraView; 
+        glm::vec2 position = (chat.m_position - cameraPosition) / cameraView;
         //transfer position to [0, 1]
         position = (position + 1.f) / 2.f;
         //transfer to pixel coordinates
@@ -143,4 +164,22 @@ void ChatSystem::draw(Renderer& renderer)
         }
         ImGui::End();
     }
+}
+
+void ChatSystem::drawNameInput(Renderer& renderer)
+{
+    ImVec2 imGuiDisplaySize = ImGui::GetIO().DisplaySize;
+
+    ImGui::SetNextWindowPos(ImVec2(imGuiDisplaySize.x - 30.f, 30.f), ImGuiCond_Always, ImVec2(1.f, 0.f));
+    ImGui::Begin("UserNameInput", nullptr
+        , ImGuiWindowFlags_NoCollapse
+        | ImGuiWindowFlags_NoResize
+        | ImGuiWindowFlags_NoMove
+        | ImGuiWindowFlags_NoTitleBar
+        | ImGuiWindowFlags_AlwaysAutoResize);
+    {
+        ImGui::PushItemWidth(ImGui::GetTextLineHeight() * m_userNameBufferSize/2);
+        ImGui::InputText("Username", m_userName, m_userNameBufferSize, ImGuiInputTextFlags_NoUndoRedo | ImGuiInputTextFlags_CharsNoBlank | ImGuiInputTextFlags_AutoSelectAll);
+    }
+    ImGui::End();
 }

@@ -30,11 +30,19 @@ public:
 
     void draw(Renderer& renderer);
 
+    float calculateAlpha(Camera &camera);
+
+    void drawChats(Renderer& renderer);
+    void drawNameInput(Renderer& renderer);
+
     void buildChatEntry(double timeStamp);
 protected:
     void addChat(ChatEntry chat);
 
+    unsigned m_chatInputBufferSize = 50;
     char m_chatInput[50] = "";
+    unsigned m_userNameBufferSize = 16;
+    char m_userName[16] = "Player";
 
     std::deque<ChatEntry> m_chats;
     Input& m_input;

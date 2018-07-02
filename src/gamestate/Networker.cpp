@@ -11,6 +11,7 @@
 #include <events/InitStateEvent.h>
 #include <events/StateEvent.h>
 #include <events/DisconnectEvent.h>
+#include <gamestate/ChatSystem.h>
 
 using namespace std;
 
@@ -66,6 +67,15 @@ bool Networker::isConnected() const
 	return sioClient.opened();
 }
 
+namespace glm 
+{
+    void to_json(nlohmann::json& json, const glm::vec2& vector)
+    {
+        json["x"] = vector.x;
+        json["y"] = vector.y;
+    }
+}
+
 void Networker::sendCommand(uint32_t unitID, std::string action, glm::vec2 direction)
 {
 	if (!isConnected())
@@ -76,12 +86,25 @@ void Networker::sendCommand(uint32_t unitID, std::string action, glm::vec2 direc
 	arguments.push(sio::string_message::create(action));
 	
 	direction = glm::normalize(direction);
-	nlohmann::json directionJSON;
-	directionJSON["x"] = direction.x;
-	directionJSON["y"] = direction.y;
+    nlohmann::json directionJSON = direction;
 	arguments.push(sio::string_message::create(directionJSON.dump()));
 
 	sioSocket->emit("command", arguments);
+}
+
+void Networker::sendChatMessage(struct ChatEntry& chatEntry)
+{
+    if (!isConnected())
+        return;
+
+    sio::message::list arguments;
+    arguments.push(sio::string_message::create(chatEntry.m_user));
+    arguments.push(sio::string_message::create(chatEntry.m_text));
+    
+    nlohmann::json position = chatEntry.m_position;
+    arguments.push(sio::string_message::create(position.dump()));
+
+    sioSocket->emit("chat", arguments);
 }
 
 void Networker::update()

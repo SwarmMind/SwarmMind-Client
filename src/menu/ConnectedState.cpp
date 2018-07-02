@@ -46,8 +46,6 @@ std::string ConnectedState::statusString() const {
 void ConnectedState::drawStatus() {
 	const std::string statusMessage{ statusString() };
 
-	ImGui::SetNextWindowBgAlpha(0.5);
-
 	ImGui::SetNextWindowPos(ImVec2(30, 30), 0);
 	ImGui::Begin(statusMessage.data(), nullptr
 		, ImGuiWindowFlags_NoCollapse
