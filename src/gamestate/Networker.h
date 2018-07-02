@@ -38,6 +38,7 @@ private:
 	void onStateReceive(sio::event event);
 	void onInitStateReceive(sio::event event);
 	void onAccumulatedCommandsReceive(sio::event event);
+    void onChatReceive(sio::event event);
 
 	Gamestate* parseGamestate(nlohmann::json state);
 	Configuration parseConfiguration(std::string jsonString);

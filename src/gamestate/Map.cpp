@@ -29,7 +29,7 @@ Map::Map(Input& _input, Sprites& _sprites, Networker& _networker, EventSystem& _
 	, sprites{_sprites}
 	, lastUpdate{glfwGetTime()}
 	, eventSystem{_eventSystem}
-    , m_chats{_input, _networker}
+    , m_chats{_input, _networker, _eventSystem}
 {
 }
 
