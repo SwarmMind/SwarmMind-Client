@@ -108,7 +108,7 @@ build:
   
 after_build:
   - cd C:\projects\swarmmind-client
-  - robocopy fonts build\src\Release\fonts /mir ^& IF %ERRORLEVEL% LEQ 1 SET ERRORLEVEL=0
+  - robocopy fonts build\src\Release\fonts /mir ^& IF %ERRORLEVEL% LEQ 1 SET ERRORLEVEL=0 
   - robocopy shaders build\src\Release\shaders /mir ^& IF %ERRORLEVEL% LEQ 1 SET ERRORLEVEL=0
   - robocopy res build\src\Release\res /mir ^& IF %ERRORLEVEL% LEQ 1 SET ERRORLEVEL=0
 
