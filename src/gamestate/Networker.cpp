@@ -11,7 +11,8 @@
 #include <events/InitStateEvent.h>
 #include <events/StateEvent.h>
 #include <events/DisconnectEvent.h>
-#include <gamestate/ChatSystem.h>
+#include <events/ChatEvent.h>
+#include <gamestate/ChatEntry.h>
 
 using namespace std;
 
@@ -22,10 +23,11 @@ Networker::Networker(EventSystem& _eventSystem)
 	sioClient.set_reconnect_attempts(reconnectAttempts);
 
 	sioSocket = sioClient.socket();
-	sioSocket->on("initState", bind(&Networker::onInitStateReceive, this, placeholders::_1));
-	sioSocket->on("state", bind(&Networker::onStateReceive, this, placeholders::_1));
-	sioSocket->on("accumulatedCommands", bind(&Networker::onAccumulatedCommandsReceive, this, placeholders::_1));
-	
+	sioSocket->on("initState", bind(&Networker::onInitStateReceive, this, std::placeholders::_1));
+	sioSocket->on("state", bind(&Networker::onStateReceive, this, std::placeholders::_1));
+	sioSocket->on("accumulatedCommands", bind(&Networker::onAccumulatedCommandsReceive, this, std::placeholders::_1));
+    sioSocket->on("chat", bind(&Networker::onChatReceive, this, std::placeholders::_1));
+
 	sioClient.set_reconnecting_listener([=]() {
         lock_guard<mutex> queueGuard(queueLock);
         eventQueue.push([=]() {
@@ -73,6 +75,12 @@ namespace glm
     {
         json["x"] = vector.x;
         json["y"] = vector.y;
+    }
+
+    void from_json(const nlohmann::json& json, glm::vec2& vector)
+    {
+        vector.x = json["x"];
+        vector.y = json["y"];
     }
 }
 
@@ -137,28 +145,6 @@ Gamestate* Networker::parseGamestate(nlohmann::json state)
 		Monster monster(jsonMonster);
 		monsters.emplace(monster.id(), monster);
 	}
-
-	/*vector<nlohmann::json> commands = state["commands"];
-	for (const nlohmann::json& jsonCommand : commands)
-	{
-		if (jsonCommand["type"] == std::string("move"))
-		{
-			uint32_t ID = jsonCommand["ID"];
-			nlohmann::json jsonDirection = jsonCommand["direction"];
-			glm::vec2 direction(jsonDirection["x"], jsonDirection["y"]);
-
-			if (units.find(ID) != units.end())
-			{
-				Unit& unit = units.at(ID);
-				unit.moveTo(unit.position() + direction);
-			}
-			if (monsters.find(ID) != monsters.end())
-			{
-				Monster& monster = monsters.at(ID);
-				monster.moveTo(monster.position() + direction);
-			}
-		}
-	}*/
 	return new Gamestate(eventSystem, units, monsters);
 }
 
@@ -294,4 +280,29 @@ void Networker::onAccumulatedCommandsReceive(sio::event _event)
 			eventSystem.processEvent(&accumulatedCommandsEvent);
 		});
 	}
+}
+
+void from_json(const nlohmann::json& json, ChatEntry& chat)
+{
+    chat.m_user = json["userName"].get<std::string>();
+    chat.m_text = json["text"].get<std::string>();
+    std::string stringPosition = json["position"];
+    nlohmann::json jsonPosition = nlohmann::json::parse(stringPosition);
+    chat.m_position = jsonPosition;
+}
+
+void Networker::onChatReceive(sio::event event)
+{
+    std::string message = event.get_message()->get_string();
+    nlohmann::json jsonChat = nlohmann::json::parse(message);
+    ChatEntry chat = jsonChat;
+    
+    {
+        std::lock_guard<std::mutex> queueGuard(queueLock);
+        eventQueue.push([=]() {
+            ChatEvent chatEvent;
+            chatEvent.m_chatEntry = chat;
+            eventSystem.processEvent(&chatEvent);
+        });
+    }
 }

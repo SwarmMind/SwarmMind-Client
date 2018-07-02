@@ -4,14 +4,16 @@
 #include <glm/glm.hpp>
 #include <gamestate/Networker.h>
 
-ChatSystem::ChatSystem(Input& input, Networker& networker)
-    : m_input{input}
-    , m_networker{networker}
+ChatSystem::ChatSystem(Input& input, Networker& networker, EventSystem& eventSystem)
+    : EventListener<ChatEvent>{ eventSystem }
+    , m_input{input}
+    , m_networker{ networker }
 {}
 
 
 void ChatSystem::update(double deltaTime, double timeStamp)
 {
+    m_lastTimeStamp = timeStamp;
     drawPopup(timeStamp);
 
     while (m_chats.size() > 0 && timeStamp - m_chats.front().m_timeStamp > m_chatVisibilityTimeout)
@@ -94,13 +96,20 @@ void ChatSystem::buildChatEntry(double timeStamp)
     if (chat.m_text.size() > 0)
     {
         addChat(chat);
+        m_networker.sendChatMessage(chat);
     }
+}
+
+void ChatSystem::receiveEvent(ChatEvent* event)
+{
+    ChatEntry chat = event->m_chatEntry;
+    chat.m_timeStamp = m_lastTimeStamp;
+    addChat(chat);
 }
 
 void ChatSystem::addChat(ChatEntry chat)
 {
     m_chats.push_back(chat);
-    m_networker.sendChatMessage(chat);
 }
 
 void ChatSystem::draw(Renderer& renderer)

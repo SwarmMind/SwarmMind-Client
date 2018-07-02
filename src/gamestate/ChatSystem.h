@@ -5,22 +5,18 @@
 #include <vector>
 #include <input/Input.h>
 #include <deque>
+#include <gamestate/ChatEntry.h>
+#include <events/ChatEvent.h>
+#include <events/EventListener.h>
+#include <events/EventSystem.h>
 
 class Networker;
 class Renderer;
 
-struct ChatEntry
-{
-    double m_timeStamp;
-    glm::vec2 m_position;
-    std::string m_user;
-    std::string m_text;
-};
-
-class ChatSystem
+class ChatSystem : public EventListener<ChatEvent>
 {
 public:
-	ChatSystem(Input& input, Networker& networker);
+	ChatSystem(Input& input, Networker& networker, EventSystem& eventSystem);
 	virtual ~ChatSystem() = default;
 	
     void update(double deltaTime, double timeStamp);
@@ -36,8 +32,13 @@ public:
     void drawNameInput(Renderer& renderer);
 
     void buildChatEntry(double timeStamp);
+
+    virtual void receiveEvent(ChatEvent* event) override;
+
 protected:
     void addChat(ChatEntry chat);
+
+    double m_lastTimeStamp;
 
     unsigned m_chatInputBufferSize = 50;
     char m_chatInput[50] = "";
