@@ -107,6 +107,7 @@ build:
   parallel: true
   
 after_build:
+  - cd C:\projects\swarmmind-client
   - robocopy fonts build\src\Release\fonts /mir
   - robocopy shaders build\src\Release\shaders /mir
   - robocopy res build\src\Release\res /mir
