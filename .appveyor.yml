@@ -105,7 +105,13 @@ build:
   project: build\SwarmMind-Client.sln
   verbosity: minimal
   parallel: true
+  
+after_build:
+  - robocopy fonts build\src\Release\fonts /mir
+  - robocopy shaders build\src\Release\shaders /mir
+  - robocopy res build\src\Release\res /mir
+
 artifacts:
-  - path: build
+  - path: build\src\Release
     name: Build output
     type: zip
