@@ -24,13 +24,16 @@ private:
 	static const unsigned bytesPerVertex = 4;
 
 
-	GLuint program;
-	GLuint vertexArrayObject;
-	GLuint colorBuffer, positionBuffer;
-	GLubyte* mappedColorBuffer = nullptr;
-	GLfloat* mappedPositionBuffer = nullptr;
+	GLuint m_program;
+	GLuint m_vertexArrayObject;
+	GLuint m_colorBuffer, m_positionBuffer;
+	GLubyte* m_mappedColorBuffer = nullptr;
+	GLfloat* m_mappedPositionBuffer = nullptr;
 	void mapBuffers();
 	void unmapBuffers();
+
+    void addPositionData(size_t offset, glm::vec4 position);
+    void addColorData(size_t offset, size_t size, void* data);
 
 	std::array<GLint, bufferSize / (CommandVisualizer::numVertices + 1)> offsets;
 	std::array<GLint, bufferSize / (CommandVisualizer::numVertices + 1)> counts;

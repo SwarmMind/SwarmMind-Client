@@ -28,6 +28,7 @@ public:
 
     float calculateAlpha(Camera &camera);
 
+    void drawChatIcons(Renderer& renderer);
     void drawChats(Renderer& renderer);
     void drawNameInput(Renderer& renderer);
 
@@ -51,7 +52,7 @@ protected:
 
     glm::vec2 m_clickPosition;
     double m_doubleClickTimeout = -1;
-    double m_doubleClickThreshold = 1;
+    double m_doubleClickThreshold = 0.5;
     double m_chatVisibilityTimeout = 10;
 private:
 };

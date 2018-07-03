@@ -3,6 +3,7 @@
 #include <renderer/Renderer.h>
 #include <glm/glm.hpp>
 #include <gamestate/Networker.h>
+#include <renderer/Sprites.h>
 
 ChatSystem::ChatSystem(Input& input, Networker& networker, EventSystem& eventSystem)
     : EventListener<ChatEvent>{ eventSystem }
@@ -33,7 +34,6 @@ void ChatSystem::update(double deltaTime, double timeStamp)
         {
             m_clickPosition = m_input.mousePositionInWorld();
             openPopup();
-
         }
         else
         {
@@ -123,6 +123,10 @@ void ChatSystem::draw(Renderer& renderer)
     {
         drawChats(renderer);
     }
+    else
+    {
+        drawChatIcons(renderer);
+    }
 
     drawNameInput(renderer);
 }
@@ -130,6 +134,16 @@ void ChatSystem::draw(Renderer& renderer)
 float ChatSystem::calculateAlpha(Camera &camera)
 {
     return 1.0 - glm::smoothstep(8.f, 10.f, camera.getHeight());
+}
+
+void ChatSystem::drawChatIcons(Renderer& renderer)
+{
+    float size = 0.5f;
+    for (const ChatEntry& chat : m_chats)
+    {
+        glm::vec2 position = chat.m_position;
+        renderer.drawSprite(glm::vec3(position.x, position.y - size, 1), size, size, SpriteEnum::ChatIcon);
+    }
 }
 
 void ChatSystem::drawChats(Renderer& renderer)
