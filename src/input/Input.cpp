@@ -81,12 +81,7 @@ void Input::update(double deltaTime)
 
 void Input::scrollCallback(GLFWwindow* window, double xoffset, double yoffset) 
 {
-	if (yoffset < 0) { // scrolling up
-		_camera->setCamera(_camera->getX(), _camera->getY(), std::min(_camera->getHeight()*1.3, 20.0));
-	}
-	else { // scrolling down
-		_camera->setCamera(_camera->getX(), _camera->getY(), std::max(_camera->getHeight()*0.7, 2.0));
-	}
+    _camera->setCamera(_camera->getX(), _camera->getY(), std::max(2.0 ,std::min(_camera->getHeight() - yoffset, 20.0)));
 }
 
 float Input::cameraMovementSpeed() {
