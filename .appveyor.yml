@@ -107,12 +107,12 @@ build:
   parallel: true
   
 after_build:
-  - cd C:\projects\swarmmind-client
-  - robocopy fonts build\src\Release\fonts /mir ^& IF %ERRORLEVEL% LEQ 1 SET ERRORLEVEL=0 
-  - robocopy shaders build\src\Release\shaders /mir ^& IF %ERRORLEVEL% LEQ 1 SET ERRORLEVEL=0
-  - robocopy res build\src\Release\res /mir ^& IF %ERRORLEVEL% LEQ 1 SET ERRORLEVEL=0
+  - ps: cd C:\projects\swarmmind-client
+  - ps: cp fonts build\src\Release -r -v
+  - ps: cp shaders build\src\Release -r -v
+  - ps: cp res build\src\Release -r -v
 
 artifacts:
-  - path: build\src\Release
+  - path: build\src
     name: Build output
     type: zip
