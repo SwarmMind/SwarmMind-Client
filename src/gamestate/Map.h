@@ -10,8 +10,9 @@
 #include <string>
 #include <glm/vec2.hpp>
 #include <gamestate/ChatSystem.h>
+#include <events/StateEvent.h>
 
-class Map
+class Map : public EventListener<StateEvent>
 {
 public:
 	Map(class Input& _input, class Sprites& _sprites, Networker& _networker, class EventSystem& _eventSystem, const class Configuration& config);
@@ -25,20 +26,23 @@ public:
 
 	const double moveAnimationTime = 3.0;
 
-private:
-    ChatSystem m_chats;
-	class Gamestate* gamestate;
-	class Sprites& sprites;
-	class Input& input;
-	class Networker& networker;
-	class EventSystem& eventSystem;
-    class Configuration config;
-	
-	uint32_t selectedUnit = 0;
-	bool selectedUnitIsValid();
-	glm::vec2 mouseClickPosition;
+    virtual void receiveEvent(StateEvent* event) override;
 
-	double lastUpdate;
+protected:
+    ChatSystem m_chats;
+	class Gamestate* m_gamestate;
+	class Sprites& m_sprites;
+	class Input& m_input;
+	class Networker& m_networker;
+	class EventSystem& m_eventSystem;
+    class Configuration m_config;
+	
+	uint32_t m_selectedUnit = 0;
+	bool selectedUnitIsValid();
+	glm::vec2 m_mouseClickPosition;
+
+	double m_lastUpdate;
+    double m_roundDuration = 6.0;
 
 	void updateSelection();
 	void updateSelectionAction(Action action, int selectedPlayerNumber);

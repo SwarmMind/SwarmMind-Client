@@ -21,22 +21,19 @@ public:
 	
     void update(double deltaTime, double timeStamp);
 
-    void openPopup();
-    void drawPopup(double timeStamp);
-
     void draw(Renderer& renderer);
-
-    float calculateAlpha(Camera &camera);
-
-    void drawChatIcons(Renderer& renderer);
-    void drawChats(Renderer& renderer);
-    void drawNameInput(Renderer& renderer);
-
-    void buildChatEntry(double timeStamp);
-
     virtual void receiveEvent(ChatEvent* event) override;
 
 protected:
+    void openPopup();
+    void drawPopup(double timeStamp);
+    
+    float calculateAlpha(Camera &camera);
+    void drawNameInput(Renderer& renderer);
+    void drawChatIcons(Renderer& renderer);
+    void drawChats(Renderer& renderer);
+    
+    void buildChatEntry(double timeStamp);
     void addChat(ChatEntry chat);
 
     double m_lastTimeStamp;

@@ -11,7 +11,7 @@
 #include <events/StateEvent.h>
 #include <events/DisconnectEvent.h>
 
-class ConnectedState : public MenuState, public EventListener<InitStateEvent>, public EventListener<StateEvent>, public EventListener<DisconnectEvent>
+class ConnectedState : public MenuState, public EventListener<InitStateEvent>, public EventListener<DisconnectEvent>
 {
 public:
     ConnectedState(class Game& _game, class Sprites& _sprites, Input& input, class EventSystem& eventSystem, std::string address, unsigned port = 3000);
@@ -23,7 +23,6 @@ public:
 	std::string statusString() const;
 	void drawStatus();
 
-	virtual void receiveEvent(StateEvent* event) override;
     virtual void receiveEvent(InitStateEvent* event) override;
     virtual void receiveEvent(DisconnectEvent* event) override;
 	

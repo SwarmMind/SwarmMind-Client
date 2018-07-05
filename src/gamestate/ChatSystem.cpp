@@ -11,13 +11,12 @@ ChatSystem::ChatSystem(Input& input, Networker& networker, EventSystem& eventSys
     , m_networker{ networker }
 {}
 
-
 void ChatSystem::update(double deltaTime, double timeStamp)
 {
     m_lastTimeStamp = timeStamp;
     drawPopup(timeStamp);
 
-    while (m_chats.size() > 0 && timeStamp - m_chats.front().m_timeStamp > m_chatVisibilityTimeout)
+    while (!m_chats.empty() && timeStamp - m_chats.front().m_timeStamp > m_chatVisibilityTimeout)
     {
         m_chats.pop_front();
     }
@@ -93,7 +92,7 @@ void ChatSystem::buildChatEntry(double timeStamp)
     chat.m_user = m_userName;
 
     //only add chat if its not empty
-    if (chat.m_text.size() > 0)
+    if (!chat.m_text.empty())
     {
         addChat(chat);
         m_networker.sendChatMessage(chat);

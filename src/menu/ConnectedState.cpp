@@ -13,7 +13,6 @@ ConnectedState::ConnectedState(Game& _game, Sprites& _sprites, Input& _input, Ev
 	, networker{_eventSystem}
 	, eventSystem{_eventSystem}
     , EventListener<InitStateEvent>(_eventSystem)
-    , EventListener<StateEvent>(_eventSystem)
     , EventListener<DisconnectEvent>(_eventSystem)
 
 {
@@ -75,10 +74,6 @@ void ConnectedState::draw(Renderer& renderer)
 }
 
 using namespace std::placeholders;
-
-void ConnectedState::receiveEvent(StateEvent* event){
-    map->updateGameState(event->m_state);
-}
 
 void ConnectedState::receiveEvent(InitStateEvent* event) {
     map = new Map{ input, sprites, networker, eventSystem, event->m_config };
