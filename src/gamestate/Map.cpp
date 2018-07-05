@@ -32,6 +32,7 @@ Map::Map(Input& _input, Sprites& _sprites, Networker& _networker, EventSystem& _
 	, m_lastUpdate{glfwGetTime()}
 	, m_eventSystem{_eventSystem}
     , m_chats{_input, _networker, _eventSystem}
+    , m_roundDuration{_config.m_roundTime}
 {
 }
 
@@ -125,13 +126,11 @@ void Map::updateCommands(double deltaTime)
 	updateCommandAction(MoveUp, "move", "north");
 	updateCommandAction(MoveRight, "move", "east");
 	updateCommandAction(MoveLeft, "move", "west");
-	//updateCommandAction(Move, "move", "north");	
 
 	updateCommandAction(ShootDown, "attack", "south");
 	updateCommandAction(ShootUp, "attack", "north");
 	updateCommandAction(ShootRight, "attack", "east");
 	updateCommandAction(ShootLeft, "attack", "west");
-	//updateCommandAction(Shoot, "shoot", "north");	
 }
 
 void Map::updateSelection()
@@ -186,8 +185,8 @@ void Map::drawGrid(Renderer& renderer)
     const auto sprite = m_sprites.get(SpriteEnum::GridBlock);
 	glm::vec3 p{ 0 };
 
-    for (p.y = 0; p.y < m_config.sizeY; p.y++) {
-		for (p.x = 0; p.x < m_config.sizeX; p.x++) {
+    for (p.y = 0; p.y < m_config.m_sizeY; p.y++) {
+		for (p.x = 0; p.x < m_config.m_sizeX; p.x++) {
 			renderer.drawSprite(p, 1, 1, sprite);
 		}
     }  

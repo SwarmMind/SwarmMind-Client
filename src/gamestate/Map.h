@@ -44,7 +44,7 @@ protected:
 	glm::vec2 m_mouseClickPosition;
 
 	double m_lastUpdate;
-    double m_roundDuration = 6.0;
+    double m_roundDuration = 1.0; //set to 1 to avoid divide by zero error
     size_t m_numberOfGivenCommands = 0;
     size_t m_maxNumberOfCommands = 1; //set to 1 to avoid divide by zero error
 

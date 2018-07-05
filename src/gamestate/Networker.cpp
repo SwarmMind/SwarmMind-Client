@@ -152,8 +152,9 @@ Configuration Networker::parseConfiguration(std::string jsonString)
 {
 	const nlohmann::json jsonConfig = nlohmann::json::parse(jsonString);
 	Configuration config;
-	config.sizeX = jsonConfig["width"];
-	config.sizeY = jsonConfig["height"];
+	config.m_sizeX = jsonConfig["width"];
+	config.m_sizeY = jsonConfig["height"];
+    config.m_roundTime = jsonConfig["roundTime"];
 	return config;
 }
 
