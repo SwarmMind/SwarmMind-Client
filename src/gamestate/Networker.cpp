@@ -118,7 +118,7 @@ void Networker::sendChatMessage(struct ChatEntry& chatEntry)
 void Networker::update()
 {
 	lock_guard<mutex> queueGuard(queueLock);
-	while (eventQueue.size() > 0)
+	while (!eventQueue.empty())
 	{
 		function<void()> eventToRun = eventQueue.front();
 		eventToRun();
@@ -201,7 +201,7 @@ void Networker::processCommands(nlohmann::json& jsonCommands)
 	{
 		std::lock_guard<std::mutex> queueGuard(queueLock);
 		eventQueue.push([=]() {
-			for (std::shared_ptr<Command> command : commands)
+			for (const std::shared_ptr<Command>& command : commands)
 			{
 				CommandEvent event;
 				event.command = command;
@@ -251,32 +251,38 @@ void Networker::onAccumulatedCommandsReceive(sio::event _event)
 {
 	const std::string jsonMessage = _event.get_message()->get_string();
 	nlohmann::json json = nlohmann::json::parse(jsonMessage);
+    nlohmann::json playerCommandsJson = json["playerCommands"];
 	std::vector<AccumulatedCommands> commandsList;
 	
-	for (nlohmann::json::iterator it = json.begin(); it != json.end(); it++)
+	for (nlohmann::json::iterator it = playerCommandsJson.begin(); it != playerCommandsJson.end(); it++)
 	{
 		AccumulatedCommands commands;
 		commands.ID = std::stoi(it.key());
 		std::vector<nlohmann::json> jsonAttackCommands = it.value()["attack"];
 		for (nlohmann::json jsonCommand : jsonAttackCommands)
 		{
-			commands.attackDirections.push_back(glm::vec2(jsonCommand["x"], jsonCommand["y"]));
+			commands.attackDirections.emplace_back(jsonCommand["x"], jsonCommand["y"]);
 		}
 
 		std::vector<nlohmann::json> jsonMoveCommands = it.value()["move"];
 		for (nlohmann::json jsonCommand : jsonMoveCommands)
 		{
-			commands.moveDirections.push_back(glm::vec2(jsonCommand["x"], jsonCommand["y"]));
+			commands.moveDirections.emplace_back(jsonCommand["x"], jsonCommand["y"]);
 		}
 
 		commandsList.push_back(commands);
 	}
 	
+    size_t numberOfGivenCommands = json["numberOfGivenCommands"];
+    size_t maxNumberOfCommands = json["maxNumberOfCommands"];
+
 	{
 		std::lock_guard<std::mutex> queueGuard(queueLock);
 		eventQueue.push([=]() {
 			AccumulatedCommandsEvent accumulatedCommandsEvent;
 			accumulatedCommandsEvent.commands = commandsList;
+            accumulatedCommandsEvent.numberOfGivenCommands = numberOfGivenCommands;
+            accumulatedCommandsEvent.maxNumberOfCommands = maxNumberOfCommands;
 			eventSystem.processEvent(&accumulatedCommandsEvent);
 		});
 	}

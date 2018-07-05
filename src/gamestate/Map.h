@@ -11,8 +11,9 @@
 #include <glm/vec2.hpp>
 #include <gamestate/ChatSystem.h>
 #include <events/StateEvent.h>
+#include <events/AccumulatedCommandsEvent.h>
 
-class Map : public EventListener<StateEvent>
+class Map : public EventListener<StateEvent>, public EventListener<AccumulatedCommandsEvent>
 {
 public:
 	Map(class Input& _input, class Sprites& _sprites, Networker& _networker, class EventSystem& _eventSystem, const class Configuration& config);
@@ -27,6 +28,7 @@ public:
 	const double moveAnimationTime = 3.0;
 
     virtual void receiveEvent(StateEvent* event) override;
+    virtual void receiveEvent(AccumulatedCommandsEvent* event) override;
 
 protected:
     ChatSystem m_chats;
@@ -43,6 +45,8 @@ protected:
 
 	double m_lastUpdate;
     double m_roundDuration = 6.0;
+    size_t m_numberOfGivenCommands = 0;
+    size_t m_maxNumberOfCommands = 1; //set to 1 to avoid divide by zero error
 
 	void updateSelection();
 	void updateSelectionAction(Action action, int selectedPlayerNumber);
@@ -54,6 +58,7 @@ protected:
 	void updateMouseCommand(Action action, std::string command, double deltaTime);
 	void updateCommands(double deltaTime);
 
+    void drawRoundProgress();
     void drawGrid(Renderer&);
     void drawEntities(Renderer&);
 };

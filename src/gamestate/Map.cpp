@@ -23,6 +23,7 @@ using namespace std;
 
 Map::Map(Input& _input, Sprites& _sprites, Networker& _networker, EventSystem& _eventSystem, const Configuration& _config)
 	: EventListener<StateEvent>{_eventSystem}
+    , EventListener<AccumulatedCommandsEvent>{_eventSystem}
     , m_input{ _input }
 	, m_config{_config}
 	, m_networker{_networker}
@@ -45,12 +46,19 @@ void Map::updateGameState(class Gamestate* newState)
 	m_gamestate = newState;
 
 	m_lastUpdate = glfwGetTime();
+    m_numberOfGivenCommands = 0;
 }
 
 void Map::receiveEvent(StateEvent* event)
 {
     updateGameState(event->m_state);
     event->m_state = nullptr;
+}
+
+void Map::receiveEvent(AccumulatedCommandsEvent* event)
+{
+    m_numberOfGivenCommands = event->numberOfGivenCommands;
+    m_maxNumberOfCommands = event->maxNumberOfCommands;
 }
 
 void Map::sendCommand(std::string action, glm::vec2 direction)
@@ -203,20 +211,34 @@ void Map::draw(class Renderer& renderer)
 		renderer.drawSprite(glm::vec3{it->second.position() - glm::vec2(0.5f, 0.5f), 0.4}, 1, 1, m_sprites.get(SpriteEnum::SelectedBlock));
 	}
 
+    drawRoundProgress();
+}
+
+void Map::drawRoundProgress()
+{
     ImVec2 imGuiDisplaySize = ImGui::GetIO().DisplaySize;
     ImVec2 position(imGuiDisplaySize.x / 2.0, imGuiDisplaySize.y - 30);
     ImGui::SetNextWindowPos(position, ImGuiCond_Always, ImVec2(0.5, 1.0));
     ImGui::SetNextWindowSize(ImVec2(imGuiDisplaySize.x / 2.0, 0.0f), ImGuiCond_Always);
-    if (ImGui::Begin("RoundProgress", nullptr,
+    if (ImGui::Begin("RoundProgressWindow", nullptr,
         ImGuiWindowFlags_NoTitleBar
+        | ImGuiWindowFlags_NoCollapse
         | ImGuiWindowFlags_NoSavedSettings
         | ImGuiWindowFlags_NoMove
         | ImGuiWindowFlags_NoInputs))
     {
-        ImGui::ProgressBar((glfwGetTime() - m_lastUpdate) / m_roundDuration, ImVec2(-1, 0), "Round Progress");
+        ImGui::TextUnformatted("Round Progress");
+
+        ImGui::ProgressBar(static_cast<double>(m_numberOfGivenCommands) / m_maxNumberOfCommands, ImVec2(-1, 0), "");
+        ImGui::SameLine(ImGui::GetTextLineHeightWithSpacing());
+        ImGui::TextUnformatted("Commands");
+
+
+        ImGui::ProgressBar((glfwGetTime() - m_lastUpdate) / m_roundDuration, ImVec2(-1, 0), "");
+        ImGui::SameLine(ImGui::GetTextLineHeightWithSpacing());
+        ImGui::TextUnformatted("Time");
     }
     ImGui::End();
-    
 }
 
 bool Map::selectedUnitIsValid()
