@@ -115,6 +115,6 @@ after_build:
   - ps: cp -r -v res C:\package
 
 artifacts:
-  - path: C:\package
+  - path: ..\..\package
     name: SwarmMind_Client
     type: zip
