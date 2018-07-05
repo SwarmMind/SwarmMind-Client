@@ -50,6 +50,7 @@ void Map::updateGameState(class Gamestate* newState)
 void Map::receiveEvent(StateEvent* event)
 {
     updateGameState(event->m_state);
+    event->m_state = nullptr;
 }
 
 void Map::sendCommand(std::string action, glm::vec2 direction)
