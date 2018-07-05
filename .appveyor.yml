@@ -107,12 +107,14 @@ build:
   parallel: true
   
 after_build:
+  - mkdir C:\package
   - ps: cd C:\projects\swarmmind-client
-  - ps: cp fonts build\src\Release -r -v
-  - ps: cp shaders build\src\Release -r -v
-  - ps: cp res build\src\Release -r -v
+  - ps: cp build\src\$env:CONFIGURATION\SwarmMind-Client.exe C:\package
+  - ps: cp -r -v fonts C:\package
+  - ps: cp -r -v shaders C:\package
+  - ps: cp -r -v res C:\package
 
 artifacts:
-  - path: build\src
-    name: Build output
+  - path: C:\package
+    name: SwarmMind_Client
     type: zip
