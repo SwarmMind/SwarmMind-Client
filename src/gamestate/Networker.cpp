@@ -21,6 +21,7 @@ Networker::Networker(EventSystem& _eventSystem)
 	, eventSystem{_eventSystem}
 {
 	sioClient.set_reconnect_attempts(reconnectAttempts);
+    sioClient.set_reconnect_delay_max(100);
 
 	sioSocket = sioClient.socket();
 	sioSocket->on("initState", bind(&Networker::onInitStateReceive, this, std::placeholders::_1));
