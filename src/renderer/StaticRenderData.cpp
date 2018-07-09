@@ -94,7 +94,7 @@ void StaticRenderData::increaseBufferSize(int minimumVertexCount)
     GLfloat *oldData = new GLfloat[newBufferSize * vertexSize()];
     glGetBufferSubData(GL_ARRAY_BUFFER, 0, m_bufferVertexSize * vertexSize(), oldData);
     glBufferData(GL_ARRAY_BUFFER, newBufferSize * vertexSize(), oldData, GL_STATIC_DRAW);
-    delete oldData;
+    delete[] oldData;
 
     m_bufferVertexSize = newBufferSize;
 }
