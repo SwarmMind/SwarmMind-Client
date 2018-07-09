@@ -5,6 +5,7 @@
 #include <vector>
 #include <iostream>
 #include <fstream>
+#include <algorithm>
 #include <lodepng/lodepng.h>
 #include <renderer/Sprite.h>
 #include <renderer/Texture.h>
