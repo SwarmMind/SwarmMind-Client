@@ -3,6 +3,7 @@
 #include <string>
 #include <stdexcept>
 #include <iostream>
+#include <memory>
 
 #include <glbinding/gl41core/gl.h>
 #include <glbinding/Binding.h>
@@ -24,13 +25,13 @@
 
 using namespace std;
 
-void Game::createWindow() {
+GLFWwindow * Game::createWindow() {
 	/* Create a windowed mode window and its OpenGL context */
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, true);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	window = glfwCreateWindow(720, 720, "SwarmMind", nullptr, nullptr);
+	GLFWwindow *window = glfwCreateWindow(720, 720, "SwarmMind", nullptr, nullptr);
 	if (!window)
 	{
 		throw std::runtime_error{
@@ -38,35 +39,21 @@ void Game::createWindow() {
 			"Please check your graphics driver. OpenGL v4.1 is required!\n"
 		};
 	}
-}
-
-void Game::initializeOpenGL() {
-	glfwMakeContextCurrent(window);
+    glfwMakeContextCurrent(window);
 	glfwSwapInterval(0);
-	glbinding::Binding::initialize();
 
-	glbinding::setCallbackMaskExcept(glbinding::CallbackMask::After, { "glGetError" });
-	glbinding::setAfterCallback([](const glbinding::FunctionCall &)
-	{
-		const auto error = glGetError();
-		if (error != 0)
-			std::cout << "error: " << std::hex << error << std::endl;
-	});
+    return window;
 }
 
 Game::Game()
+    : window{ createWindow() }
+    , camera{ window }
+    , renderer{ window, camera }
+    , imguiRenderer{ window }
+    , input{ window, &camera }
+    , sprites{ textures }
 {
-	createWindow();
-	initializeOpenGL();
-
-	camera = new Camera(window);
-	camera->setCamera(10, 10, 11);
-	renderer = new OpenGLRenderer(window, *camera);
-	imguiRenderer = new ImGuiRenderer(window);
-	input = new Input(window, camera);
-
-	textures = new Textures();
-	sprites = new Sprites(*textures);
+	camera.setCamera(10, 10, 11);
 
 	initializeImGui();
 
@@ -75,7 +62,7 @@ Game::Game()
 
 void Game::connectTo(std::string address, unsigned int port)
 {
-	menu = std::make_unique<ConnectedState>(*this, *renderer, *input, eventSystem, address, port);
+	menu = std::make_unique<ConnectedState>(*this, renderer, input, eventSystem, address, port);
 }
 
 void Game::openMainMenu()
@@ -95,13 +82,6 @@ void Game::initializeImGui()
 }
 
 Game::~Game() {
-	delete sprites;
-	delete textures;
-
-    delete input;
-	delete renderer;
-    delete camera;
-    delete imguiRenderer;
 }
 
 
@@ -109,25 +89,24 @@ void Game::processInputs(double deltaTime)
 {
     /* Poll for and process events */
     glfwPollEvents();
-	input->update(deltaTime);
+	input.update(deltaTime);
 }
 
 void Game::update(double time, double timeStamp)
 {
-    imguiRenderer->preRender(); //Required before any update in order for popups to work!
+    imguiRenderer.preRender(); //Required before any update in order for popups to work!
     menu->update(time, timeStamp);
 }
 
 void Game::render(double timeElapsed)
 {
-    
-    renderer->preDraw();
+    renderer.preDraw();
 
-	menu->draw(*renderer);
+	menu->draw(renderer);
 	drawDebug(timeElapsed);
 
-    renderer->draw(timeElapsed);
-    imguiRenderer->render();
+    renderer.draw(timeElapsed);
+    imguiRenderer.render();
     glfwSwapBuffers(window);
 }
 
@@ -139,7 +118,7 @@ void Game::drawDebug(double timeElapsed)
 	while (frameTimes.size() > 60)
 		frameTimes.pop_front();
 
-	if (input->isActionPressed(Debug))
+	if (input.isActionPressed(Debug))
 	{
 		double timeSum = 0;
 		for (double frameTime : frameTimes)
@@ -172,7 +151,7 @@ void Game::drawDebug(double timeElapsed)
 
 	}
 
-	if (input->isActionJustPressed(Debug))
+	if (input.isActionJustPressed(Debug))
 	{
 		ParticleSystem::spawnShootParticles(glm::vec2(5, 5), glm::vec2(0.5, 0.5));
 	}

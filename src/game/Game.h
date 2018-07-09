@@ -11,7 +11,7 @@
 //static bool g_isZoomingEnabled;
 
 class Game {
-    void createWindow();
+    static GLFWwindow* createWindow();
     void initializeOpenGL();
 
     void processInputs(double deltaTime);
@@ -21,19 +21,20 @@ class Game {
 
 	void initializeImGui();
 	
-	std::unique_ptr<MenuState> menu;
-
 protected:
     
-    class GLFWwindow *window;
-    OpenGLRenderer *renderer;
-    ImGuiRenderer *imguiRenderer;
-    Input *input;
-	Camera *camera;
-	
-	class Textures* textures;
-	class Sprites* sprites;
+    GLFWwindow *window;
+    OpenGLRenderer renderer;
+    ImGuiRenderer imguiRenderer;
+    Input input;
+	Camera camera;
+
 	EventSystem eventSystem;
+
+    std::unique_ptr<MenuState> menu;
+
+	Textures textures;
+	Sprites sprites;
 
 public:
     Game();
