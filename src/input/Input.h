@@ -10,16 +10,7 @@
 using namespace std;
 
 enum Action {
-	MoveLeft,
-	MoveRight,
-	MoveUp,
-	MoveDown,
 	Move,
-	
-    ShootLeft,
-	ShootRight,
-	ShootUp,
-	ShootDown,
 	Shoot,
 	
     SelectUnit1,

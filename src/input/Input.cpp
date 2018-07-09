@@ -11,16 +11,8 @@ Input::Input(GLFWwindow* window, Camera* camera)
 	: _window{window} 
 	, _camera{camera}
 {
-	actionStatus[MoveRight]  =	ActionStatus({ GLFW_KEY_D });
-	actionStatus[MoveLeft]   =	ActionStatus({ GLFW_KEY_A });
-	actionStatus[MoveUp]  	 =	ActionStatus({ GLFW_KEY_W });
-	actionStatus[MoveDown]   =	ActionStatus({ GLFW_KEY_S });
 	actionStatus[Move]       =  ActionStatus({ GLFW_MOUSE_BUTTON_LEFT });
 
-	actionStatus[ShootRight] =	ActionStatus({ GLFW_KEY_H });
-	actionStatus[ShootLeft]  =	ActionStatus({ GLFW_KEY_F });
-	actionStatus[ShootUp]    =  ActionStatus({ GLFW_KEY_T });
-	actionStatus[ShootDown]  =	ActionStatus({ GLFW_KEY_G });
 	actionStatus[Shoot]      =  ActionStatus({ GLFW_MOUSE_BUTTON_RIGHT });
 
 	actionStatus[SelectUnit1] = ActionStatus({ GLFW_KEY_1 });
@@ -28,10 +20,10 @@ Input::Input(GLFWwindow* window, Camera* camera)
 	actionStatus[SelectUnit3] = ActionStatus({ GLFW_KEY_3 });
 	actionStatus[SelectUnit]  = ActionStatus({ GLFW_MOUSE_BUTTON_LEFT });
 
-	actionStatus[MoveCameraRight] = ActionStatus({ GLFW_KEY_RIGHT });
-	actionStatus[MoveCameraLeft]  = ActionStatus({ GLFW_KEY_LEFT });
-	actionStatus[MoveCameraUp]    = ActionStatus({ GLFW_KEY_UP });
-	actionStatus[MoveCameraDown]  = ActionStatus({ GLFW_KEY_DOWN });
+	actionStatus[MoveCameraRight] = ActionStatus({ GLFW_KEY_D, GLFW_KEY_RIGHT });
+	actionStatus[MoveCameraLeft]  = ActionStatus({ GLFW_KEY_A, GLFW_KEY_LEFT });
+	actionStatus[MoveCameraUp]    = ActionStatus({ GLFW_KEY_W, GLFW_KEY_UP });
+	actionStatus[MoveCameraDown]  = ActionStatus({ GLFW_KEY_S, GLFW_KEY_DOWN });
     actionStatus[MoveCamera] = ActionStatus({ GLFW_MOUSE_BUTTON_MIDDLE });
 
 	actionStatus[Debug] = ActionStatus({ GLFW_KEY_PERIOD });

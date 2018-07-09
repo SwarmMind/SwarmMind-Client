@@ -119,16 +119,6 @@ void Map::updateCommands(double deltaTime)
 	{
 		return;
 	}
-	
-	updateCommandAction(MoveDown, "move", "south");
-	updateCommandAction(MoveUp, "move", "north");
-	updateCommandAction(MoveRight, "move", "east");
-	updateCommandAction(MoveLeft, "move", "west");
-
-	updateCommandAction(ShootDown, "attack", "south");
-	updateCommandAction(ShootUp, "attack", "north");
-	updateCommandAction(ShootRight, "attack", "east");
-	updateCommandAction(ShootLeft, "attack", "west");
 }
 
 void Map::updateSelection()
