@@ -30,14 +30,6 @@ enum Action {
     MoveCamera
 };
 
-#if 0
-struct KeyEvent {
-    bool pressed;
-    int modifiers;
-    double timestamp;
-};
-#endif
-
 struct KeyBinding {
     int m_key;
     int m_modifiers;
