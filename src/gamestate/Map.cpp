@@ -77,16 +77,28 @@ void Map::updateCommandAction(Action action, std::string command, std::string di
 	}*/
 }
 
-void Map::updateMouseCommand(Action action, std::string command, double deltaTime)
+void Map::updateMouseCommand(Action action, std::string command, double deltaTime, bool isDirect = false)
 {
-	float minimumDragDistance = 0.5;
+	const float minimumDragDistance = 0.5;
 	if (m_input.isActionJustPressed(action))
 	{
-		m_selectedUnit = clickedUnit(m_input.mousePositionInWorld());
+		const int32_t wouldSelect = clickedUnit(m_input.mousePositionInWorld());
+        if (!trackpadMode || wouldSelect != -1) {
+            m_selectedUnit = wouldSelect;
+        }
 		m_mouseClickPosition = m_input.mousePositionInWorld();
 	}
 	if (!isUnitClicked(m_mouseClickPosition))
 	{
+        const auto unit = m_gamestate->units.find(m_selectedUnit);
+        if (unit != m_gamestate->units.end() &&
+            isDirect &&
+            m_input.isActionJustReleased(action)) {
+            glm::vec2 delta = m_input.mousePositionInWorld() -
+                              unit->second.position();
+			sendCommand(command, glm::normalize(delta));
+            ParticleSystem::spawnAcknowledgeParticles(m_input.mousePositionInWorld());
+        }
 		return;
 	}
 
@@ -113,7 +125,9 @@ void Map::updateMouseCommand(Action action, std::string command, double deltaTim
 void Map::updateCommands(double deltaTime)
 {
 	updateMouseCommand(Move, "move", deltaTime);
+	updateMouseCommand(MoveDirect, "move", deltaTime, true);
 	updateMouseCommand(Shoot, "attack", deltaTime);
+	updateMouseCommand(ShootDirect, "attack", deltaTime, true);
 
 	if (!selectedUnitIsValid())
 	{

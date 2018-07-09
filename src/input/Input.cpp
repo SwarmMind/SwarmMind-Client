@@ -12,8 +12,10 @@ Input::Input(GLFWwindow* window, Camera* camera)
 	, _camera{camera}
 {
 	actionStatus[Move]       =  ActionStatus({ GLFW_MOUSE_BUTTON_LEFT });
+    actionStatus[MoveDirect] =  ActionStatus({ KeyBinding { GLFW_MOUSE_BUTTON_LEFT, GLFW_MOD_SHIFT } });
 
-	actionStatus[Shoot]      =  ActionStatus({ GLFW_MOUSE_BUTTON_RIGHT });
+	actionStatus[Shoot]       = ActionStatus({ GLFW_MOUSE_BUTTON_RIGHT });
+    actionStatus[ShootDirect] = ActionStatus({ KeyBinding { GLFW_MOUSE_BUTTON_RIGHT, GLFW_MOD_SHIFT } });
 
 	actionStatus[SelectUnit1] = ActionStatus({ GLFW_KEY_1 });
 	actionStatus[SelectUnit2] = ActionStatus({ GLFW_KEY_2 });
@@ -122,12 +124,14 @@ void Input::updateAction(Action action)
 	}
 }
 
-bool Input::isAnyKeyPressed(std::vector<int> glfwKeys)
+bool Input::isAnyKeyPressed(std::vector<KeyBinding> glfwKeys)
 {
 	bool imGuiConsumesInput = ImGui::GetIO().WantCaptureKeyboard;
-	for (int keyCode: glfwKeys)
+	for (KeyBinding keyCode: glfwKeys)
 	{
-		if (glfwGetKey(_window, keyCode) == GLFW_PRESS && !imGuiConsumesInput)
+		if (glfwGetKey(_window, keyCode.m_key) == GLFW_PRESS &&
+            ((keyCode.m_modifiers & GLFW_MOD_SHIFT) != 0) == ImGui::GetIO().KeyShift &&
+            !imGuiConsumesInput)
 		{
 			return true;
 		}
@@ -135,13 +139,16 @@ bool Input::isAnyKeyPressed(std::vector<int> glfwKeys)
 	return false;
 }
 
-bool Input::isMousePressed(std::vector<int> glfwKeys) {
+bool Input::isMousePressed(std::vector<KeyBinding> glfwKeys) {
 	bool imGuiConsumesInput = ImGui::GetIO().WantCaptureMouse;
 
-	for (int mouseCode : glfwKeys)
-	if (glfwGetMouseButton(_window, mouseCode) == GLFW_PRESS && !imGuiConsumesInput) {
-			return true;
-	}
+	for (KeyBinding mouseCode : glfwKeys) {
+    	if (glfwGetMouseButton(_window, mouseCode.m_key) == GLFW_PRESS &&
+            ((mouseCode.m_modifiers & GLFW_MOD_SHIFT) != 0) == ImGui::GetIO().KeyShift &&
+            !imGuiConsumesInput) {
+	    		return true;
+    	}
+    }
 	return false;
 }
 
@@ -181,7 +188,7 @@ glm::vec2 Input::screenToWorldCoordinate(glm::vec2 mousePosition) {
 	return glm::vec2(mousePosition.x, mousePosition.y);
 }
 
-ActionStatus::ActionStatus(vector<int> keys) 
+ActionStatus::ActionStatus(vector<KeyBinding> keys) 
 	: glfwKeys{ keys }
 {}
 

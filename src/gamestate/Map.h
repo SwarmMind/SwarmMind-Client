@@ -39,7 +39,9 @@ protected:
 	class EventSystem& m_eventSystem;
     class Configuration m_config;
 	
-	uint32_t m_selectedUnit = 0;
+    bool trackpadMode = true;
+
+	int32_t m_selectedUnit = 0;
 	bool selectedUnitIsValid();
 	glm::vec2 m_mouseClickPosition;
 
@@ -55,7 +57,7 @@ protected:
 
 	void sendCommand(std::string action, glm::vec2 direction);
 	void updateCommandAction(Action action, std::string command, std::string direction);
-	void updateMouseCommand(Action action, std::string command, double deltaTime);
+	void updateMouseCommand(Action action, std::string command, double deltaTime, bool isDirect);
 	void updateCommands(double deltaTime);
 
     void drawRoundProgress();
