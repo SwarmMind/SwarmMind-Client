@@ -8,7 +8,7 @@ public:
 	~Sprite();
 
 	//Accessors
-	class Texture* texture() const;
+	class Texture* texture();
 	void texture(class Texture* val);
 	float u() const;
 	void u(float val);

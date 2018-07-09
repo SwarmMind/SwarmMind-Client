@@ -1,28 +1,31 @@
+
 set(sources
 	${sources}
-	"renderer/OpenGLRenderer.cpp"
-	"renderer/OpenGLRenderer.h"
-	"renderer/Renderer.h"
-	"renderer/Sprite.h"
-	"renderer/Sprite.cpp"
-	"renderer/Texture.h"
-	"renderer/Texture.cpp"
-	"renderer/TextureRenderData.cpp"
-	"renderer/TextureRenderData.h"
-	"renderer/Textures.h"
-	"renderer/Textures.cpp"
-	"renderer/Sprites.h"
-	"renderer/Sprites.cpp"
-	"renderer/ImGuiRenderer.cpp"
-	"renderer/ImGuiRenderer.h"
-	"renderer/ParticleRenderer.h"
-	"renderer/ParticleRenderer.cpp"
-	"renderer/OpenGLHelpers.h"
-	"renderer/OpenGLHelpers.cpp"
-	"renderer/ParticleSystem.h"
-	"renderer/ParticleSystem.cpp"
-	"renderer/CommandVisualizer.h"
-	"renderer/CommandVisualizer.cpp"
-	"renderer/CommandVisualizationRenderer.cpp"
-	"renderer/CommandVisualizationRenderer.h"
+	${CMAKE_CURRENT_SOURCE_DIR}/CommandVisualizationRenderer.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/CommandVisualizationRenderer.h
+	${CMAKE_CURRENT_SOURCE_DIR}/CommandVisualizer.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/CommandVisualizer.h
+	${CMAKE_CURRENT_SOURCE_DIR}/ImGuiRenderer.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/ImGuiRenderer.h
+	${CMAKE_CURRENT_SOURCE_DIR}/OpenGLHelpers.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/OpenGLHelpers.h
+	${CMAKE_CURRENT_SOURCE_DIR}/OpenGLRenderer.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/OpenGLRenderer.h
+	${CMAKE_CURRENT_SOURCE_DIR}/ParticleRenderer.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/ParticleRenderer.h
+	${CMAKE_CURRENT_SOURCE_DIR}/ParticleSystem.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/ParticleSystem.h
+	${CMAKE_CURRENT_SOURCE_DIR}/Renderer.h
+	${CMAKE_CURRENT_SOURCE_DIR}/Sprite.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/Sprite.h
+	${CMAKE_CURRENT_SOURCE_DIR}/Sprites.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/Sprites.h
+	${CMAKE_CURRENT_SOURCE_DIR}/StaticRenderData.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/StaticRenderData.h
+	${CMAKE_CURRENT_SOURCE_DIR}/Texture.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/Texture.h
+	${CMAKE_CURRENT_SOURCE_DIR}/TextureRenderData.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/TextureRenderData.h
+	${CMAKE_CURRENT_SOURCE_DIR}/Textures.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/Textures.h
 	PARENT_SCOPE)

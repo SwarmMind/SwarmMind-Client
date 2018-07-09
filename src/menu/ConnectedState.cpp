@@ -5,11 +5,11 @@
 #include <renderer/Sprites.h>
 #include <events/EventSystem.h>
 
-ConnectedState::ConnectedState(Game& _game, Sprites& _sprites, Input& _input, EventSystem& _eventSystem, std::string address, unsigned port)
+ConnectedState::ConnectedState(Game& _game, Renderer& renderer, Input& _input, EventSystem& _eventSystem, std::string address, unsigned port)
 	: input{ _input }
 	, map{nullptr}
 	, game{_game}
-	, sprites{_sprites}
+    , m_renderer{renderer}
 	, networker{_eventSystem}
 	, eventSystem{_eventSystem}
     , EventListener<InitStateEvent>(_eventSystem)
@@ -21,6 +21,7 @@ ConnectedState::ConnectedState(Game& _game, Sprites& _sprites, Input& _input, Ev
 
 ConnectedState::~ConnectedState()
 {
+    m_renderer.clearStaticData();
 	delete map;
 }
 
@@ -76,11 +77,14 @@ void ConnectedState::draw(Renderer& renderer)
 using namespace std::placeholders;
 
 void ConnectedState::receiveEvent(InitStateEvent* event) {
-    map = new Map{ input, sprites, networker, eventSystem, event->m_config };
+    map = new Map{ input, networker, eventSystem, event->m_config };
+    m_renderer.clearStaticData();
+    map->drawGridStatic(m_renderer);
     map->updateGameState(event->m_state);
 }
 
 void ConnectedState::receiveEvent(DisconnectEvent* event) {
     delete map;
     map = nullptr;
+    m_renderer.clearStaticData();
 }

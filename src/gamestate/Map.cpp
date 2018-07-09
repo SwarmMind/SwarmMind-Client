@@ -21,20 +21,18 @@
 
 using namespace std;
 
-Map::Map(Input& _input, Sprites& _sprites, Networker& _networker, EventSystem& _eventSystem, const Configuration& _config)
+Map::Map(Input& _input, Networker& _networker, EventSystem& _eventSystem, const Configuration& _config)
 	: EventListener<StateEvent>{_eventSystem}
     , EventListener<AccumulatedCommandsEvent>{_eventSystem}
     , m_input{ _input }
 	, m_config{_config}
 	, m_networker{_networker}
-	, m_gamestate{new Gamestate{_eventSystem}}
-	, m_sprites{_sprites}
+    , m_gamestate{ new Gamestate{_eventSystem} }
 	, m_lastUpdate{glfwGetTime()}
 	, m_eventSystem{_eventSystem}
     , m_chats{_input, _networker, _eventSystem}
     , m_roundDuration{_config.m_roundTime}
-{
-}
+{}
 
 Map::~Map()
 {
@@ -180,16 +178,15 @@ void Map::update(double deltaTime, double timeStamp)
 	updateCommands(deltaTime);
 }
 
-void Map::drawGrid(Renderer& renderer) 
+void Map::drawGridStatic(Renderer& renderer) 
 {
-    const auto sprite = m_sprites.get(SpriteEnum::GridBlock);
 	glm::vec3 p{ 0 };
 
     for (p.y = 0; p.y < m_config.m_sizeY; p.y++) {
 		for (p.x = 0; p.x < m_config.m_sizeX; p.x++) {
-			renderer.drawSprite(p, 1, 1, sprite);
+			renderer.addStaticSprite(p, 1, 1, SpriteEnum::GridBlock);
 		}
-    }  
+    }
 }
 
 void Map::drawEntities(Renderer& renderer) 
@@ -200,14 +197,14 @@ void Map::drawEntities(Renderer& renderer)
 void Map::draw(class Renderer& renderer)
 {
     m_chats.draw(renderer);
-    drawGrid(renderer);
+    //drawGridStatic(renderer);
     drawEntities(renderer);
 
 	const auto units = m_gamestate->units;
 	auto it = units.find(m_selectedUnit);
 	if (it != units.cend())
 	{
-		renderer.drawSprite(glm::vec3{it->second.position() - glm::vec2(0.5f, 0.5f), 0.4}, 1, 1, m_sprites.get(SpriteEnum::SelectedBlock));
+		renderer.drawSprite(glm::vec3{it->second.position() - glm::vec2(0.5f, 0.5f), 0.4}, 1, 1, SpriteEnum::SelectedBlock);
 	}
 
     drawRoundProgress();

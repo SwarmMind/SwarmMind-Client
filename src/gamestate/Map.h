@@ -16,13 +16,14 @@
 class Map : public EventListener<StateEvent>, public EventListener<AccumulatedCommandsEvent>
 {
 public:
-	Map(class Input& _input, class Sprites& _sprites, Networker& _networker, class EventSystem& _eventSystem, const class Configuration& config);
+	Map(class Input& _input, Networker& _networker, class EventSystem& _eventSystem, const class Configuration& config);
 
 	~Map();
 
 	void updateGameState(class Gamestate* newState);
 
 	void update(double deltaTime, double timeStamp);
+    void drawGridStatic(Renderer&);
 	void draw(class Renderer& renderer);
 
 	const double moveAnimationTime = 3.0;
@@ -33,7 +34,6 @@ public:
 protected:
     ChatSystem m_chats;
 	class Gamestate* m_gamestate;
-	class Sprites& m_sprites;
 	class Input& m_input;
 	class Networker& m_networker;
 	class EventSystem& m_eventSystem;
@@ -59,6 +59,5 @@ protected:
 	void updateCommands(double deltaTime);
 
     void drawRoundProgress();
-    void drawGrid(Renderer&);
     void drawEntities(Renderer&);
 };

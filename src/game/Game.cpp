@@ -30,7 +30,7 @@ void Game::createWindow() {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, true);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	window = glfwCreateWindow(720, 720, "SwarmMind", NULL, NULL);
+	window = glfwCreateWindow(720, 720, "SwarmMind", nullptr, nullptr);
 	if (!window)
 	{
 		throw std::runtime_error{
@@ -75,7 +75,7 @@ Game::Game()
 
 void Game::connectTo(std::string address, unsigned int port)
 {
-	menu = std::make_unique<ConnectedState>(*this, *sprites, *input, eventSystem, address, port);
+	menu = std::make_unique<ConnectedState>(*this, *renderer, *input, eventSystem, address, port);
 }
 
 void Game::openMainMenu()
