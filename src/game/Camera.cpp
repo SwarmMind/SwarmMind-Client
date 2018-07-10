@@ -8,6 +8,14 @@ Camera::Camera(GLFWwindow* window)
 
 }
 
+Camera::Camera(GLFWwindow* window, float x, float y, float height)
+    : _window{ window }
+    , _x{ x }
+    , _y{ y }
+    , _height{ height } {
+
+}
+
 Camera::~Camera() 
 {
 

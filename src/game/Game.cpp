@@ -47,14 +47,12 @@ GLFWwindow * Game::createWindow() {
 
 Game::Game()
     : window{ createWindow() }
-    , camera{ window }
+    , camera{ window, 10, 10, 11 }
     , renderer{ window, camera }
     , imguiRenderer{ window }
     , input{ window, &camera }
     , sprites{ textures }
 {
-	camera.setCamera(10, 10, 11);
-
 	initializeImGui();
 
 	openMainMenu();
