@@ -9,6 +9,10 @@
 #include <renderer/ParticleSystem.h>
 #include <game/Camera.h>
 
+#include <glbinding/ContextInfo.h>
+#include <glbinding/Version.h>
+#include <iostream>
+
 ParticleRenderer::ParticleRenderer(GLFWwindow* _window, Camera& _camera)
 	: window{_window}
 	, camera{_camera}
@@ -69,7 +73,7 @@ void ParticleRenderer::initializeDynamicData(unsigned int index)
 	setFrameBufferTextures(index);
 
 	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-	assert(status == GL_FRAMEBUFFER_COMPLETE);
+    assert(status == GL_FRAMEBUFFER_COMPLETE);
 
 	clearTexture();
 

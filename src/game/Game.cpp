@@ -22,8 +22,24 @@
 #include <functional>
 #include <menu/MainMenuState.h>
 #include <menu/ConnectedState.h>
+#include <glbinding/ContextInfo.h>
+#include <glbinding/Version.h>
 
 using namespace std;
+
+void Game::initializeOpenGL() {
+    glbinding::Binding::initialize();
+    glbinding::setCallbackMaskExcept(glbinding::CallbackMask::After, { "glGetError" });
+    glbinding::setAfterCallback([](const glbinding::FunctionCall &)
+    {
+        const auto error = glGetError();
+        if (error != 0)
+            std::cout << "error: " << std::hex << error << std::endl;
+    });
+
+    std::cout << "OpenGL Version: " << glbinding::ContextInfo::version() << std::endl;
+    std::cout << "GPU Vendor: " << glbinding::ContextInfo::vendor() << std::endl;
+}
 
 GLFWwindow * Game::createWindow() {
 	/* Create a windowed mode window and its OpenGL context */
@@ -41,6 +57,8 @@ GLFWwindow * Game::createWindow() {
 	}
     glfwMakeContextCurrent(window);
 	glfwSwapInterval(0);
+
+    initializeOpenGL();
 
     return window;
 }

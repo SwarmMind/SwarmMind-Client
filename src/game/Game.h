@@ -12,7 +12,7 @@
 
 class Game {
     static GLFWwindow* createWindow();
-    void initializeOpenGL();
+    static void initializeOpenGL();
 
     void processInputs(double deltaTime);
     void update(double time, double timeStamp);
