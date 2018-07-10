@@ -7,6 +7,7 @@
 #include <menu/MenuState.h>
 #include <game/Camera.h>
 #include <events/EventSystem.h>
+#include <sound/Sound.h>
 
 //static bool g_isZoomingEnabled;
 
@@ -18,6 +19,7 @@ class Game {
     void update(double time, double timeStamp);
     void render(double timeElapsed);
 	void drawDebug(double timeElapsed);
+    void playAudio();
 
 	void initializeImGui();
 	
@@ -30,6 +32,7 @@ protected:
     ImGuiRenderer *imguiRenderer;
     Input *input;
 	Camera *camera;
+    Sound *sound;
 	
 	class Textures* textures;
 	class Sprites* sprites;

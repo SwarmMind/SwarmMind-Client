@@ -28,6 +28,7 @@ enum Action {
 	SelectUnit,
 	
     Debug,
+    Audio,
 	
     MoveCameraRight,
 	MoveCameraLeft,

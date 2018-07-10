@@ -21,6 +21,7 @@
 #include <functional>
 #include <menu/MainMenuState.h>
 #include <menu/ConnectedState.h>
+#include <sound/Sound.h>
 
 using namespace std;
 
@@ -64,6 +65,7 @@ Game::Game()
 	renderer = new OpenGLRenderer(window, *camera);
 	imguiRenderer = new ImGuiRenderer(window);
 	input = new Input(window, camera);
+    sound = new Sound(input);
 
 	textures = new Textures();
 	sprites = new Sprites(*textures);
@@ -102,6 +104,7 @@ Game::~Game() {
 	delete renderer;
     delete camera;
     delete imguiRenderer;
+    delete sound;
 }
 
 
@@ -116,6 +119,7 @@ void Game::update(double time, double timeStamp)
 {
     imguiRenderer->preRender(); //Required before any update in order for popups to work!
     menu->update(time, timeStamp);
+    playAudio();
 }
 
 void Game::render(double timeElapsed)
@@ -125,10 +129,16 @@ void Game::render(double timeElapsed)
 
 	menu->draw(*renderer);
 	drawDebug(timeElapsed);
-
+  
     renderer->draw(timeElapsed);
     imguiRenderer->render();
     glfwSwapBuffers(window);
+}
+
+void Game::playAudio() {
+    if (input->isActionJustPressed(Audio)) {
+        sound->play();
+    }
 }
 
 void Game::drawDebug(double timeElapsed)

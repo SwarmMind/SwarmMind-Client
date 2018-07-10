@@ -13,6 +13,7 @@ add_subdirectory(input)
 add_subdirectory(game)
 add_subdirectory(menu)
 add_subdirectory(events)
+add_subdirectory(sound)
 
 add_executable(SwarmMind-Client ${sources})
 
@@ -56,7 +57,7 @@ else()
 endif()
 endif()
 
-target_link_libraries(SwarmMind-Client PUBLIC glbinding::glbinding glfw glm)
+target_link_libraries(SwarmMind-Client PUBLIC glbinding::glbinding glfw glm sfml)
 
 if(MSVC)
 target_compile_options(SwarmMind-Client PRIVATE /wd4251)
