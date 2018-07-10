@@ -5,7 +5,7 @@
 class Sound
 {
 public:
-    Sound(Input* input);
+    Sound();
     ~Sound();
 
     void play();

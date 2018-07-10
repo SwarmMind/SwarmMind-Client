@@ -11,27 +11,21 @@ Input::Input(GLFWwindow* window, Camera* camera)
 	: _window{window} 
 	, _camera{camera}
 {
-	actionStatus[MoveRight]  =	ActionStatus({ GLFW_KEY_D });
-	actionStatus[MoveLeft]   =	ActionStatus({ GLFW_KEY_A });
-	actionStatus[MoveUp]  	 =	ActionStatus({ GLFW_KEY_W });
-	actionStatus[MoveDown]   =	ActionStatus({ GLFW_KEY_S });
 	actionStatus[Move]       =  ActionStatus({ GLFW_MOUSE_BUTTON_LEFT });
+    actionStatus[MoveDirect] =  ActionStatus({ KeyBinding { GLFW_MOUSE_BUTTON_LEFT, GLFW_MOD_SHIFT } });
 
-	actionStatus[ShootRight] =	ActionStatus({ GLFW_KEY_H });
-	actionStatus[ShootLeft]  =	ActionStatus({ GLFW_KEY_F });
-	actionStatus[ShootUp]    =  ActionStatus({ GLFW_KEY_T });
-	actionStatus[ShootDown]  =	ActionStatus({ GLFW_KEY_G });
-	actionStatus[Shoot]      =  ActionStatus({ GLFW_MOUSE_BUTTON_RIGHT });
+	actionStatus[Shoot]       = ActionStatus({ GLFW_MOUSE_BUTTON_RIGHT });
+    actionStatus[ShootDirect] = ActionStatus({ KeyBinding { GLFW_MOUSE_BUTTON_RIGHT, GLFW_MOD_SHIFT } });
 
 	actionStatus[SelectUnit1] = ActionStatus({ GLFW_KEY_1 });
 	actionStatus[SelectUnit2] = ActionStatus({ GLFW_KEY_2 });
 	actionStatus[SelectUnit3] = ActionStatus({ GLFW_KEY_3 });
 	actionStatus[SelectUnit]  = ActionStatus({ GLFW_MOUSE_BUTTON_LEFT });
 
-	actionStatus[MoveCameraRight] = ActionStatus({ GLFW_KEY_RIGHT });
-	actionStatus[MoveCameraLeft]  = ActionStatus({ GLFW_KEY_LEFT });
-	actionStatus[MoveCameraUp]    = ActionStatus({ GLFW_KEY_UP });
-	actionStatus[MoveCameraDown]  = ActionStatus({ GLFW_KEY_DOWN });
+	actionStatus[MoveCameraRight] = ActionStatus({ GLFW_KEY_D, GLFW_KEY_RIGHT });
+	actionStatus[MoveCameraLeft]  = ActionStatus({ GLFW_KEY_A, GLFW_KEY_LEFT });
+	actionStatus[MoveCameraUp]    = ActionStatus({ GLFW_KEY_W, GLFW_KEY_UP });
+	actionStatus[MoveCameraDown]  = ActionStatus({ GLFW_KEY_S, GLFW_KEY_DOWN });
     actionStatus[MoveCamera] = ActionStatus({ GLFW_MOUSE_BUTTON_MIDDLE });
 
 	actionStatus[Debug] = ActionStatus({ GLFW_KEY_PERIOD });
@@ -131,12 +125,14 @@ void Input::updateAction(Action action)
 	}
 }
 
-bool Input::isAnyKeyPressed(std::vector<int> glfwKeys)
+bool Input::isAnyKeyPressed(std::vector<KeyBinding> glfwKeys)
 {
 	bool imGuiConsumesInput = ImGui::GetIO().WantCaptureKeyboard;
-	for (int keyCode: glfwKeys)
+	for (KeyBinding keyCode: glfwKeys)
 	{
-		if (glfwGetKey(_window, keyCode) == GLFW_PRESS && !imGuiConsumesInput)
+		if (glfwGetKey(_window, keyCode.m_key) == GLFW_PRESS &&
+            ((keyCode.m_modifiers & GLFW_MOD_SHIFT) != 0) == ImGui::GetIO().KeyShift &&
+            !imGuiConsumesInput)
 		{
 			return true;
 		}
@@ -144,13 +140,16 @@ bool Input::isAnyKeyPressed(std::vector<int> glfwKeys)
 	return false;
 }
 
-bool Input::isMousePressed(std::vector<int> glfwKeys) {
+bool Input::isMousePressed(std::vector<KeyBinding> glfwKeys) {
 	bool imGuiConsumesInput = ImGui::GetIO().WantCaptureMouse;
 
-	for (int mouseCode : glfwKeys)
-	if (glfwGetMouseButton(_window, mouseCode) == GLFW_PRESS && !imGuiConsumesInput) {
-			return true;
-	}
+	for (KeyBinding mouseCode : glfwKeys) {
+    	if (glfwGetMouseButton(_window, mouseCode.m_key) == GLFW_PRESS &&
+            ((mouseCode.m_modifiers & GLFW_MOD_SHIFT) != 0) == ImGui::GetIO().KeyShift &&
+            !imGuiConsumesInput) {
+	    		return true;
+    	}
+    }
 	return false;
 }
 
@@ -190,7 +189,7 @@ glm::vec2 Input::screenToWorldCoordinate(glm::vec2 mousePosition) {
 	return glm::vec2(mousePosition.x, mousePosition.y);
 }
 
-ActionStatus::ActionStatus(vector<int> keys) 
+ActionStatus::ActionStatus(vector<KeyBinding> keys) 
 	: glfwKeys{ keys }
 {}
 

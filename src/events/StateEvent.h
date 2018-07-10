@@ -2,16 +2,20 @@
 
 #include <events/Event.h>
 #include <string>
-#include <gamestate/Gamestate.h>
 #include <memory>
 
 class StateEvent : public Event
 {
 public:
-    StateEvent() = default;
+    StateEvent() 
+        : m_state{nullptr}
+    {}
 
-    virtual ~StateEvent() = default;
+    virtual ~StateEvent()
+    {
+        delete m_state;
+    }
 
-    Gamestate* m_state;
+    class Gamestate* m_state;
 
 };

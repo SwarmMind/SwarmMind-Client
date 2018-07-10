@@ -9,6 +9,7 @@
 #include <renderer/TextureRenderData.h>
 #include <renderer/ParticleRenderer.h>
 #include <renderer/CommandVisualizationRenderer.h>
+#include <renderer/StaticRenderData.h>
 
 using namespace gl41core;
 using namespace std;
@@ -23,16 +24,16 @@ public:
 	
 	void preDraw();
 
+	virtual void drawSprite(glm::vec3 pos, float width, float height, SpriteEnum sprite) override;
 	virtual void drawSprite(glm::vec3 pos, float width, float height, Sprite* sprite) override;
 	virtual void drawCommandVisualizer(glm::vec3 pos, CommandVisualizer& visualizer) override;
 	void draw(double deltaTime);
 
-	void addParticles(ParticleSystem particles);
-
-
-	virtual void drawSprite(glm::vec3 pos, float width, float height, SpriteEnum sprite) override;
-
     virtual Camera& camera() override;
+
+    virtual void addStaticSprite(glm::vec3 pos, float width, float height, Sprite* sprite) override;
+    virtual void addStaticSprite(glm::vec3 pos, float width, float height, SpriteEnum sprite) override;
+    virtual void clearStaticData() override;
 
 private:
 	virtual void uploadCamera();
@@ -40,6 +41,9 @@ private:
 	void findUniformLocations();
 
 	GLint program;
+
+    //static renderData
+    std::vector<StaticRenderData> m_staticRenderData;
 
 	//Texture render data
 	std::unordered_map<class Texture*, TextureRenderData> renderData;

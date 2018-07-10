@@ -4,6 +4,8 @@
 #include <fstream>
 #include <iostream>
 #include <vector>
+#include <thread>
+
 using namespace gl41core;
 using namespace std;
 
@@ -46,8 +48,9 @@ GLint loadShader(string path, GLenum shaderType)
 
 		vector<GLchar> infoLog(errorLength);
 		glGetShaderInfoLog(shader, errorLength, &errorLength, &infoLog[0]);
+        infoLog.emplace_back('\0');
 
-		cout << "Shader compilation: " << path << " failed:\n" << infoLog.data();
+		cout << "Shader compilation: " << path << " failed:\n" << infoLog.data() << std::endl;
 
 		glDeleteShader(shader);
 		exit(-1);

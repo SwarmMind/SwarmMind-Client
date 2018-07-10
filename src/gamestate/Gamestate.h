@@ -16,8 +16,10 @@
 class Configuration 
 {
 public:
-	uint32_t sizeX;
-	uint32_t sizeY;
+	uint32_t m_sizeX;
+	uint32_t m_sizeY;
+
+    double m_roundTime = 1.0;
 };
 
 class Gamestate : public EventListener<CommandEvent>, public EventListener<AccumulatedCommandsEvent>

@@ -5,6 +5,7 @@
 #include <vector>
 #include <iostream>
 #include <fstream>
+#include <algorithm>
 #include <lodepng/lodepng.h>
 #include <renderer/Sprite.h>
 #include <renderer/Texture.h>
@@ -26,9 +27,9 @@ void OpenGLRenderer::findUniformLocations()
 
 OpenGLRenderer::OpenGLRenderer(GLFWwindow* _window, Camera& _camera)
 	: window{_window}
-	, particleRenderer{ _window, _camera }
 	, m_camera {_camera}
-	, commandRenderer {_camera}
+	, particleRenderer{ window, m_camera }
+	, commandRenderer { m_camera}
 	, textures{}
 	, sprites{textures}
 {
@@ -42,10 +43,6 @@ OpenGLRenderer::OpenGLRenderer(GLFWwindow* _window, Camera& _camera)
 	glUseProgram(program);
 
 	findUniformLocations();
-	
-	/*glfwSetFramebufferSizeCallback(window, [](GLFWwindow* window, int width, int height) {
-		glViewport(0, 0, width, height);
-	});*/
 }
 
 OpenGLRenderer::~OpenGLRenderer()
@@ -114,6 +111,38 @@ Camera& OpenGLRenderer::camera()
     return m_camera;
 }
 
+void OpenGLRenderer::addStaticSprite(glm::vec3 pos, float width, float height, Sprite* sprite)
+{
+    unsigned int vertsPerSprite = 6;
+    unsigned int floatsPerVert = 5;
+    unsigned int floatsPerSprite = floatsPerVert * vertsPerSprite;
+
+    Texture* texture = sprite->texture();
+   
+    auto iterator = std::find_if(m_staticRenderData.begin(), m_staticRenderData.end(), [=](StaticRenderData& data) {
+        return texture->ID() == data.texture()->ID();
+    });
+    bool found = iterator != m_staticRenderData.end();
+    if (!found)
+    {
+        m_staticRenderData.emplace_back(StaticRenderData(texture));
+    }
+    StaticRenderData& renderData = found ? *iterator : m_staticRenderData.back();
+
+    auto data = spriteVertices(pos, width, height, sprite);
+    renderData.addData(vertsPerSprite, data.data());
+}
+
+void OpenGLRenderer::addStaticSprite(glm::vec3 pos, float width, float height, SpriteEnum sprite)
+{
+    addStaticSprite(pos, width, height, sprites.get(sprite));
+}
+
+void OpenGLRenderer::clearStaticData()
+{
+    m_staticRenderData.clear();
+}
+
 void OpenGLRenderer::drawCommandVisualizer(glm::vec3 pos, CommandVisualizer& visualizer)
 {
 	commandRenderer.drawCommandVisualizer(pos, visualizer);
@@ -149,18 +178,19 @@ void OpenGLRenderer::draw(double deltaTime)
 	glfwGetFramebufferSize(window, &width, &height);
 	glViewport(0, 0, width, height);
 
-	for (auto iterator = renderData.begin(); iterator != renderData.end(); iterator++)
+    for (auto& staticRenderData : m_staticRenderData)
+    {
+        staticRenderData.draw();
+    }
+
+	for (auto& TextureDataPair : renderData)
 	{
-		drawTexture(iterator->first);
+		drawTexture(TextureDataPair.first);
 	}
+
 
 	commandRenderer.draw();
 	particleRenderer.draw(deltaTime);
-}
-
-void OpenGLRenderer::addParticles(ParticleSystem particles)
-{
-	particleRenderer.addParticles(particles);
 }
 
 #pragma endregion Drawing

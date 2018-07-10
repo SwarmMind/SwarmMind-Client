@@ -10,35 +10,45 @@
 #include <string>
 #include <glm/vec2.hpp>
 #include <gamestate/ChatSystem.h>
+#include <events/StateEvent.h>
+#include <events/AccumulatedCommandsEvent.h>
 
-class Map
+class Map : public EventListener<StateEvent>, public EventListener<AccumulatedCommandsEvent>
 {
 public:
-	Map(class Input& _input, class Sprites& _sprites, Networker& _networker, class EventSystem& _eventSystem, const class Configuration& config);
+	Map(class Input& _input, Networker& _networker, class EventSystem& _eventSystem, const class Configuration& config);
 
 	~Map();
 
 	void updateGameState(class Gamestate* newState);
 
 	void update(double deltaTime, double timeStamp);
+    void drawGridStatic(Renderer&);
 	void draw(class Renderer& renderer);
 
 	const double moveAnimationTime = 3.0;
 
-private:
-    ChatSystem m_chats;
-	class Gamestate* gamestate;
-	class Sprites& sprites;
-	class Input& input;
-	class Networker& networker;
-	class EventSystem& eventSystem;
-    class Configuration config;
-	
-	uint32_t selectedUnit = 0;
-	bool selectedUnitIsValid();
-	glm::vec2 mouseClickPosition;
+    virtual void receiveEvent(StateEvent* event) override;
+    virtual void receiveEvent(AccumulatedCommandsEvent* event) override;
 
-	double lastUpdate;
+protected:
+    ChatSystem m_chats;
+	class Gamestate* m_gamestate;
+	class Input& m_input;
+	class Networker& m_networker;
+	class EventSystem& m_eventSystem;
+    class Configuration m_config;
+	
+    bool trackpadMode = true;
+
+	int32_t m_selectedUnit = 0;
+	bool selectedUnitIsValid();
+	glm::vec2 m_mouseClickPosition;
+
+	double m_lastUpdate;
+    double m_roundDuration = 1.0; //set to 1 to avoid divide by zero error
+    size_t m_numberOfGivenCommands = 0;
+    size_t m_maxNumberOfCommands = 1; //set to 1 to avoid divide by zero error
 
 	void updateSelection();
 	void updateSelectionAction(Action action, int selectedPlayerNumber);
@@ -47,9 +57,9 @@ private:
 
 	void sendCommand(std::string action, glm::vec2 direction);
 	void updateCommandAction(Action action, std::string command, std::string direction);
-	void updateMouseCommand(Action action, std::string command, double deltaTime);
+	void updateMouseCommand(Action action, std::string command, double deltaTime, bool isDirect);
 	void updateCommands(double deltaTime);
 
-    void drawGrid(Renderer&);
+    void drawRoundProgress();
     void drawEntities(Renderer&);
 };

@@ -3,6 +3,7 @@
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 #include <map>
+#include <unordered_map>
 #include <vector>
 #include <game/Camera.h>
 #include <glm/vec2.hpp>
@@ -10,17 +11,10 @@
 using namespace std;
 
 enum Action {
-	MoveLeft,
-	MoveRight,
-	MoveUp,
-	MoveDown,
 	Move,
-	
-    ShootLeft,
-	ShootRight,
-	ShootUp,
-	ShootDown,
+    MoveDirect,
 	Shoot,
+    ShootDirect,
 	
     SelectUnit1,
 	SelectUnit2,
@@ -37,12 +31,20 @@ enum Action {
     MoveCamera
 };
 
+struct KeyBinding {
+    int m_key;
+    int m_modifiers;
+
+    KeyBinding(int key) : m_key{key}, m_modifiers{0} {}
+    KeyBinding(int key, int modifiers) : m_key{key}, m_modifiers{modifiers} {}
+};
+
 typedef struct ActionStatus {
 
-	ActionStatus(vector<int> keys);
+	ActionStatus(vector<KeyBinding> keys);
 	ActionStatus();
 
-	std::vector<int> glfwKeys;
+	std::vector<KeyBinding> glfwKeys;
 	bool isPressed = false;
 	bool isJustPressed = false;
 	bool isJustReleased = false;
@@ -66,7 +68,7 @@ public:
 	glm::vec2 mousePositionInWorld();
 
 private:
-	map<Action, ActionStatus> actionStatus;
+	unordered_map<Action, ActionStatus> actionStatus;
 	GLFWwindow* _window;
 	Camera* _camera;
 
@@ -77,8 +79,8 @@ private:
 	void updateAction(Action action);
 
 	void setMousePosition();
-	bool isAnyKeyPressed(std::vector<int> glfwKeys);
-	bool isMousePressed(std::vector<int> glfwKeys);	
+	bool isAnyKeyPressed(std::vector<KeyBinding> glfwKeys);
+	bool isMousePressed(std::vector<KeyBinding> glfwKeys);
 
 	void scrollCallback(GLFWwindow* window, double xoffset, double yoffset);
 	void moveCamera(double deltaTime);

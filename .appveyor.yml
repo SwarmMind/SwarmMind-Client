@@ -108,11 +108,13 @@ build:
   
 after_build:
   - ps: cd C:\projects\swarmmind-client
-  - ps: cp fonts build\src\Release -r -v
-  - ps: cp shaders build\src\Release -r -v
-  - ps: cp res build\src\Release -r -v
+  - mkdir package
+  - ps: cp build\src\$env:CONFIGURATION\SwarmMind-Client.exe package
+  - ps: cp -r -v fonts package
+  - ps: cp -r -v shaders package
+  - ps: cp -r -v res package
 
 artifacts:
-  - path: build\src
-    name: Build output
+  - path: package
+    name: SwarmMind_Client
     type: zip
