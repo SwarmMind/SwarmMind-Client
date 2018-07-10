@@ -7,8 +7,8 @@
 
 ConnectedState::ConnectedState(Game& _game, Renderer& renderer, Input& _input, EventSystem& _eventSystem, std::string address, unsigned port)
 	: input{ _input }
-	, map{nullptr}
 	, game{_game}
+	, map{nullptr}
     , m_renderer{renderer}
 	, networker{_eventSystem}
 	, eventSystem{_eventSystem}

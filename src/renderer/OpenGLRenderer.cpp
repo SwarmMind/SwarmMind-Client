@@ -27,9 +27,9 @@ void OpenGLRenderer::findUniformLocations()
 
 OpenGLRenderer::OpenGLRenderer(GLFWwindow* _window, Camera& _camera)
 	: window{_window}
-	, particleRenderer{ _window, _camera }
 	, m_camera {_camera}
-	, commandRenderer {_camera}
+	, particleRenderer{ window, m_camera }
+	, commandRenderer { m_camera}
 	, textures{}
 	, sprites{textures}
 {

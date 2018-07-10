@@ -22,12 +22,13 @@ class Game {
 	void initializeImGui();
 	
 protected:
-    
     GLFWwindow *window;
+
+ 	Camera camera;
+   
     OpenGLRenderer renderer;
     ImGuiRenderer imguiRenderer;
     Input input;
-	Camera camera;
 
 	EventSystem eventSystem;
 
