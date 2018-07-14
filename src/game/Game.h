@@ -9,6 +9,8 @@
 #include <events/EventSystem.h>
 #include <sound/Sound.h>
 
+using namespace std;
+
 //static bool g_isZoomingEnabled;
 
 class Game {
@@ -19,7 +21,6 @@ class Game {
     void update(double time, double timeStamp);
     void render(double timeElapsed);
 	void drawDebug(double timeElapsed);
-    void playAudio();
 
 	void initializeImGui();
 	
@@ -30,7 +31,11 @@ protected:
     OpenGLRenderer renderer;
     ImGuiRenderer imguiRenderer;
     Input input;
-    Sound sound;
+
+
+    sf::SoundBuffer m_soundBuffer;
+    deque<sf::Sound> m_soundInstances;
+
 
 	EventSystem eventSystem;
 

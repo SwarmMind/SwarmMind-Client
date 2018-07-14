@@ -1,6 +1,8 @@
 #pragma once
 #include <cstdint>
 #include <glm/vec2.hpp>
+#include <sound/Sound.h>
+
 class Gamestate;
 
 class Command
@@ -12,6 +14,8 @@ public:
 protected:
 	Command(uint32_t _ID);
 	uint32_t ID;
+    sf::SoundBuffer m_soundBuffer;
+    deque<sf::Sound> m_soundInstances;
 	
 private:
 };
@@ -27,9 +31,6 @@ protected:
 	
 private:
 };
-
-
-
 
 class DirectionalCommand : public Command
 {

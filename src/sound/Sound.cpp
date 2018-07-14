@@ -1,33 +1,47 @@
 #include <sound/Sound.h>
-#include <SFML/Audio.hpp>
 
-using namespace std;
-
-Sound::Sound()
+Sound::Sound(sf::SoundBuffer buffer, deque<sf::Sound> soundInstances)
+    : m_buffer { buffer }
+    , m_soundInstances { soundInstances }
 {
+
 }
 
 Sound::~Sound() {
 
 }
 
+void Sound::load(string wav) {
+    m_buffer.loadFromFile("sound/" + wav);
+}
+
 void Sound::play() {
-    
+    m_soundInstances.push_back(sf::Sound(m_buffer));
+    m_soundInstances.back().play();
+}
+
+void Sound::update() {
+    for (int i = 0; i < m_soundInstances.size(); i++) {
+        if (m_soundInstances[i].getStatus() == sf::Sound::Stopped) {
+            m_soundInstances.erase(m_soundInstances.begin() + i);
+            i--;
+        }
+    }
+}
+
+void Sound::count()
+{
+    cout << "size of soundInstances: " << m_soundInstances.size() << endl;
+}
+
+/*   
     sf::SoundBuffer buffer;
-    buffer.loadFromFile("sound/shot_and_reload.wav");
+    buffer.loadFromFile("sound/" + wav);
     sf::Sound sound;
     sound.setBuffer(buffer);
-    sound.setVolume(10);
     sound.play();
-    
+        
     while (sound.getStatus() == sf::Sound::Playing)
         ;
-
-    /*
-    sound/next_round.wav
-    sound/shot_and_reload.wav
-    sound/unit_walking.wav
-    */
-
-}
+*/
 

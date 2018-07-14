@@ -22,7 +22,6 @@
 #include <functional>
 #include <menu/MainMenuState.h>
 #include <menu/ConnectedState.h>
-#include <sound/Sound.h>
 #include <glbinding/ContextInfo.h>
 #include <glbinding/Version.h>
 
@@ -65,13 +64,12 @@ GLFWwindow * Game::createWindow() {
 }
 
 Game::Game()
-    : window{ createWindow() }
-    , camera{ window, 10, 10, 11 }
-    , renderer{ window, camera }
+    : window { createWindow() }
+    , camera { window, 10, 10, 11 }
+    , renderer { window, camera }
     , imguiRenderer{ window }
-    , input{ window, &camera }
-    , sprites{ textures }
-    , sound { }
+    , input { window, &camera }
+    , sprites { textures }
 {
 
 	initializeImGui();
@@ -113,9 +111,11 @@ void Game::processInputs(double deltaTime)
 
 void Game::update(double time, double timeStamp)
 {
-    imguiRenderer.preRender(); //Required before any update in order for popups to work!
+    imguiRenderer.preRender(); // required before any update in order for popups to work!
     menu->update(time, timeStamp);
-    playAudio();
+
+    Sound* sound = new Sound(m_soundBuffer, m_soundInstances);
+    sound->count();
 }
 
 void Game::render(double timeElapsed)
@@ -126,12 +126,6 @@ void Game::render(double timeElapsed)
     renderer.draw(timeElapsed);
     imguiRenderer.render();
     glfwSwapBuffers(window);
-}
-
-void Game::playAudio() {
-    if (input.isActionJustPressed(Debug)) {
-        sound.play();
-    }
 }
 
 void Game::drawDebug(double timeElapsed)
