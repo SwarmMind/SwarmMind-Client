@@ -11,5 +11,4 @@ public:
     void play();
 
 private:
-    Input* m_input;
 };

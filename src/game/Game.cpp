@@ -129,7 +129,7 @@ void Game::render(double timeElapsed)
 }
 
 void Game::playAudio() {
-    if (input.isActionJustPressed(Audio)) {
+    if (input.isActionJustPressed(Debug)) {
         sound.play();
     }
 }

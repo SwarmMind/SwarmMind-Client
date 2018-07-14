@@ -1,6 +1,8 @@
 find_package(glfw3 REQUIRED)
 find_package(glbinding REQUIRED)
 find_package(glm REQUIRED)
+set(SFML_STATIC_LIBRARIES TRUE)
+find_package(SFML COMPONENTS audio REQUIRED)
 
 set(sources "main.cpp")
 
@@ -17,7 +19,7 @@ add_subdirectory(sound)
 
 add_executable(SwarmMind-Client ${sources})
 
-target_link_libraries(SwarmMind-Client PRIVATE imgui)
+target_link_libraries(SwarmMind-Client PRIVATE imgui sfml-audio)
 
 #Replicate the directory structure in Visual Studio filters
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${sources})
@@ -57,7 +59,9 @@ else()
 endif()
 endif()
 
-target_link_libraries(SwarmMind-Client PUBLIC glbinding::glbinding glfw glm sfml)
+
+
+target_link_libraries(SwarmMind-Client PUBLIC glbinding::glbinding glfw glm)
 
 if(MSVC)
 target_compile_options(SwarmMind-Client PRIVATE /wd4251)
