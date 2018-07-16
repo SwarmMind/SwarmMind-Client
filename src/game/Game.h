@@ -32,10 +32,9 @@ protected:
     ImGuiRenderer imguiRenderer;
     Input input;
 
-
+    Sound sound;
     sf::SoundBuffer m_soundBuffer;
     deque<sf::Sound> m_soundInstances;
-
 
 	EventSystem eventSystem;
 

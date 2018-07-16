@@ -4,7 +4,7 @@ Sound::Sound(sf::SoundBuffer buffer, deque<sf::Sound> soundInstances)
     : m_buffer { buffer }
     , m_soundInstances { soundInstances }
 {
-
+    //m_buffer.loadFromFile("sound/" + wav);
 }
 
 Sound::~Sound() {

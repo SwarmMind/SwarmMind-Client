@@ -29,7 +29,6 @@ Input::Input(GLFWwindow* window, Camera* camera)
     actionStatus[MoveCamera] = ActionStatus({ GLFW_MOUSE_BUTTON_MIDDLE });
 
 	actionStatus[Debug] = ActionStatus({ GLFW_KEY_PERIOD });
-    actionStatus[Audio] = ActionStatus({ GLFW_KEY_M });
 
 	glfwSetWindowUserPointer(_window, this);
 	auto scrollLambda = [](GLFWwindow* window, double xoffset, double yoffset) {

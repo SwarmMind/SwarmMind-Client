@@ -12,10 +12,9 @@ public:
 
 	virtual void executeOn(Gamestate& state) = 0;
 protected:
-	Command(uint32_t _ID);
+	Command(uint32_t _ID, Sound& sound);
 	uint32_t ID;
-    sf::SoundBuffer m_soundBuffer;
-    deque<sf::Sound> m_soundInstances;
+    class Sound& m_sound;
 	
 private:
 };
@@ -23,7 +22,7 @@ private:
 class DieCommand : public Command
 {
 public:
-	DieCommand(uint32_t _ID);
+	DieCommand(uint32_t _ID, Sound& sound);
 	virtual ~DieCommand() = default;
 
 	virtual void executeOn(Gamestate& state) override;
@@ -37,14 +36,14 @@ class DirectionalCommand : public Command
 public:
 	virtual ~DirectionalCommand() = default;
 protected:
-	DirectionalCommand(uint32_t _ID, glm::vec2 _direction);
+	DirectionalCommand(uint32_t _ID, glm::vec2 _direction, Sound& sound);
 	glm::vec2 direction;
 };
 
 class MoveCommand : public DirectionalCommand
 {
 public:
-	MoveCommand(uint32_t _ID, glm::vec2 _direction);
+	MoveCommand(uint32_t _ID, glm::vec2 _direction, Sound& sound);
 	virtual ~MoveCommand() = default;
 
 	virtual void executeOn(Gamestate& state) override;
@@ -53,7 +52,7 @@ public:
 class AttackCommand : public DirectionalCommand
 {
 public:
-	AttackCommand(uint32_t _ID, glm::vec2 _direction);
+	AttackCommand(uint32_t _ID, glm::vec2 _direction, Sound& sound);
 	virtual ~AttackCommand() = default;
 
 	virtual void executeOn(Gamestate& state) override;
@@ -62,7 +61,7 @@ public:
 class DamageCommand : public DirectionalCommand
 {
 public:
-	DamageCommand(uint32_t _ID, glm::vec2 _direction);
+	DamageCommand(uint32_t _ID, glm::vec2 _direction, Sound& sound);
 	virtual ~DamageCommand() = default;
 
 	virtual void executeOn(Gamestate& state) override;

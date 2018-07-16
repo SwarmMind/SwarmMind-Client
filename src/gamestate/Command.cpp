@@ -3,28 +3,27 @@
 #include <gamestate/Gamestate.h>
 #include <renderer/ParticleSystem.h>
 
-Command::Command(uint32_t _ID)
+Command::Command(uint32_t _ID, Sound& sound)
 	: ID{_ID}
+    , m_sound{ sound }
 {}
 
 //////////////////////////////////////////////////////////////////////////
 //						DieCommand
 //////////////////////////////////////////////////////////////////////////
-DieCommand::DieCommand(uint32_t _ID)
-	: Command(_ID)
+DieCommand::DieCommand(uint32_t _ID, Sound& sound)
+	: Command( _ID, sound )
 {}
 
 void DieCommand::executeOn(Gamestate& state)
 {
-    Sound* sound = new Sound(m_soundBuffer, m_soundInstances);
-    sound->load("play_and_reload.wav");
-    sound->play();
+    m_sound.load("play_and_reload.wav");
+    m_sound.play();
     state.deleteEntity(ID);
-    sound->update();
 }
 
-DirectionalCommand::DirectionalCommand(uint32_t _ID, glm::vec2 _direction)
-	: Command(_ID)
+DirectionalCommand::DirectionalCommand(uint32_t _ID, glm::vec2 _direction, Sound& sound)
+	: Command(_ID, sound)
 	, direction{_direction}
 {}
 
@@ -32,30 +31,28 @@ DirectionalCommand::DirectionalCommand(uint32_t _ID, glm::vec2 _direction)
 //						 MoveCommand
 //////////////////////////////////////////////////////////////////////////
 
-MoveCommand::MoveCommand(uint32_t _ID, glm::vec2 _direction)
-	: DirectionalCommand{_ID, _direction}
+MoveCommand::MoveCommand(uint32_t _ID, glm::vec2 _direction, Sound& sound)
+	: DirectionalCommand(_ID, _direction, sound)
 {}
 
 void MoveCommand::executeOn(Gamestate& state)
 {
-    Sound* sound = new Sound(m_soundBuffer, m_soundInstances);
-    sound->load("unit_walking.wav");
+    m_sound.load("unit_walking.wav");
 
     Entity* entity = state.getEntityByID(ID);
 
 	if (entity != nullptr)
 	{
 		entity->moveTo(entity->position() + direction);
-        sound->play();
+        m_sound.play();
 	}
-    sound->update();
 }
 
 //////////////////////////////////////////////////////////////////////////	
 //						AttackCommand
 //////////////////////////////////////////////////////////////////////////
-AttackCommand::AttackCommand(uint32_t _ID, glm::vec2 _direction)
-	: DirectionalCommand(_ID, _direction)
+AttackCommand::AttackCommand(uint32_t _ID, glm::vec2 _direction, Sound& sound)
+	: DirectionalCommand(_ID, _direction, sound)
 {}
 
 void AttackCommand::executeOn(Gamestate& state)
@@ -70,8 +67,8 @@ void AttackCommand::executeOn(Gamestate& state)
 //////////////////////////////////////////////////////////////////////////
 //						DamageCommand
 //////////////////////////////////////////////////////////////////////////
-DamageCommand::DamageCommand(uint32_t _ID, glm::vec2 _direction)
-	: DirectionalCommand(_ID, _direction)
+DamageCommand::DamageCommand(uint32_t _ID, glm::vec2 _direction, Sound& sound)
+	: DirectionalCommand(_ID, _direction, sound)
 {}
 
 void DamageCommand::executeOn(Gamestate& state)
@@ -80,5 +77,7 @@ void DamageCommand::executeOn(Gamestate& state)
 	if (entity != nullptr)
 	{
 		ParticleSystem::spawnBloodParticles(entity->position(), direction);
+        m_sound.load("play_and_reload.wav");
+        m_sound.play();
 	}
 }

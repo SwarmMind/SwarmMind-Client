@@ -70,6 +70,7 @@ Game::Game()
     , imguiRenderer{ window }
     , input { window, &camera }
     , sprites { textures }
+    , sound { m_soundBuffer, m_soundInstances }
 {
 
 	initializeImGui();
@@ -113,9 +114,8 @@ void Game::update(double time, double timeStamp)
 {
     imguiRenderer.preRender(); // required before any update in order for popups to work!
     menu->update(time, timeStamp);
-
-    Sound* sound = new Sound(m_soundBuffer, m_soundInstances);
-    sound->count();
+    sound.update();
+    sound.count();
 }
 
 void Game::render(double timeElapsed)
