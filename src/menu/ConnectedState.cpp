@@ -81,6 +81,7 @@ void ConnectedState::receiveEvent(InitStateEvent* event) {
     m_renderer.clearStaticData();
     map->drawGridStatic(m_renderer);
     map->updateGameState(event->m_state);
+    map->m_lastUpdate -= event->m_timeSinceLastRound;
 }
 
 void ConnectedState::receiveEvent(DisconnectEvent* event) {

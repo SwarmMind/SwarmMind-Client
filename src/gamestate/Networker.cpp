@@ -237,6 +237,7 @@ void Networker::onInitStateReceive(sio::event _event)
 	const nlohmann::json initState = nlohmann::json::parse(jsonMessage);
 	const Configuration config = parseConfiguration(initState["config"].dump());
 	Gamestate* state = parseGamestate(initState["state"]);
+    double timeSineceLastRound = initState["config"]["timeSinceLastRound"];
 
 	{
 		lock_guard<mutex> queueGuard(queueLock);
@@ -244,6 +245,7 @@ void Networker::onInitStateReceive(sio::event _event)
             InitStateEvent initStateEvent;
             initStateEvent.m_state = state;
             initStateEvent.m_config = config;
+            initStateEvent.m_timeSinceLastRound = timeSineceLastRound;
             eventSystem.processEvent(&initStateEvent);
 		});
 	}

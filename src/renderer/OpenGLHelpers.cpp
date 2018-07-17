@@ -5,6 +5,7 @@
 #include <iostream>
 #include <vector>
 #include <thread>
+#include <sstream>
 
 using namespace gl41core;
 using namespace std;
@@ -13,21 +14,16 @@ using namespace std;
 
 std::string loadShaderFile(string path)
 {
-	string shader;
 	ifstream file(path);
 	if (!file.is_open())
 	{
-		cout << "Could not open file: " << path << endl;
-		exit(-1);
+        throw std::runtime_error(std::string("Could not open file: ") + path);
 	}
 
-	while (!file.eof())
-	{
-		char character = file.get();
-		if (character > 0)
-			shader += character;
-	}
-	return shader;
+    std::ostringstream contents;
+    contents << file.rdbuf();
+
+	return contents.str();
 }
 
 GLint loadShader(string path, GLenum shaderType)
@@ -50,10 +46,8 @@ GLint loadShader(string path, GLenum shaderType)
 		glGetShaderInfoLog(shader, errorLength, &errorLength, &infoLog[0]);
         infoLog.emplace_back('\0');
 
-		cout << "Shader compilation: " << path << " failed:\n" << infoLog.data() << std::endl;
-
 		glDeleteShader(shader);
-		exit(-1);
+        throw std::runtime_error(std::string("Shader compilation: ") + path + " failed:\n" + infoLog.data());
 	}
 
 	return shader;
@@ -82,10 +76,8 @@ GLint loadProgram(string vertexShaderPath, string fragmentShaderPath)
 		vector<GLchar> errorLog(maxLength);
 		glGetProgramInfoLog(program, maxLength, &maxLength, &errorLog[0]);
 
-		cout << "OpenGL Linker Error:" << std::endl;
-		cout << errorLog.data();
 		glDeleteProgram(program);
-		exit(-1);
+        throw std::runtime_error(std::string("OpenGL Linker Error: \n") + errorLog.data());
 	}
 
 	return program;

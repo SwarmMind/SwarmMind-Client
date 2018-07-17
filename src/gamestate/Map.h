@@ -31,6 +31,7 @@ public:
     virtual void receiveEvent(StateEvent* event) override;
     virtual void receiveEvent(AccumulatedCommandsEvent* event) override;
 
+	double m_lastUpdate;
 protected:
     ChatSystem m_chats;
 	class Gamestate* m_gamestate;
@@ -45,7 +46,6 @@ protected:
 	bool selectedUnitIsValid();
 	glm::vec2 m_mouseClickPosition;
 
-	double m_lastUpdate;
     double m_roundDuration = 1.0; //set to 1 to avoid divide by zero error
     size_t m_numberOfGivenCommands = 0;
     size_t m_maxNumberOfCommands = 1; //set to 1 to avoid divide by zero error
