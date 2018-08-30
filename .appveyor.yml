@@ -29,7 +29,7 @@ install:
   - if not exist "C:\projects\glfw" git clone --depth 1 --no-checkout https://github.com/glfw/glfw.git C:\projects\glfw
   - cd C:\projects\glfw
   - git fetch --depth 1 --tags
-  - ps: git checkout $env:GLFW_VER
+  - git checkout %GLFW_VER%
   - cd ../build-glfw
   - ps: |
       cmake `
@@ -45,7 +45,7 @@ install:
   - if not exist "C:\projects\glm" git clone --depth 1 --no-checkout https://github.com/g-truc/glm.git C:\projects\glm
   - cd C:\projects\glm
   - git fetch --depth 1 --tags
-  - ps: git checkout $env:GLM_VER
+  - git checkout %GLM_VER%
   - cd ../build-glm
   - ps: |
       cmake `
@@ -60,7 +60,7 @@ install:
   - if not exist "C:\projects\glbinding" git clone --depth 1 --no-checkout https://github.com/cginternals/glbinding C:\projects\glbinding
   - cd C:\projects\glbinding
   - git fetch --depth 1 --tags
-  - ps: git checkout v$env:GLBINDING_VER
+  - git checkout v%GLBINDING_VER%
   - cd ../build-glbinding
   - ps: |
       cmake `
