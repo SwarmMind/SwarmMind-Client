@@ -3,6 +3,11 @@ image:
 configuration:
   - Release
   - Debug
+environment:
+  APPVEYOR_CACHE_SKIP_RESTORE: true
+  GLFW_VER: 3.2.1
+  GLM_VER: 0.9.9.0
+  GLBINDING_VER: 3.0.2
 cache:
   - C:\projects\glfw
   - C:\projects\glbinding
@@ -24,7 +29,7 @@ install:
   - if not exist "C:\projects\glfw" git clone --depth 1 --no-checkout https://github.com/glfw/glfw.git C:\projects\glfw
   - cd C:\projects\glfw
   - git fetch --depth 1 --tags
-  - git checkout 3.2.1
+  - git checkout $env:GLFW_VER
   - cd ../build-glfw
   - ps: |
       cmake `
@@ -40,7 +45,7 @@ install:
   - if not exist "C:\projects\glm" git clone --depth 1 --no-checkout https://github.com/g-truc/glm.git C:\projects\glm
   - cd C:\projects\glm
   - git fetch --depth 1 --tags
-  - git checkout 0.9.9.0
+  - git checkout $env:GLM_VER
   - cd ../build-glm
   - ps: |
       cmake `
@@ -55,7 +60,7 @@ install:
   - if not exist "C:\projects\glbinding" git clone --depth 1 --no-checkout https://github.com/cginternals/glbinding C:\projects\glbinding
   - cd C:\projects\glbinding
   - git fetch --depth 1 --tags
-  - git checkout v3.0.2
+  - git checkout v$env:GLBINDING_VER
   - cd ../build-glbinding
   - ps: |
       cmake `
