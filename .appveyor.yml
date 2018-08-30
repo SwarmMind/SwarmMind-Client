@@ -29,10 +29,10 @@ install:
   - ps: |
       cmake \
       -DCMAKE_BUILD_TYPE=$env:CONFIGURATION \
-	  -DCMAKE_INSTALL_PREFIX=C:\deps\glfw \
-	  -DGLFW_BUILD_EXAMPLES=OFF \
-	  -DGLFW_BUILD_TESTS=OFF \
-	  -G "Visual Studio 15 2017 Win64" \
+      -DCMAKE_INSTALL_PREFIX=C:\deps\glfw \
+      -DGLFW_BUILD_EXAMPLES=OFF \
+      -DGLFW_BUILD_TESTS=OFF \
+      -G "Visual Studio 15 2017 Win64" \
 ../glfw
   - cmake --build . --config %CONFIGURATION%
   - cmake --build . --config %CONFIGURATION% --target install
