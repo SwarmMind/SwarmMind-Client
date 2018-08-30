@@ -152,7 +152,7 @@ void Game::drawDebug(double timeElapsed)
 			| ImGuiWindowFlags_NoMove
 			| ImGuiWindowFlags_NoScrollbar
 			| ImGuiWindowFlags_NoSavedSettings
-			| ImGuiWindowFlags_NoInputs));
+			| ImGuiWindowFlags_NoInputs))
 		{
 			width = ImGui::GetWindowWidth();
 			height = ImGui::GetWindowHeight();
