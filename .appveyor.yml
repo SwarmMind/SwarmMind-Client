@@ -21,14 +21,13 @@ install:
   - if not exist build-glbinding mkdir build-glbinding
   - if not exist build-sioclient mkdir build-sioclient
 
-  - if not exist "C:\projects\glfw" \
-    git clone --depth 1 --no-checkout \
-    https://github.com/glfw/glfw.git C:\projects\glfw
+  - if not exist "C:\projects\glfw" git clone --depth 1 --no-checkout https://github.com/glfw/glfw.git C:\projects\glfw
   - cd C:\projects\glfw
   - git fetch --depth 1 --tags
   - git checkout 3.2.1
   - cd ../build-glfw
-  - cmake \
+  - ps: |
+     cmake \
     -DCMAKE_BUILD_TYPE=%CONFIGURATION% \
     -DCMAKE_INSTALL_PREFIX=C:\deps\glfw \
     -DGLFW_BUILD_EXAMPLES=OFF \
@@ -38,14 +37,13 @@ install:
   - cmake --build . --config %CONFIGURATION%
   - cmake --build . --config %CONFIGURATION% --target install
 
-  - ps: if (-not Test-Path "C:\projects\glm") {
-    git clone --depth 1 --no-checkout https://github.com/g-truc/glm.git C:\projects\glm
-    }
+  - if not exist "C:\projects\glm" git clone --depth 1 --no-checkout https://github.com/g-truc/glm.git C:\projects\glm
   - cd C:\projects\glm
   - git fetch --depth 1 --tags
   - git checkout 0.9.9.0
   - cd ../build-glm
-  - cmake \
+  - ps: |
+    cmake \
     -DCMAKE_BUILD_TYPE=%CONFIGURATION% \
     -DCMAKE_INSTALL_PREFIX=C:\deps\glm \
     -DGLM_INSTALL_ENABLE=true \
@@ -54,14 +52,13 @@ install:
   - cmake --build . --config %CONFIGURATION%
   - cmake --build . --config %CONFIGURATION% --target install
 
-  - if not exist "C:\projects\glbinding" \
-    git clone --depth 1 --no-checkout \
-    https://github.com/cginternals/glbinding C:\projects\glbinding
+  - if not exist "C:\projects\glbinding" git clone --depth 1 --no-checkout https://github.com/cginternals/glbinding C:\projects\glbinding
   - cd C:\projects\glbinding
   - git fetch --depth 1 --tags
   - git checkout v2.1.4
   - cd ../build-glbinding
-  - cmake \
+  - ps: |
+    cmake \
     -DCMAKE_BUILD_TYPE=%CONFIGURATION% \
     -DCMAKE_INSTALL_PREFIX=C:\deps\glbinding \
     -DCMAKE_CXX_FLAGS="/D_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING /EHsc" \
@@ -75,13 +72,12 @@ install:
   - cmake --build . --config %CONFIGURATION%
   - cmake --build . --config %CONFIGURATION% --target install
 
-  - if not exist "C:\projects\sioclient" \
-    git clone --depth 1 --no-checkout --branch fixes \
-    https://github.com/SwarmMind/socket.io-client-cpp.git C:\projects\sioclient
+  - if not exist "C:\projects\sioclient" git clone --depth 1 --no-checkout --branch fixes https://github.com/SwarmMind/socket.io-client-cpp.git C:\projects\sioclient
   - cd C:\projects\sioclient
   - git fetch --depth 1 --tags
   - cd ../build-sioclient
-  - cmake \
+  - ps: |
+    cmake \
     -DCMAKE_BUILD_TYPE=%CONFIGURATION% \
     -DCMAKE_INSTALL_PREFIX=C:\deps\sioclient \
     -DCMAKE_CXX_FLAGS="/D_SCL_SECURE_NO_WARNINGS /EHsc" \
@@ -95,7 +91,8 @@ install:
 before_build:
   - cd C:\projects\swarmmind-client
   - mkdir build && cd build
-  - cmake \
+  - ps: |
+	cmake \
     -DCMAKE_BUILD_TYPE=%CONFIGURATION% \
     -DCMAKE_PREFIX_PATH=C:\deps\glfw;C:\deps\glbinding;C:\deps\sioclient \
     -DSIOCLIENT_USE_FIND_PACKAGE=ON \
