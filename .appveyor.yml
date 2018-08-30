@@ -37,7 +37,7 @@ install:
       -DGLFW_BUILD_EXAMPLES=OFF `
       -DGLFW_BUILD_TESTS=OFF `
       -G "Visual Studio 15 2017 Win64" `
-      ../glfw 2>&1 | %{ "$_" }
+      ../glfw
   - cmake --build . --config %CONFIGURATION%
   - cmake --build . --config %CONFIGURATION% --target install
 
@@ -51,7 +51,7 @@ install:
       -DCMAKE_INSTALL_PREFIX=C:\deps\glm `
       -DGLM_INSTALL_ENABLE=true `
       -G "Visual Studio 15 2017 Win64" `
-      ../glm 2>&1 | %{ "$_" }
+      ../glm 2> $null
   - cmake --build . --config %CONFIGURATION%
   - cmake --build . --config %CONFIGURATION% --target install
 
@@ -71,7 +71,7 @@ install:
       -DOPTION_BUILD_GPU_TESTS=OFF `
       -DOPTION_BUILD_TOOLS=OFF `
       -G "Visual Studio 15 2017 Win64" `
-      ../glbinding 2>&1 | %{ "$_" }
+      ../glbinding
   - cmake --build . --config %CONFIGURATION%
   - cmake --build . --config %CONFIGURATION% --target install
 
@@ -87,7 +87,7 @@ install:
       -DBOOST_ROOT=C:\Libraries\boost_1_67_0 `
       -DBOOST_VER=1.67.0 `
       -G "Visual Studio 15 2017 Win64" `
-      ../sioclient 2>&1 | %{ "$_" }
+      ../sioclient
   - cmake --build . --config %CONFIGURATION%
   - cmake --build . --config %CONFIGURATION% --target install
 
@@ -100,7 +100,7 @@ before_build:
       -DCMAKE_PREFIX_PATH=C:\deps\glfw;C:\deps\glbinding;C:\deps\sioclient `
       -DSIOCLIENT_USE_FIND_PACKAGE=ON `
       -G "Visual Studio 15 2017 Win64" `
-      .. 2>&1 | %{ "$_" }
+      ..
 build:
   project: build\SwarmMind-Client.sln
   verbosity: minimal
