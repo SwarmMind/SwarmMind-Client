@@ -33,7 +33,6 @@ install:
   - cd ../build-glfw
   - ps: |
       cmake -Wno-dev -Wno-deprecated `
-      -DCMAKE_BUILD_TYPE=$env:CONFIGURATION `
       -DCMAKE_INSTALL_PREFIX=C:\deps\glfw `
       -DGLFW_BUILD_EXAMPLES=OFF `
       -DGLFW_BUILD_TESTS=OFF `
