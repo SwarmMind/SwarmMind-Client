@@ -32,7 +32,7 @@ install:
   - git checkout %GLFW_VER%
   - cd ../build-glfw
   - ps: |
-      cmake `
+      cmake -Wno-dev -Wno-deprecated `
       -DCMAKE_BUILD_TYPE=$env:CONFIGURATION `
       -DCMAKE_INSTALL_PREFIX=C:\deps\glfw `
       -DGLFW_BUILD_EXAMPLES=OFF `
