@@ -27,13 +27,13 @@ install:
   - git checkout 3.2.1
   - cd ../build-glfw
   - ps: |
-     cmake \
-    -DCMAKE_BUILD_TYPE=$env:CONFIGURATION \
-    -DCMAKE_INSTALL_PREFIX=C:\deps\glfw \
-    -DGLFW_BUILD_EXAMPLES=OFF \
-    -DGLFW_BUILD_TESTS=OFF \
-    -G "Visual Studio 15 2017 Win64" \
-    ../glfw
+      cmake \
+      -DCMAKE_BUILD_TYPE=$env:CONFIGURATION \
+	  -DCMAKE_INSTALL_PREFIX=C:\deps\glfw \
+	  -DGLFW_BUILD_EXAMPLES=OFF \
+	  -DGLFW_BUILD_TESTS=OFF \
+	  -G "Visual Studio 15 2017 Win64" \
+../glfw
   - cmake --build . --config %CONFIGURATION%
   - cmake --build . --config %CONFIGURATION% --target install
 
@@ -43,12 +43,12 @@ install:
   - git checkout 0.9.9.0
   - cd ../build-glm
   - ps: |
-    cmake \
-    -DCMAKE_BUILD_TYPE=$env:CONFIGURATION \
-    -DCMAKE_INSTALL_PREFIX=C:\deps\glm \
-    -DGLM_INSTALL_ENABLE=true \
-    -G "Visual Studio 15 2017 Win64" \
-    ../glm
+      cmake \
+      -DCMAKE_BUILD_TYPE=$env:CONFIGURATION \
+      -DCMAKE_INSTALL_PREFIX=C:\deps\glm \
+      -DGLM_INSTALL_ENABLE=true \
+      -G "Visual Studio 15 2017 Win64" \
+      ../glm
   - cmake --build . --config %CONFIGURATION%
   - cmake --build . --config %CONFIGURATION% --target install
 
@@ -58,17 +58,17 @@ install:
   - git checkout v2.1.4
   - cd ../build-glbinding
   - ps: |
-    cmake \
-    -DCMAKE_BUILD_TYPE=$env:CONFIGURATION \
-    -DCMAKE_INSTALL_PREFIX=C:\deps\glbinding \
-    -DCMAKE_CXX_FLAGS="/D_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING /EHsc" \
-    -DCMAKE_PREFIX_PATH=C:\deps\glfw \
-    -DBUILD_SHARED_LIBS=OFF \
-    -DOPTION_BUILD_TESTS=OFF \
-    -DOPTION_BUILD_GPU_TESTS=OFF \
-    -DOPTION_BUILD_TOOLS=OFF \
-    -G "Visual Studio 15 2017 Win64" \
-    ../glbinding
+      cmake \
+      -DCMAKE_BUILD_TYPE=$env:CONFIGURATION \
+      -DCMAKE_INSTALL_PREFIX=C:\deps\glbinding \
+      -DCMAKE_CXX_FLAGS="/D_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING /EHsc" \
+      -DCMAKE_PREFIX_PATH=C:\deps\glfw \
+      -DBUILD_SHARED_LIBS=OFF \
+      -DOPTION_BUILD_TESTS=OFF \
+      -DOPTION_BUILD_GPU_TESTS=OFF \
+      -DOPTION_BUILD_TOOLS=OFF \
+      -G "Visual Studio 15 2017 Win64" \
+      ../glbinding
   - cmake --build . --config %CONFIGURATION%
   - cmake --build . --config %CONFIGURATION% --target install
 
@@ -77,14 +77,14 @@ install:
   - git fetch --depth 1 --tags
   - cd ../build-sioclient
   - ps: |
-    cmake \
-    -DCMAKE_BUILD_TYPE=$env:CONFIGURATION \
-    -DCMAKE_INSTALL_PREFIX=C:\deps\sioclient \
-    -DCMAKE_CXX_FLAGS="/D_SCL_SECURE_NO_WARNINGS /EHsc" \
-    -DBOOST_ROOT=C:\Libraries\boost_1_67_0 \
-    -DBOOST_VER=1.67.0 \
-    -G "Visual Studio 15 2017 Win64" \
-    ../sioclient
+      cmake \
+      -DCMAKE_BUILD_TYPE=$env:CONFIGURATION \
+      -DCMAKE_INSTALL_PREFIX=C:\deps\sioclient \
+      -DCMAKE_CXX_FLAGS="/D_SCL_SECURE_NO_WARNINGS /EHsc" \
+      -DBOOST_ROOT=C:\Libraries\boost_1_67_0 \
+      -DBOOST_VER=1.67.0 \
+      -G "Visual Studio 15 2017 Win64" \
+      ../sioclient
   - cmake --build . --config %CONFIGURATION%
   - cmake --build . --config %CONFIGURATION% --target install
 
