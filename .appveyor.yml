@@ -40,7 +40,7 @@ install:
 
   - ps: if (-not Test-Path "C:\projects\glm") {
     git clone --depth 1 --no-checkout https://github.com/g-truc/glm.git C:\projects\glm
-	}
+    }
   - cd C:\projects\glm
   - git fetch --depth 1 --tags
   - git checkout 0.9.9.0
