@@ -28,7 +28,7 @@ install:
   - cd ../build-glfw
   - ps: |
      cmake \
-    -DCMAKE_BUILD_TYPE=%CONFIGURATION% \
+    -DCMAKE_BUILD_TYPE=$env:CONFIGURATION \
     -DCMAKE_INSTALL_PREFIX=C:\deps\glfw \
     -DGLFW_BUILD_EXAMPLES=OFF \
     -DGLFW_BUILD_TESTS=OFF \
@@ -44,7 +44,7 @@ install:
   - cd ../build-glm
   - ps: |
     cmake \
-    -DCMAKE_BUILD_TYPE=%CONFIGURATION% \
+    -DCMAKE_BUILD_TYPE=$env:CONFIGURATION \
     -DCMAKE_INSTALL_PREFIX=C:\deps\glm \
     -DGLM_INSTALL_ENABLE=true \
     -G "Visual Studio 15 2017 Win64" \
@@ -59,7 +59,7 @@ install:
   - cd ../build-glbinding
   - ps: |
     cmake \
-    -DCMAKE_BUILD_TYPE=%CONFIGURATION% \
+    -DCMAKE_BUILD_TYPE=$env:CONFIGURATION \
     -DCMAKE_INSTALL_PREFIX=C:\deps\glbinding \
     -DCMAKE_CXX_FLAGS="/D_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING /EHsc" \
     -DCMAKE_PREFIX_PATH=C:\deps\glfw \
@@ -78,7 +78,7 @@ install:
   - cd ../build-sioclient
   - ps: |
     cmake \
-    -DCMAKE_BUILD_TYPE=%CONFIGURATION% \
+    -DCMAKE_BUILD_TYPE=$env:CONFIGURATION \
     -DCMAKE_INSTALL_PREFIX=C:\deps\sioclient \
     -DCMAKE_CXX_FLAGS="/D_SCL_SECURE_NO_WARNINGS /EHsc" \
     -DBOOST_ROOT=C:\Libraries\boost_1_67_0 \
@@ -93,7 +93,7 @@ before_build:
   - mkdir build && cd build
   - ps: |
 	cmake \
-    -DCMAKE_BUILD_TYPE=%CONFIGURATION% \
+    -DCMAKE_BUILD_TYPE=$env:CONFIGURATION \
     -DCMAKE_PREFIX_PATH=C:\deps\glfw;C:\deps\glbinding;C:\deps\sioclient \
     -DSIOCLIENT_USE_FIND_PACKAGE=ON \
     -G "Visual Studio 15 2017 Win64" \
