@@ -48,7 +48,6 @@ install:
   - cd ../build-glm
   - ps: |
       cmake `
-      -DCMAKE_BUILD_TYPE=$env:CONFIGURATION `
       -DCMAKE_INSTALL_PREFIX=C:\deps\glm `
       -DGLM_INSTALL_ENABLE=true `
       -G "Visual Studio 15 2017 Win64" `
