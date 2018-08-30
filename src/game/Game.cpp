@@ -7,7 +7,9 @@
 
 #include <glbinding/gl41core/gl.h>
 #include <glbinding/Binding.h>
-#include <glbinding/callbacks.h>
+#include <glbinding/Version.h>
+#include <glbinding-aux/ContextInfo.h>
+#include <glbinding-aux/types_to_string.h>
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
@@ -22,23 +24,21 @@
 #include <functional>
 #include <menu/MainMenuState.h>
 #include <menu/ConnectedState.h>
-#include <glbinding/ContextInfo.h>
-#include <glbinding/Version.h>
 
 using namespace std;
 
 void Game::initializeOpenGL() {
-    glbinding::Binding::initialize();
-    glbinding::setCallbackMaskExcept(glbinding::CallbackMask::After, { "glGetError" });
-    glbinding::setAfterCallback([](const glbinding::FunctionCall &)
+    glbinding::Binding::initialize(glfwGetProcAddress);
+    glbinding::Binding::setCallbackMaskExcept(glbinding::CallbackMask::After, { "glGetError" });
+    glbinding::Binding::setAfterCallback([](const glbinding::FunctionCall &)
     {
         const auto error = glGetError();
         if (error != 0)
             std::cout << "error: " << std::hex << error << std::endl;
     });
-
-    std::cout << "OpenGL Version: " << glbinding::ContextInfo::version() << std::endl;
-    std::cout << "GPU Vendor: " << glbinding::ContextInfo::vendor() << std::endl;
+	
+    std::cout << "OpenGL Version: " << glbinding::aux::ContextInfo::version().toString() << std::endl;
+    std::cout << "GPU Vendor: " << glbinding::aux::ContextInfo::vendor() << std::endl;
 }
 
 GLFWwindow * Game::createWindow() {

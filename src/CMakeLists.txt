@@ -56,7 +56,7 @@ else()
 endif()
 endif()
 
-target_link_libraries(SwarmMind-Client PUBLIC glbinding::glbinding glfw glm)
+target_link_libraries(SwarmMind-Client PUBLIC glbinding::glbinding glbinding::glbinding-aux glfw glm)
 
 if(MSVC)
 target_compile_options(SwarmMind-Client PRIVATE /wd4251)
