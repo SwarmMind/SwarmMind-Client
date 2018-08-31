@@ -78,12 +78,18 @@ Game::Game()
 
 void Game::connectTo(std::string address, unsigned int port)
 {
+	settings.hostname = address;
+	settings.port = port;
+	settings.save();
+
 	menu = std::make_unique<ConnectedState>(*this, renderer, input, eventSystem, address, port);
 }
 
 void Game::openMainMenu()
 {
-	menu = std::make_unique<MainMenuState>(this);
+	settings.read();
+
+	menu = std::make_unique<MainMenuState>(this, settings.hostname, settings.port);
 }
 
 void Game::initializeImGui()

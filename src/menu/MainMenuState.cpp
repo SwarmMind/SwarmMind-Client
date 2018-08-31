@@ -3,11 +3,13 @@
 #include <imgui/imgui.h>
 #include <game/Game.h>
 #include <algorithm>
+#include <cstring>
 
-MainMenuState::MainMenuState(Game* _game)
+MainMenuState::MainMenuState(Game* _game, const std::string& preset_host, const uint16_t preset_port)
 	: game{_game}
 {
-
+	strcpy(address, preset_host.c_str());
+	port = preset_port;
 }
 
 MainMenuState::~MainMenuState()
@@ -53,7 +55,7 @@ void MainMenuState::draw(Renderer& renderer)
 			{
 				if (ImGui::Button("Reset"))
 				{
-					port = defaultPort;
+					port = default_port;
 				}
 				ImGui::SameLine();
 				if (ImGui::InputInt("Port", &port, 1, 100))

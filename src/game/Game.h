@@ -7,6 +7,7 @@
 #include <menu/MenuState.h>
 #include <game/Camera.h>
 #include <events/EventSystem.h>
+#include <game/Settings.h>
 
 //static bool g_isZoomingEnabled;
 
@@ -36,6 +37,8 @@ protected:
 
 	Textures textures;
 	Sprites sprites;
+
+	Settings settings;
 
 public:
     Game();
