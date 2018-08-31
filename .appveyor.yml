@@ -4,7 +4,6 @@ configuration:
   - Release
   - Debug
 environment:
-  APPVEYOR_CACHE_SKIP_RESTORE: true
   GLFW_VER: 3.2.1
   GLM_VER: 0.9.9.0
   GLBINDING_VER: 3.0.2
