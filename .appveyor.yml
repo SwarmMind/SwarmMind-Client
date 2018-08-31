@@ -53,7 +53,7 @@ install:
   - cmake --build . --config %CONFIGURATION%
   - cmake --build . --config %CONFIGURATION% --target install
 
-  - if not exist "C:\projects\sioclient" git clone --depth 1 --no-checkout --branch fixes https://github.com/SwarmMind/socket.io-client-cpp.git C:\projects\sioclient
+  - if not exist "C:\projects\sioclient" git clone --depth 1 --branch fixes https://github.com/SwarmMind/socket.io-client-cpp.git C:\projects\sioclient
   - cd C:\projects\sioclient
   - git fetch --depth 1 --tags
   - cd ../build-sioclient
