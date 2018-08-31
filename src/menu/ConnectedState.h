@@ -10,11 +10,12 @@
 #include <events/InitStateEvent.h>
 #include <events/StateEvent.h>
 #include <events/DisconnectEvent.h>
+#include <game/Settings.h>
 
 class ConnectedState : public MenuState, public EventListener<InitStateEvent>, public EventListener<DisconnectEvent>
 {
 public:
-    ConnectedState(class Game& _game, class Renderer& renderer, Input& input, class EventSystem& eventSystem, std::string address, unsigned port = 3000);
+    ConnectedState(class Game& _game, class Renderer& renderer, Input& input, class EventSystem& eventSystem, Settings& _settings);
 	virtual ~ConnectedState() override;
 
 	virtual void update(double deltaTime, double timeStamp) override;
@@ -33,4 +34,5 @@ private:
 	Networker networker;
 	Input& input;
 	Map* map;
+	Settings& settings;
 };

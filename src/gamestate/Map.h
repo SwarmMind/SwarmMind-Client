@@ -16,7 +16,7 @@
 class Map : public EventListener<StateEvent>, public EventListener<AccumulatedCommandsEvent>
 {
 public:
-	Map(class Input& _input, Networker& _networker, class EventSystem& _eventSystem, const class Configuration& config);
+	Map(class Input& _input, Networker& _networker, class EventSystem& _eventSystem, const class Configuration& config, const std::string& preset_username);
 
 	~Map();
 
@@ -32,6 +32,9 @@ public:
     virtual void receiveEvent(AccumulatedCommandsEvent* event) override;
 
 	double m_lastUpdate;
+
+	std::string username() const { return m_chats.username(); }
+
 protected:
     ChatSystem m_chats;
 	class Gamestate* m_gamestate;

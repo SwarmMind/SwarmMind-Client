@@ -21,7 +21,7 @@
 
 using namespace std;
 
-Map::Map(Input& _input, Networker& _networker, EventSystem& _eventSystem, const Configuration& _config)
+Map::Map(Input& _input, Networker& _networker, EventSystem& _eventSystem, const Configuration& _config, const std::string& preset_username)
 	: EventListener<StateEvent>{_eventSystem}
     , EventListener<AccumulatedCommandsEvent>{_eventSystem}
     , m_input{ _input }
@@ -30,7 +30,7 @@ Map::Map(Input& _input, Networker& _networker, EventSystem& _eventSystem, const 
     , m_gamestate{ new Gamestate{_eventSystem} }
 	, m_lastUpdate{glfwGetTime()}
 	, m_eventSystem{_eventSystem}
-    , m_chats{_input, _networker, _eventSystem}
+    , m_chats{_input, _networker, _eventSystem, preset_username}
     , m_roundDuration{_config.m_roundTime}
 {}
 
