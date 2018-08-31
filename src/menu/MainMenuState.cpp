@@ -4,7 +4,7 @@
 #include <game/Game.h>
 #include <algorithm>
 
-MainMenuState::MainMenuState(class Game* _game)
+MainMenuState::MainMenuState(Game* _game)
 	: game{_game}
 {
 
@@ -15,7 +15,7 @@ MainMenuState::~MainMenuState()
 
 }
 
-void MainMenuState::update(double deltaTime)
+void MainMenuState::update(double deltaTime, double timeStamp)
 {
 	
 }

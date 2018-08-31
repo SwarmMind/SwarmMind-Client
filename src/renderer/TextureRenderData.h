@@ -10,7 +10,7 @@ public:
 
 	~TextureRenderData();
 
-	bool addData(unsigned int size, GLfloat* data);
+	bool addData(unsigned int size, const GLfloat* data);
 	void draw();
 
 private:

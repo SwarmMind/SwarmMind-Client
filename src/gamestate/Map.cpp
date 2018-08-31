@@ -1,5 +1,9 @@
 #include <iostream>
 #include <cstdint>
+#include <limits>
+#include <string>
+#include <glm/glm.hpp>
+#include <cmath>
 
 #include <gamestate/Map.h>
 #include <gamestate/Gamestate.h>
@@ -7,63 +11,128 @@
 #include <renderer/Renderer.h>
 #include <imgui/imgui.h>
 #include <renderer/Sprites.h>
+#include <renderer/ParticleSystem.h>
 
-Map::Map(Input& _input, Sprites& _sprites, Networker& _networker, const Configuration& _config) 
-	: input{ _input }
-	, config{_config}
-	, networker{_networker}
-	, gamestate{nullptr}
-	, sprites{_sprites}
-{
+#include <glm/common.hpp>
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/norm.hpp>
+#include <renderer/CommandVisualizer.h>
+#include <events/EventSystem.h>
 
-}
+using namespace std;
+
+Map::Map(Input& _input, Networker& _networker, EventSystem& _eventSystem, const Configuration& _config)
+	: EventListener<StateEvent>{_eventSystem}
+    , EventListener<AccumulatedCommandsEvent>{_eventSystem}
+    , m_input{ _input }
+	, m_config{_config}
+	, m_networker{_networker}
+    , m_gamestate{ new Gamestate{_eventSystem} }
+	, m_lastUpdate{glfwGetTime()}
+	, m_eventSystem{_eventSystem}
+    , m_chats{_input, _networker, _eventSystem}
+    , m_roundDuration{_config.m_roundTime}
+{}
 
 Map::~Map()
 {
-	delete gamestate;
+	delete m_gamestate;
 }
 
 void Map::updateGameState(class Gamestate* newState)
 {
-	delete gamestate;
-	gamestate = newState;
+    delete m_gamestate;
+	m_gamestate = newState;
+
+	m_lastUpdate = glfwGetTime();
+    m_numberOfGivenCommands = 0;
 }
 
-void Map::sendCommand(std::string action, std::string direction)
+void Map::receiveEvent(StateEvent* event)
 {
-	if (!selectedUnitIsValid())
-	{
-		return;
-	}
+    updateGameState(event->m_state);
+    event->m_state = nullptr;
+}
 
-	Entity unit = gamestate->getUnits().at(selectedUnit);
-	networker.sendCommand(unit.id, action, direction);
+void Map::receiveEvent(AccumulatedCommandsEvent* event)
+{
+    m_numberOfGivenCommands = event->numberOfGivenCommands;
+    m_maxNumberOfCommands = event->maxNumberOfCommands;
+}
+
+void Map::sendCommand(std::string action, glm::vec2 direction)
+{
+	auto unit = m_gamestate->units.find(m_selectedUnit);
+	if (unit != m_gamestate->units.end()) {
+		m_networker.sendCommand(unit->second.id(), action, direction);
+	}
 }
 
 void Map::updateCommandAction(Action action, std::string command, std::string direction)
 {
-	if (input.isActionJustReleased(action))
+	//#TODO
+	/*if (input.isActionJustReleased(action))
 	{
 		sendCommand(command, direction);
+	}*/
+}
+
+void Map::updateMouseCommand(Action action, std::string command, double deltaTime, bool isDirect = false)
+{
+	const float minimumDragDistance = 0.5;
+	if (m_input.isActionJustPressed(action))
+	{
+		const int32_t wouldSelect = clickedUnit(m_input.mousePositionInWorld());
+        if (!trackpadMode || wouldSelect != -1) {
+            m_selectedUnit = wouldSelect;
+        }
+		m_mouseClickPosition = m_input.mousePositionInWorld();
+	}
+	if (!isUnitClicked(m_mouseClickPosition))
+	{
+        const auto unit = m_gamestate->units.find(m_selectedUnit);
+        if (unit != m_gamestate->units.end() &&
+            isDirect &&
+            m_input.isActionJustReleased(action)) {
+            glm::vec2 delta = m_input.mousePositionInWorld() -
+                              unit->second.position();
+			sendCommand(command, glm::normalize(delta));
+            ParticleSystem::spawnAcknowledgeParticles(m_input.mousePositionInWorld());
+        }
+		return;
+	}
+
+	if (m_input.isActionJustReleased(action))
+	{
+		glm::vec2 delta = m_input.mousePositionInWorld() - m_mouseClickPosition;
+		if (glm::length(delta) > minimumDragDistance)
+		{
+			sendCommand(command, glm::normalize(delta));
+			ParticleSystem::spawnAcknowledgeParticles(m_input.mousePositionInWorld());
+		}
+	}
+
+	if (m_input.isActionPressed(action))
+	{
+		glm::vec2 delta = m_input.mousePositionInWorld() - m_mouseClickPosition;
+		if (glm::length(delta) > minimumDragDistance)
+		{
+			ParticleSystem::mouseDragParticles(m_input.mousePositionInWorld(), m_mouseClickPosition, action == Move ? glm::vec4(0.1, 0.8, 0.1, 0.7) : glm::vec4(1, 0.5, 0.1, 0.8), deltaTime);
+		}
 	}
 }
 
-void Map::updateCommands()
+void Map::updateCommands(double deltaTime)
 {
+	updateMouseCommand(Move, "move", deltaTime);
+	updateMouseCommand(MoveDirect, "move", deltaTime, true);
+	updateMouseCommand(Shoot, "attack", deltaTime);
+	updateMouseCommand(ShootDirect, "attack", deltaTime, true);
+
 	if (!selectedUnitIsValid())
 	{
 		return;
 	}
-	
-	updateCommandAction(MoveDown, "move", "south");
-	updateCommandAction(MoveUp, "move", "north");
-	updateCommandAction(MoveRight, "move", "east");
-	updateCommandAction(MoveLeft, "move", "west");
-
-	updateCommandAction(ShootDown, "shoot", "south");
-	updateCommandAction(ShootUp, "shoot", "north");
-	updateCommandAction(ShootRight, "shoot", "east");
-	updateCommandAction(ShootLeft, "shoot", "west");
 }
 
 void Map::updateSelection()
@@ -73,48 +142,106 @@ void Map::updateSelection()
 	updateSelectionAction(SelectUnit3, 2);
 }
 
+bool Map::isUnitClicked(glm::vec2 mousePosition) {
+	return clickedUnit(mousePosition) != -1;
+}
+
+int Map::clickedUnit(glm::vec2 mousePosition)
+{
+	std::map<uint32_t, Unit> units = m_gamestate->units;
+	auto closest = units.cend();
+	float actualDistance = std::numeric_limits<float>::infinity();
+
+	for (auto it = units.cbegin(); it != units.cend(); it++) {
+		float distance = glm::distance(it->second.position(), mousePosition);
+		if (distance < actualDistance) {
+			actualDistance = distance;
+			closest = it;
+		}
+	}
+	return (closest == units.cend() || actualDistance > 0.5f) ? -1 : closest->first;
+}
+
 void Map::updateSelectionAction(Action action, int selectedPlayerNumber)
 {
-	if (input.isActionJustPressed(action))
+	if (m_input.isActionJustPressed(action))
 	{
-		selectedUnit = selectedPlayerNumber;
+		m_selectedUnit = selectedPlayerNumber;
 	}
 }
 
-void Map::update(double deltaTime)
+void Map::update(double deltaTime, double timeStamp)
 {
-	if (gamestate == nullptr)
+	if (m_gamestate == nullptr)
 		return;
 
-	updateSelection();
-	updateCommands();
+    m_chats.update(deltaTime, timeStamp);
+	m_gamestate->update(deltaTime);
+	
+    updateSelection();
+	updateCommands(deltaTime);
+}
+
+void Map::drawGridStatic(Renderer& renderer) 
+{
+	glm::vec3 p{ 0 };
+
+    for (p.y = 0; p.y < m_config.m_sizeY; p.y++) {
+		for (p.x = 0; p.x < m_config.m_sizeX; p.x++) {
+			renderer.addStaticSprite(p, 1, 1, SpriteEnum::GridBlock);
+		}
+    }
+}
+
+void Map::drawEntities(Renderer& renderer) 
+{
+	m_gamestate->draw(renderer);
 }
 
 void Map::draw(class Renderer& renderer)
 {
-    if (gamestate == nullptr) return;
-    for (uint32_t y = 0; y < config.sizeY; y++) {
-    for (uint32_t x = 0; x < config.sizeX; x++) {
-        renderer.drawSprite(x, y, 0, 1, 1, sprites.get(GridBlock));
-    }
-    }
+    m_chats.draw(renderer);
+    //drawGridStatic(renderer);
+    drawEntities(renderer);
 
-    for (const auto& unit: gamestate->getUnits()) {
-        renderer.drawSprite(unit.posX, unit.posY, 1, 1, 1, sprites.get(Unit));
-    }
-
-    for (const auto& monster: gamestate->getMonsters()) {
-        renderer.drawSprite(monster.posX, monster.posY, 1, 1, 1, sprites.get(Monster));
-    }
-	vector<Entity> units = gamestate->getUnits();
-	if (selectedUnitIsValid())
+	const auto units = m_gamestate->units;
+	auto it = units.find(m_selectedUnit);
+	if (it != units.cend())
 	{
-		renderer.drawSprite(units[selectedUnit].posX, units[selectedUnit].posY, 0.5, 1, 1, sprites.get(SelectedBlock));
+		renderer.drawSprite(glm::vec3{it->second.position() - glm::vec2(0.5f, 0.5f), 0.4}, 1, 1, SpriteEnum::SelectedBlock);
 	}
+
+    drawRoundProgress();
+}
+
+void Map::drawRoundProgress()
+{
+    ImVec2 imGuiDisplaySize = ImGui::GetIO().DisplaySize;
+    ImVec2 position(imGuiDisplaySize.x / 2.0, imGuiDisplaySize.y - 30);
+    ImGui::SetNextWindowPos(position, ImGuiCond_Always, ImVec2(0.5, 1.0));
+    ImGui::SetNextWindowSize(ImVec2(imGuiDisplaySize.x / 2.0, 0.0f), ImGuiCond_Always);
+    if (ImGui::Begin("RoundProgressWindow", nullptr,
+        ImGuiWindowFlags_NoTitleBar
+        | ImGuiWindowFlags_NoCollapse
+        | ImGuiWindowFlags_NoSavedSettings
+        | ImGuiWindowFlags_NoMove
+        | ImGuiWindowFlags_NoInputs))
+    {
+        ImGui::TextUnformatted("Round Progress");
+
+        ImGui::ProgressBar(static_cast<double>(m_numberOfGivenCommands) / m_maxNumberOfCommands, ImVec2(-1, 0), "");
+        ImGui::SameLine(ImGui::GetTextLineHeightWithSpacing());
+        ImGui::TextUnformatted("Commands");
+
+
+        ImGui::ProgressBar((glfwGetTime() - m_lastUpdate) / m_roundDuration, ImVec2(-1, 0), "");
+        ImGui::SameLine(ImGui::GetTextLineHeightWithSpacing());
+        ImGui::TextUnformatted("Time");
+    }
+    ImGui::End();
 }
 
 bool Map::selectedUnitIsValid()
 {
-	vector<Entity> units = gamestate->getUnits();
-	return selectedUnit >= 0 && selectedUnit < units.size();
+	return m_gamestate->units.find(m_selectedUnit) != m_gamestate->units.cend();
 }

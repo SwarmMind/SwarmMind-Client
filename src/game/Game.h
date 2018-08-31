@@ -5,29 +5,37 @@
 #include <input/Input.h>
 #include <memory>
 #include <menu/MenuState.h>
+#include <game/Camera.h>
+#include <events/EventSystem.h>
+
+//static bool g_isZoomingEnabled;
 
 class Game {
-    void createWindow();
-    void initializeOpenGL();
+    static GLFWwindow* createWindow();
+    static void initializeOpenGL();
 
-    void processInputs();
-    void update(double time);
+    void processInputs(double deltaTime);
+    void update(double time, double timeStamp);
     void render(double timeElapsed);
 	void drawDebug(double timeElapsed);
 
 	void initializeImGui();
-
-	std::unique_ptr<MenuState> menu;
-
+	
 protected:
-    
-    class GLFWwindow *window;
-    OpenGLRenderer *renderer;
-    ImGuiRenderer *imguiRenderer;
-    Input *input;
+    GLFWwindow *window;
 
-	class Textures* textures;
-	class Sprites* sprites;
+ 	Camera camera;
+   
+    OpenGLRenderer renderer;
+    ImGuiRenderer imguiRenderer;
+    Input input;
+
+	EventSystem eventSystem;
+
+    std::unique_ptr<MenuState> menu;
+
+	Textures textures;
+	Sprites sprites;
 
 public:
     Game();
@@ -36,6 +44,6 @@ public:
 
 	void connectTo(std::string address, unsigned int port = 3000);
 	void openMainMenu();
-
-    void loop();
+	
+	void loop();
 };

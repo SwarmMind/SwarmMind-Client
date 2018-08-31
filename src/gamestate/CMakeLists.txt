@@ -1,9 +1,17 @@
+
 set(sources
 	${sources}
-	gamestate/Networker.h
-	gamestate/Networker.cpp
-	gamestate/Gamestate.h
-	gamestate/Gamestate.cpp
-	gamestate/Map.h
-	gamestate/Map.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/ChatEntry.h
+	${CMAKE_CURRENT_SOURCE_DIR}/ChatSystem.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/ChatSystem.h
+	${CMAKE_CURRENT_SOURCE_DIR}/Command.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/Command.h
+	${CMAKE_CURRENT_SOURCE_DIR}/Entity.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/Entity.h
+	${CMAKE_CURRENT_SOURCE_DIR}/Gamestate.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/Gamestate.h
+	${CMAKE_CURRENT_SOURCE_DIR}/Map.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/Map.h
+	${CMAKE_CURRENT_SOURCE_DIR}/Networker.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/Networker.h
 	PARENT_SCOPE)

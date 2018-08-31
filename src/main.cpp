@@ -1,9 +1,9 @@
+#include <cstdlib>
 #include <iostream>
 #include <stdexcept>
 
 #include <glbinding/gl41core/gl.h>
 #include <glbinding/Binding.h>
-#include <glbinding/callbacks.h>
 
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
@@ -14,7 +14,7 @@ int main(void)
 {
 	if (!glfwInit()) 
 	{
-		return -1;
+		return EXIT_FAILURE;
 	}
 
     try {
@@ -23,8 +23,8 @@ int main(void)
     } catch (std::runtime_error e) {
         std::cerr << e.what() << std::endl;
         glfwTerminate();
-        return -1;
+        return EXIT_FAILURE;
     }
 
-    return 0;
+    return EXIT_SUCCESS;
 }

@@ -4,12 +4,13 @@
 
 using namespace std;
 
-enum SpriteEnum
+enum class SpriteEnum
 {
 	GridBlock,
 	SelectedBlock,
 	Unit,
-	Monster
+	Monster,
+    ChatIcon
 };
 
 struct SpriteInitList {

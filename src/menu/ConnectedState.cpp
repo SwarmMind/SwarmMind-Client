@@ -3,28 +3,34 @@
 #include <imgui/imgui.h>
 #include <game/Game.h>
 #include <renderer/Sprites.h>
+#include <events/EventSystem.h>
 
-ConnectedState::ConnectedState(Game& _game, Sprites& _sprites, Input& _input, std::string address, unsigned port)
+ConnectedState::ConnectedState(Game& _game, Renderer& renderer, Input& _input, EventSystem& _eventSystem, std::string address, unsigned port)
 	: input{ _input }
-	, map{nullptr}
 	, game{_game}
-	, sprites{_sprites}
+	, map{nullptr}
+    , m_renderer{renderer}
+	, networker{_eventSystem}
+	, eventSystem{_eventSystem}
+    , EventListener<InitStateEvent>(_eventSystem)
+    , EventListener<DisconnectEvent>(_eventSystem)
+
 {
-	enableCallbacks();
 	networker.connect(address, port);
 }
 
 ConnectedState::~ConnectedState()
 {
+    m_renderer.clearStaticData();
 	delete map;
 }
 
-void ConnectedState::update(double deltaTime)
+void ConnectedState::update(double deltaTime, double timeStamp)
 {
 	networker.update();
 	if (map != nullptr)
 	{
-		map->update(deltaTime);
+		map->update(deltaTime, timeStamp);
 	}
 }
 
@@ -39,8 +45,6 @@ std::string ConnectedState::statusString() const {
 
 void ConnectedState::drawStatus() {
 	const std::string statusMessage{ statusString() };
-
-	ImGui::SetNextWindowBgAlpha(0.5);
 
 	ImGui::SetNextWindowPos(ImVec2(30, 30), 0);
 	ImGui::Begin(statusMessage.data(), nullptr
@@ -72,33 +76,16 @@ void ConnectedState::draw(Renderer& renderer)
 
 using namespace std::placeholders;
 
-void ConnectedState::enableCallbacks()
-{
-	networker.setConnectCallback(std::bind(&ConnectedState::onConnect, this));
-	networker.setDisconnectCallback(std::bind(&ConnectedState::onDisconnect, this));
-	networker.setInitStateCallback(std::bind(&ConnectedState::onInitState, this, _1, _2));
-	networker.setStateCallback(std::bind(&ConnectedState::onState, this, _1));
-	networker.setGameOverCallback(std::bind(&ConnectedState::onDisconnect, this));
+void ConnectedState::receiveEvent(InitStateEvent* event) {
+    map = new Map{ input, networker, eventSystem, event->m_config };
+    m_renderer.clearStaticData();
+    map->drawGridStatic(m_renderer);
+    map->updateGameState(event->m_state);
+    map->m_lastUpdate -= event->m_timeSinceLastRound;
 }
 
-void ConnectedState::onInitState(Configuration config, Gamestate *gamestate) {
-	//renderer->setCamera(config.sizeX / 2, config.sizeY / 2, config.sizeY / 2);
-
-	map = new Map{ input, sprites, networker, config };
-	map->updateGameState(gamestate);
-}
-
-void ConnectedState::onState(Gamestate *state)
-{
-	map->updateGameState(state);
-}
-
-void ConnectedState::onConnect()
-{
-}
-
-void ConnectedState::onDisconnect()
-{
-	delete map;
-	map = nullptr;
+void ConnectedState::receiveEvent(DisconnectEvent* event) {
+    delete map;
+    map = nullptr;
+    m_renderer.clearStaticData();
 }

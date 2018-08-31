@@ -18,7 +18,7 @@ void Sprite::texture(class Texture* val)
 	_texture = val;
 }
 
-class Texture* Sprite::texture() const
+class Texture* Sprite::texture()
 {
 	return _texture;
 }

@@ -5,95 +5,15 @@
 #include <vector>
 #include <iostream>
 #include <fstream>
+#include <algorithm>
 #include <lodepng/lodepng.h>
 #include <renderer/Sprite.h>
 #include <renderer/Texture.h>
 #include <imgui/imgui.h>
+#include <renderer/OpenGLHelpers.h>
+#include <game/Camera.h>
 
 using namespace std;
-
-#pragma region Shader loading
-
-GLint OpenGLRenderer::loadProgram(string vertexShaderPath, string fragmentShaderPath)
-{
-	GLint vertexShader = loadShader(vertexShaderPath, GL_VERTEX_SHADER);
-	GLint fragmentShader = loadShader(fragmentShaderPath, GL_FRAGMENT_SHADER);
-
-	GLint program = glCreateProgram();
-	glAttachShader(program, vertexShader);
-	glAttachShader(program, fragmentShader);
-	glLinkProgram(program);
-
-	glDeleteShader(vertexShader);
-	glDeleteShader(fragmentShader);
-
-	GLboolean isLinked;
-	glGetProgramiv(program, GL_LINK_STATUS, &isLinked);
-	if (isLinked == GL_FALSE)
-	{
-		GLint maxLength = 0;
-		glGetProgramiv(program, GL_INFO_LOG_LENGTH, &maxLength);
-
-		vector<GLchar> errorLog(maxLength);
-		glGetProgramInfoLog(program, maxLength, &maxLength, &errorLog[0]);
-
-		cout << "OpenGL Linker Error:" << std::endl;
-		cout << errorLog.data();
-		glDeleteProgram(program);
-		exit(-1);
-	}
-
-	return program;
-}
-
-GLint OpenGLRenderer::loadShader(string path, GLenum shaderType)
-{
-	string code = loadShaderFile(path);
-	const GLchar* source = code.data();
-	const GLint length = code.length();
-	GLint shader = glCreateShader(shaderType);
-	glShaderSource(shader, 1, &source, &length);
-	glCompileShader(shader);
-
-	GLboolean compileStatus;
-	glGetShaderiv(shader, GL_COMPILE_STATUS, &compileStatus);
-	if (compileStatus == GL_FALSE)
-	{
-		GLint errorLength;
-		glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &errorLength);
-
-		vector<GLchar> infoLog(errorLength);
-		glGetShaderInfoLog(shader, errorLength, &errorLength, &infoLog[0]);
-
-		cout << "Shader compilation: " << path << " failed:\n" << infoLog.data();
-
-		glDeleteShader(shader);
-		exit(-1);
-	}
-
-	return shader;
-}
-
-std::string OpenGLRenderer::loadShaderFile(string path)
-{
-	string shader;
-	ifstream file(path);
-	if (!file.is_open())
-	{
-		cout << "Could not open file: " << path << endl;
-		exit(-1);
-	}
-
-	while (!file.eof())
-	{
-		char character = file.get();
-		if (character > 0)
-			shader += character;
-	}
-	return shader;
-}
-
-#pragma  endregion
 
 #pragma region initialization
 
@@ -105,8 +25,13 @@ void OpenGLRenderer::findUniformLocations()
 	heightLocation = glGetUniformLocation(program, "camHeight");
 }
 
-OpenGLRenderer::OpenGLRenderer(GLFWwindow* _window)
+OpenGLRenderer::OpenGLRenderer(GLFWwindow* _window, Camera& _camera)
 	: window{_window}
+	, m_camera {_camera}
+	, particleRenderer{ window, m_camera }
+	, commandRenderer { m_camera}
+	, textures{}
+	, sprites{textures}
 {
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -114,14 +39,10 @@ OpenGLRenderer::OpenGLRenderer(GLFWwindow* _window)
 	glDepthFunc(GL_GREATER);
 	glDepthRange(0.0, 1.0);
 
-	program = loadProgram("shaders/vert.glsl", "shaders/frag.glsl");
+	program = loadProgram("shaders/Sprite.vert", "shaders/Sprite.frag");
 	glUseProgram(program);
 
 	findUniformLocations();
-	
-	glfwSetFramebufferSizeCallback(window, [](GLFWwindow* window, int width, int height) {
-		glViewport(0, 0, width, height);
-	});
 }
 
 OpenGLRenderer::~OpenGLRenderer()
@@ -134,25 +55,35 @@ OpenGLRenderer::~OpenGLRenderer()
 #pragma region Drawing
 void OpenGLRenderer::uploadCamera()
 {
-	//Update the size every frame
-	int bufferWidth, bufferHeight;
-	glfwGetFramebufferSize(window, &bufferWidth, &bufferHeight);
-	float width = (static_cast<float>(bufferWidth) / static_cast<float>(bufferHeight)) * camera.height;
-	camera.width = width;
+	glUseProgram(program);
+	glUniform1f(xLocation, m_camera.getX());
+	glUniform1f(yLocation, m_camera.getY());
 
-	glUniform1f(xLocation, camera.x);
-	glUniform1f(yLocation, camera.y);
+	glUniform1f(widthLocation, m_camera.getWidth());
+	glUniform1f(heightLocation, m_camera.getHeight());
+}
 
-	glUniform1f(widthLocation, camera.width);
-	glUniform1f(heightLocation, camera.height);
+std::array<GLfloat, 6*5> spriteVertices(glm::vec3 pos, float width, float height, Sprite* sprite) {
+	GLfloat u = sprite->u();
+	GLfloat v = sprite->v();
+	GLfloat u2 = sprite->u2();
+	GLfloat v2 = sprite->v2();
 
+	return std::array<GLfloat, 6*5> {
+		pos.x,			pos.y,			pos.z,			u,	v,
+		pos.x,			pos.y + height, pos.z,			u,	v2,
+		pos.x + width,	pos.y,			pos.z,			u2,	v,
+		pos.x,			pos.y + height, pos.z,			u,	v2,
+		pos.x + width,	pos.y + height,	pos.z,			u2, v2,
+		pos.x + width,	pos.y,			pos.z,			u2, v
+    };
 }
 
 /**
 *	\brief draws a sprite at the specified position
 *	\param z has to be between 0 and 1, where 1 is the most "in front" and 0 is the most "in back"
 */
-void OpenGLRenderer::drawSprite(float x, float y, float z, float width, float height, Sprite* sprite)
+void OpenGLRenderer::drawSprite(glm::vec3 pos, float width, float height, Sprite* sprite)
 {
 	unsigned int vertsPerSprite = 6;
 	unsigned int floatsPerVert = 5;
@@ -161,24 +92,60 @@ void OpenGLRenderer::drawSprite(float x, float y, float z, float width, float he
 	Texture* texture = sprite->texture();
 	TextureRenderData& textureData = renderData[texture];
 	
-	GLfloat u = sprite->u();
-	GLfloat v = sprite->v();
-	GLfloat u2 = sprite->u2();
-	GLfloat v2 = sprite->v2();
+    const auto data = spriteVertices(pos, width, height, sprite);
 
-	GLfloat data[] = { 
-		x,			y,			z,			u,	v,
-		x,			y + height, z,			u,	v2,
-		x + width,	y,			z,			u2,	v,
-		x,			y + height, z,			u,	v2,
-		x + width,	y + height,	z,			u2, v2,
-		x + width,	y,			z,			u2, v };
-
-	if (!textureData.addData(floatsPerSprite, data))
+	if (!textureData.addData(floatsPerSprite, data.data()))
 	{
 		drawTexture(texture);
-		textureData.addData(floatsPerSprite, data);
+		textureData.addData(floatsPerSprite, data.data());
 	}
+}
+
+void OpenGLRenderer::drawSprite(glm::vec3 pos, float width, float height, SpriteEnum sprite)
+{
+	drawSprite(pos, width, height, sprites.get(sprite));
+}
+
+Camera& OpenGLRenderer::camera()
+{
+    return m_camera;
+}
+
+void OpenGLRenderer::addStaticSprite(glm::vec3 pos, float width, float height, Sprite* sprite)
+{
+    unsigned int vertsPerSprite = 6;
+    unsigned int floatsPerVert = 5;
+    unsigned int floatsPerSprite = floatsPerVert * vertsPerSprite;
+
+    Texture* texture = sprite->texture();
+   
+    auto iterator = std::find_if(m_staticRenderData.begin(), m_staticRenderData.end(), [=](StaticRenderData& data) {
+        return texture->ID() == data.texture()->ID();
+    });
+    bool found = iterator != m_staticRenderData.end();
+    if (!found)
+    {
+        m_staticRenderData.emplace_back(StaticRenderData(texture));
+    }
+    StaticRenderData& renderData = found ? *iterator : m_staticRenderData.back();
+
+    auto data = spriteVertices(pos, width, height, sprite);
+    renderData.addData(vertsPerSprite, data.data());
+}
+
+void OpenGLRenderer::addStaticSprite(glm::vec3 pos, float width, float height, SpriteEnum sprite)
+{
+    addStaticSprite(pos, width, height, sprites.get(sprite));
+}
+
+void OpenGLRenderer::clearStaticData()
+{
+    m_staticRenderData.clear();
+}
+
+void OpenGLRenderer::drawCommandVisualizer(glm::vec3 pos, CommandVisualizer& visualizer)
+{
+	commandRenderer.drawCommandVisualizer(pos, visualizer);
 }
 
 void OpenGLRenderer::drawTexture(Texture* texture)
@@ -189,28 +156,6 @@ void OpenGLRenderer::drawTexture(Texture* texture)
 	textureData.draw();
 }
 
-/**
-	\brief set the view, the renderer should display
-	The width is calculated automatically according to the current aspect ratio
-	This command is best called before calling preDraw in the current frame, as otherwise the camera will not be updated for the current frame
-*/
-void OpenGLRenderer::setCamera(float x, float y, float height)
-{
-	int bufferWidth, bufferHeight;
-	glfwGetFramebufferSize(window, &bufferWidth, &bufferHeight);
-	float width = (static_cast<float>(bufferWidth) / static_cast<float>(bufferHeight)) * height;
-
-	camera.x = x;
-	camera.y = y;
-	camera.height = height;
-	camera.width = width;
-}
-
-Camera OpenGLRenderer::getCamera()
-{
-	return camera;
-}
-
 void OpenGLRenderer::preDraw()
 {
 	this->uploadCamera();
@@ -218,14 +163,34 @@ void OpenGLRenderer::preDraw()
 	glClearDepth(0.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	renderData.clear();
+
+	commandRenderer.preDraw();
 }
 
-void OpenGLRenderer::draw()
-{	
-	for (auto iterator = renderData.begin(); iterator != renderData.end(); iterator++)
+void OpenGLRenderer::draw(double deltaTime)
+{
+	glEnable(GL_BLEND);
+	glEnable(GL_DEPTH_TEST);
+	glUseProgram(program);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);	
+
+	int width, height;
+	glfwGetFramebufferSize(window, &width, &height);
+	glViewport(0, 0, width, height);
+
+    for (auto& staticRenderData : m_staticRenderData)
+    {
+        staticRenderData.draw();
+    }
+
+	for (auto& TextureDataPair : renderData)
 	{
-		drawTexture(iterator->first);
+		drawTexture(TextureDataPair.first);
 	}
+
+
+	commandRenderer.draw();
+	particleRenderer.draw(deltaTime);
 }
 
 #pragma endregion Drawing

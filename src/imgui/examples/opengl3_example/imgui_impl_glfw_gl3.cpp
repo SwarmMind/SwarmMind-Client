@@ -37,8 +37,8 @@
 #define _CRT_SECURE_NO_WARNINGS
 #endif
 
-#include <imgui/imgui.h>
-#include <imgui/opengl3_example/imgui_impl_glfw_gl3.h>
+#include <imgui.h>
+#include "imgui_impl_glfw_gl3.h"
 
 // GL3W/GLFW
 //#include <GL/gl3w.h>    // This example is using gl3w to access OpenGL functions (because it is small). You may use glew/glad/glLoadGen/etc. whatever already works for you.
@@ -529,6 +529,6 @@ void ImGui_ImplGlfwGL3_NewFrame()
             io.BackendFlags &= ~ImGuiBackendFlags_HasGamepad;
     }
 
-    // Start the frame. This call will update the io.WantCaptureMouse, io.WantCaptureKeyboard flag that you can use to dispatch inputs (or not) to your application.
+    // Start the frame. This call will update the io.Mouse, io.WantCaptureKeyboard flag that you can use to dispatch inputs (or not) to your application.
     ImGui::NewFrame();
 }

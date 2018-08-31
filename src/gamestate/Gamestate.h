@@ -1,31 +1,44 @@
 #pragma once
 
+#include <cstdint>
+
+#include <map>
 #include <vector>
 #include <string>
 
-struct Configuration 
-{
-	unsigned sizeX;
-	unsigned sizeY;
-};
+#include <glm/vec2.hpp>
+#include <gamestate/Entity.h>
 
-struct Entity
-{
-	std::string id;
-	unsigned posX;
-	unsigned posY;
-};
+#include <events/EventListener.h>
+#include <events/CommandEvent.h>
+#include <events/AccumulatedCommandsEvent.h>
 
-class Gamestate
+class Configuration 
 {
 public:
-	Gamestate(std::vector<Entity> _units, std::vector<Entity> _monsters);
+	uint32_t m_sizeX;
+	uint32_t m_sizeY;
+
+    double m_roundTime = 1.0;
+};
+
+class Gamestate : public EventListener<CommandEvent>, public EventListener<AccumulatedCommandsEvent>
+{
+public:
+    Gamestate(const Gamestate& state) = default;
+	Gamestate(class EventSystem& eventSystem);
+	Gamestate(class EventSystem& eventSystem, std::map<uint32_t, Unit>& _units, const std::map<uint32_t, Monster>& _monsters);
 	~Gamestate();
 
-	
-	std::vector<Entity> getUnits() const;
-	std::vector<Entity> getMonsters() const;
-private:
-	std::vector<Entity> units;
-	std::vector<Entity> monsters;
+	void update(double deltaTime);
+	void draw(class Renderer& renderer);
+
+	Entity* getEntityByID(uint32_t ID);
+	void deleteEntity(uint32_t ID);
+
+	virtual void receiveEvent(CommandEvent* event) override;
+	virtual void receiveEvent(AccumulatedCommandsEvent* event) override;
+
+	std::map<uint32_t, Unit> units;
+	std::map<uint32_t, Monster> monsters;
 };
