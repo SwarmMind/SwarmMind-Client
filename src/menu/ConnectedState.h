@@ -1,7 +1,7 @@
 #pragma once
 
 #include <menu/MenuState.h>
-#include <gamestate/Networker.h>
+#include <gamestate/GameNetworker.h>
 #include <gamestate/Map.h>
 #include <input/Input.h>
 #include <string>
@@ -31,7 +31,7 @@ private:
 	class Game& game;
     class Renderer& m_renderer;
 	class EventSystem& eventSystem;
-	Networker networker;
+	GameNetworker networker;
 	Input& input;
 	Map* map;
 	Settings& settings;

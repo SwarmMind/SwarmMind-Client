@@ -36,7 +36,6 @@ void Game::initializeOpenGL() {
         if (error != 0)
             std::cout << "error: " << std::hex << error << std::endl;
     });
-	
     std::cout << "OpenGL Version: " << glbinding::aux::ContextInfo::version().toString() << std::endl;
     std::cout << "GPU Vendor: " << glbinding::aux::ContextInfo::vendor() << std::endl;
 }
@@ -89,7 +88,7 @@ void Game::openMainMenu()
 {
 	settings.read();
 
-	menu = std::make_unique<MainMenuState>(this, settings.hostname, settings.port);
+	menu = std::make_unique<MainMenuState>(this, eventSystem, input, renderer, settings.hostname, settings.port);
 }
 
 void Game::initializeImGui()
