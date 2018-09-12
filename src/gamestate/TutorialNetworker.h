@@ -1,6 +1,14 @@
 #pragma once
 
 #include <gamestate/Networker.h>
+#include <glm/vec2.hpp>
+
+
+struct TutorialMessage {
+    std::string m_message;
+    glm::vec2 m_position;
+    float m_delay;
+};
 
 class TutorialNetworker : public Networker
 {
@@ -11,7 +19,7 @@ public:
     virtual void sendCommand(uint32_t unitID, std::string action, glm::vec2 direction) override;
     virtual void sendChatMessage(struct ChatEntry& chatEntry) override;
 
-    virtual void update() override;
+    virtual void update(double deltaTime, double timeStamp) override;
 
     void begin();
 protected:

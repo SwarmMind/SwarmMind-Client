@@ -24,7 +24,7 @@ public:
     virtual void sendCommand(uint32_t unitID, std::string action, glm::vec2 direction) override;
     virtual void sendChatMessage(struct ChatEntry& chatEntry) override;
 
-    virtual void update() override;
+    virtual void update(double deltaTime, double timeStamp) override;
 
 private:
     class EventSystem& eventSystem;

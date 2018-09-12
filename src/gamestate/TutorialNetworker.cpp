@@ -1,6 +1,7 @@
 #include <gamestate/TutorialNetworker.h>
 #include <events/EventSystem.h>
 #include <events/InitStateEvent.h>
+#include <events/ChatEvent.h>
 
 TutorialNetworker::TutorialNetworker(class EventSystem& eventSystem)
     : m_eventSystem{eventSystem}
@@ -13,10 +14,12 @@ void TutorialNetworker::sendCommand(uint32_t unitID, std::string action, glm::ve
 
 void TutorialNetworker::sendChatMessage(struct ChatEntry& chatEntry)
 {
-
+    ChatEvent chatEvent;
+    chatEvent.m_chatEntry = chatEntry;
+    m_eventSystem.processEvent(&chatEvent);
 }
 
-void TutorialNetworker::update()
+void TutorialNetworker::update(double deltaTime, double timeStamp)
 {
 
 }

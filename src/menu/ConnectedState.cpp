@@ -32,7 +32,7 @@ ConnectedState::~ConnectedState()
 
 void ConnectedState::update(double deltaTime, double timeStamp)
 {
-	networker.update();
+	networker.update(deltaTime, timeStamp);
 	if (map != nullptr)
 	{
 		map->update(deltaTime, timeStamp);

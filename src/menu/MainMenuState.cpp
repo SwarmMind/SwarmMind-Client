@@ -27,6 +27,7 @@ MainMenuState::~MainMenuState()
 
 void MainMenuState::update(double deltaTime, double timeStamp)
 {
+    m_networker.update(deltaTime, timeStamp);
     if (m_map)
     {
         m_map->update(deltaTime, timeStamp);

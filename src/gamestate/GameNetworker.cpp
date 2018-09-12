@@ -116,7 +116,7 @@ void GameNetworker::sendChatMessage(struct ChatEntry& chatEntry)
     sioSocket->emit("chat", arguments);
 }
 
-void GameNetworker::update()
+void GameNetworker::update(double deltaTime, double timeStamp)
 {
     lock_guard<mutex> queueGuard(queueLock);
     while (!eventQueue.empty())
