@@ -17,7 +17,7 @@ MainMenuState::MainMenuState(Game* _game, EventSystem& eventSystem, Input& input
 	strcpy(address, preset_host.c_str());
 	port = preset_port;
 
-    m_networker.begin();
+    m_networker.begin(m_renderer);
 }
 
 MainMenuState::~MainMenuState()
