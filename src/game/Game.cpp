@@ -88,6 +88,8 @@ void Game::openMainMenu()
 {
 	settings.read();
 
+    menu = nullptr; //Delete the ConnectedState first!
+                    //Important, because otherwise it is still registered as an EventListener
 	menu = std::make_unique<MainMenuState>(this, eventSystem, input, renderer, settings.hostname, settings.port);
 }
 

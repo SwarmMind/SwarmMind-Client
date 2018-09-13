@@ -88,8 +88,6 @@ void TutorialNetworker::begin(Renderer& renderer)
 
     startEvent.m_state = new Gamestate(m_eventSystem, units, monsters);
 
-
-
     m_eventSystem.processEvent(&startEvent);
 
 

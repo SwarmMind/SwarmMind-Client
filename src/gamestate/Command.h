@@ -66,3 +66,15 @@ public:
 
 	virtual void executeOn(Gamestate& state) override;
 };
+
+class SpawnCommand : public Command {
+public:
+    SpawnCommand(uint32_t _ID, glm::vec2 position, bool isUnit);
+    virtual ~SpawnCommand() = default;
+
+    virtual void executeOn(Gamestate& state) override;
+
+protected:
+    glm::vec2 m_position;
+    bool m_isUnit;
+};

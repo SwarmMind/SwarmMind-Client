@@ -187,6 +187,13 @@ std::shared_ptr<Command> GameNetworker::parseCommand(const nlohmann::json& jsonC
         auto command = std::make_shared<DieCommand>(jsonCommand["ID"].get<uint32_t>());
         return command;
     }
+    else if (type == "spawn")
+    {
+        auto command = std::make_shared<SpawnCommand>(jsonCommand["ID"].get<uint32_t>(), 
+            jsonCommand["position"].get<glm::vec2>(), 
+            jsonCommand["isPlayer"].get<bool>());
+        return command;
+    }
     return nullptr;
 }
 
@@ -239,7 +246,7 @@ void GameNetworker::onInitStateReceive(sio::event _event)
     const nlohmann::json initState = nlohmann::json::parse(jsonMessage);
     const Configuration config = parseConfiguration(initState["config"].dump());
     Gamestate* state = parseGamestate(initState["state"]);
-    double timeSineceLastRound = initState["config"]["timeSinceLastRound"];
+    double timeSinceLastRound = initState["config"]["timeSinceLastRound"];
 
     {
         lock_guard<mutex> queueGuard(queueLock);
@@ -247,7 +254,7 @@ void GameNetworker::onInitStateReceive(sio::event _event)
             InitStateEvent initStateEvent;
             initStateEvent.m_state = state;
             initStateEvent.m_config = config;
-            initStateEvent.m_timeSinceLastRound = timeSineceLastRound;
+            initStateEvent.m_timeSinceLastRound = timeSinceLastRound;
             eventSystem.processEvent(&initStateEvent);
         });
     }
