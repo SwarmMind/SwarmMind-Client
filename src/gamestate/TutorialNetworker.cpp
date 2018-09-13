@@ -74,7 +74,7 @@ void TutorialNetworker::begin(Renderer& renderer)
     config.m_sizeY = m_mapSize;
     startEvent.m_config = config;
 
-    m_unitPosition = glm::vec2(m_mapSize / 2, m_mapSize / 2);
+    m_unitPosition = glm::vec2(m_mapSize / 2, m_mapSize / 2) + 0.5f;
     std::map<uint32_t, Unit> units;
     units.emplace(m_unitID, Unit(m_unitID, m_unitPosition));
 
