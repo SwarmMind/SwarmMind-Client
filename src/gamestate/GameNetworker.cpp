@@ -156,6 +156,8 @@ Configuration GameNetworker::parseConfiguration(std::string jsonString)
     config.m_sizeX = jsonConfig["width"];
     config.m_sizeY = jsonConfig["height"];
     config.m_roundTime = jsonConfig["roundTime"];
+    std::vector<glm::vec2> blockades = jsonConfig["blockades"];
+    config.m_blockadePositions = blockades;
     return config;
 }
 

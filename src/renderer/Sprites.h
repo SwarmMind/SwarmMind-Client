@@ -10,7 +10,8 @@ enum class SpriteEnum
 	SelectedBlock,
 	Unit,
 	Monster,
-    ChatIcon
+    ChatIcon,
+    WallBlock
 };
 
 struct SpriteInitList {

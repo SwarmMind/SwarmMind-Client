@@ -35,6 +35,7 @@ public:
 
 	std::string username() const { return m_chats.username(); }
 
+    void drawWallsStatic(class Renderer& renderer, std::vector<glm::vec2> blockadePositions);
 protected:
     ChatSystem m_chats;
 	class Gamestate* m_gamestate;

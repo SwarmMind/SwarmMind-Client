@@ -46,7 +46,7 @@ GLFWwindow * Game::createWindow() {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, true);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	GLFWwindow *window = glfwCreateWindow(720, 720, "SwarmMind", nullptr, nullptr);
+	GLFWwindow *window = glfwCreateWindow(1280, 720, "SwarmMind", nullptr, nullptr);
 	if (!window)
 	{
 		throw std::runtime_error{

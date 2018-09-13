@@ -16,6 +16,8 @@
 class Configuration 
 {
 public:
+    std::vector<glm::vec2> m_blockadePositions;
+
 	uint32_t m_sizeX;
 	uint32_t m_sizeY;
 

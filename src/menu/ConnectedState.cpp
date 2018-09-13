@@ -85,6 +85,7 @@ void ConnectedState::receiveEvent(InitStateEvent* event) {
     map = new Map{ input, networker, eventSystem, event->m_config, settings.username };
     m_renderer.clearStaticData();
     map->drawGridStatic(m_renderer);
+    map->drawWallsStatic(m_renderer, event->m_config.m_blockadePositions);
     map->updateGameState(event->m_state);
     map->m_lastUpdate -= event->m_timeSinceLastRound;
 }

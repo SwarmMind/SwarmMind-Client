@@ -193,6 +193,14 @@ void Map::drawGridStatic(Renderer& renderer)
     }
 }
 
+void Map::drawWallsStatic(class Renderer& renderer, std::vector<glm::vec2> blockadePositions)
+{
+    for (glm::vec2 position : blockadePositions)
+    {
+        renderer.addStaticSprite(glm::vec3(position, 1.0), 1.0, 1.0, SpriteEnum::WallBlock);
+    }
+}
+
 void Map::drawEntities(Renderer& renderer) 
 {
 	m_gamestate->draw(renderer);
