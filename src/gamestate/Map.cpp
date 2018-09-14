@@ -21,12 +21,13 @@
 
 using namespace std;
 
-Map::Map(Input& _input, Networker& _networker, EventSystem& _eventSystem, const Configuration& _config)
+Map::Map(Input& _input, Networker& _networker, EventSystem& _eventSystem, const Configuration& _config, Sounds& sounds)
 	: EventListener<StateEvent>{_eventSystem}
     , EventListener<AccumulatedCommandsEvent>{_eventSystem}
     , m_input{ _input }
 	, m_config{_config}
 	, m_networker{_networker}
+    , m_sounds{sounds}
     , m_gamestate{ new Gamestate{_eventSystem} }
 	, m_lastUpdate{glfwGetTime()}
 	, m_eventSystem{_eventSystem}
@@ -46,6 +47,7 @@ void Map::updateGameState(class Gamestate* newState)
 
 	m_lastUpdate = glfwGetTime();
     m_numberOfGivenCommands = 0;
+    m_gamestate->setMap(this);
 }
 
 void Map::receiveEvent(StateEvent* event)
@@ -167,6 +169,11 @@ void Map::updateSelectionAction(Action action, int selectedPlayerNumber)
 	}
 }
 
+Sounds& Map::sounds()
+{
+    return m_sounds;
+}
+
 void Map::update(double deltaTime, double timeStamp)
 {
 	if (m_gamestate == nullptr)
@@ -177,6 +184,7 @@ void Map::update(double deltaTime, double timeStamp)
 	
     updateSelection();
 	updateCommands(deltaTime);
+    m_sounds.update();
 }
 
 void Map::drawGridStatic(Renderer& renderer) 

@@ -7,11 +7,8 @@
 #include <menu/MenuState.h>
 #include <game/Camera.h>
 #include <events/EventSystem.h>
-#include <sound/Sound.h>
 
 using namespace std;
-
-//static bool g_isZoomingEnabled;
 
 class Game {
     static GLFWwindow* createWindow();
@@ -32,11 +29,7 @@ protected:
     ImGuiRenderer imguiRenderer;
     Input input;
 
-    Sound sound;
-    sf::SoundBuffer m_soundBuffer;
-    deque<sf::Sound> m_soundInstances;
-
-	EventSystem eventSystem;
+    EventSystem eventSystem;
 
     std::unique_ptr<MenuState> menu;
 

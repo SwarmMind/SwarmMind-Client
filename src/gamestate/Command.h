@@ -1,7 +1,6 @@
 #pragma once
 #include <cstdint>
 #include <glm/vec2.hpp>
-#include <sound/Sound.h>
 
 class Gamestate;
 
@@ -12,9 +11,9 @@ public:
 
 	virtual void executeOn(Gamestate& state) = 0;
 protected:
-	Command(uint32_t _ID, Sound& sound);
+	Command(uint32_t _ID);
 	uint32_t ID;
-    class Sound& m_sound;
+    //class Sound& m_sound;
 	
 private:
 };
@@ -22,7 +21,7 @@ private:
 class DieCommand : public Command
 {
 public:
-	DieCommand(uint32_t _ID, Sound& sound);
+	DieCommand(uint32_t _ID);
 	virtual ~DieCommand() = default;
 
 	virtual void executeOn(Gamestate& state) override;
@@ -36,14 +35,14 @@ class DirectionalCommand : public Command
 public:
 	virtual ~DirectionalCommand() = default;
 protected:
-	DirectionalCommand(uint32_t _ID, glm::vec2 _direction, Sound& sound);
+	DirectionalCommand(uint32_t _ID, glm::vec2 _direction);
 	glm::vec2 direction;
 };
 
 class MoveCommand : public DirectionalCommand
 {
 public:
-	MoveCommand(uint32_t _ID, glm::vec2 _direction, Sound& sound);
+	MoveCommand(uint32_t _ID, glm::vec2 _direction);
 	virtual ~MoveCommand() = default;
 
 	virtual void executeOn(Gamestate& state) override;
@@ -52,7 +51,7 @@ public:
 class AttackCommand : public DirectionalCommand
 {
 public:
-	AttackCommand(uint32_t _ID, glm::vec2 _direction, Sound& sound);
+	AttackCommand(uint32_t _ID, glm::vec2 _direction);
 	virtual ~AttackCommand() = default;
 
 	virtual void executeOn(Gamestate& state) override;
@@ -61,7 +60,7 @@ public:
 class DamageCommand : public DirectionalCommand
 {
 public:
-	DamageCommand(uint32_t _ID, glm::vec2 _direction, Sound& sound);
+	DamageCommand(uint32_t _ID, glm::vec2 _direction);
 	virtual ~DamageCommand() = default;
 
 	virtual void executeOn(Gamestate& state) override;

@@ -2,28 +2,29 @@
 #include <gamestate/Entity.h>
 #include <gamestate/Gamestate.h>
 #include <renderer/ParticleSystem.h>
+#include <sound/Sounds.h>
+#include <gamestate/Gamestate.h>
+#include <gamestate/Map.h>
 
-Command::Command(uint32_t _ID, Sound& sound)
+
+Command::Command(uint32_t _ID)
 	: ID{_ID}
-    , m_sound{ sound }
 {}
 
 //////////////////////////////////////////////////////////////////////////
 //						DieCommand
 //////////////////////////////////////////////////////////////////////////
-DieCommand::DieCommand(uint32_t _ID, Sound& sound)
-	: Command( _ID, sound )
+DieCommand::DieCommand(uint32_t _ID)
+	: Command(_ID)
 {}
 
 void DieCommand::executeOn(Gamestate& state)
 {
-    m_sound.load("play_and_reload.wav");
-    m_sound.play();
     state.deleteEntity(ID);
 }
 
-DirectionalCommand::DirectionalCommand(uint32_t _ID, glm::vec2 _direction, Sound& sound)
-	: Command(_ID, sound)
+DirectionalCommand::DirectionalCommand(uint32_t _ID, glm::vec2 _direction)
+	: Command(_ID)
 	, direction{_direction}
 {}
 
@@ -31,28 +32,26 @@ DirectionalCommand::DirectionalCommand(uint32_t _ID, glm::vec2 _direction, Sound
 //						 MoveCommand
 //////////////////////////////////////////////////////////////////////////
 
-MoveCommand::MoveCommand(uint32_t _ID, glm::vec2 _direction, Sound& sound)
-	: DirectionalCommand(_ID, _direction, sound)
+MoveCommand::MoveCommand(uint32_t _ID, glm::vec2 _direction)
+	: DirectionalCommand(_ID, _direction)
 {}
 
 void MoveCommand::executeOn(Gamestate& state)
 {
-    m_sound.load("unit_walking.wav");
-
     Entity* entity = state.getEntityByID(ID);
 
 	if (entity != nullptr)
 	{
-		entity->moveTo(entity->position() + direction);
-        m_sound.play();
+        state.m_map->sounds().play(SoundEnum::Walk); 
+        entity->moveTo(entity->position() + direction);
 	}
 }
 
 //////////////////////////////////////////////////////////////////////////	
 //						AttackCommand
 //////////////////////////////////////////////////////////////////////////
-AttackCommand::AttackCommand(uint32_t _ID, glm::vec2 _direction, Sound& sound)
-	: DirectionalCommand(_ID, _direction, sound)
+AttackCommand::AttackCommand(uint32_t _ID, glm::vec2 _direction)
+	: DirectionalCommand(_ID, _direction)
 {}
 
 void AttackCommand::executeOn(Gamestate& state)
@@ -67,8 +66,8 @@ void AttackCommand::executeOn(Gamestate& state)
 //////////////////////////////////////////////////////////////////////////
 //						DamageCommand
 //////////////////////////////////////////////////////////////////////////
-DamageCommand::DamageCommand(uint32_t _ID, glm::vec2 _direction, Sound& sound)
-	: DirectionalCommand(_ID, _direction, sound)
+DamageCommand::DamageCommand(uint32_t _ID, glm::vec2 _direction)
+	: DirectionalCommand(_ID, _direction)
 {}
 
 void DamageCommand::executeOn(Gamestate& state)
@@ -76,8 +75,7 @@ void DamageCommand::executeOn(Gamestate& state)
 	Entity* entity = state.getEntityByID(ID);
 	if (entity != nullptr)
 	{
-		ParticleSystem::spawnBloodParticles(entity->position(), direction);
-        m_sound.load("play_and_reload.wav");
-        m_sound.play();
+        state.m_map->sounds().play(SoundEnum::Shoot); 
+        ParticleSystem::spawnBloodParticles(entity->position(), direction);
 	}
 }

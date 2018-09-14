@@ -1,5 +1,5 @@
 set(sources
 	${sources}
-	sound/Sound.h
-	sound/Sound.cpp
+	sound/Sounds.h
+	sound/Sounds.cpp
 	PARENT_SCOPE)

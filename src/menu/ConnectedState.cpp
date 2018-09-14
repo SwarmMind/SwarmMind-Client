@@ -4,6 +4,7 @@
 #include <game/Game.h>
 #include <renderer/Sprites.h>
 #include <events/EventSystem.h>
+#include <sound/Sounds.h>
 
 ConnectedState::ConnectedState(Game& _game, Renderer& renderer, Input& _input, EventSystem& _eventSystem, std::string address, unsigned port)
 	: input{ _input }
@@ -77,7 +78,8 @@ void ConnectedState::draw(Renderer& renderer)
 using namespace std::placeholders;
 
 void ConnectedState::receiveEvent(InitStateEvent* event) {
-    map = new Map{ input, networker, eventSystem, event->m_config };
+    Sounds sounds;
+    map = new Map{ input, networker, eventSystem, event->m_config, sounds};
     m_renderer.clearStaticData();
     map->drawGridStatic(m_renderer);
     map->updateGameState(event->m_state);

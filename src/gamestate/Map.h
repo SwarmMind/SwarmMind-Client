@@ -12,11 +12,12 @@
 #include <gamestate/ChatSystem.h>
 #include <events/StateEvent.h>
 #include <events/AccumulatedCommandsEvent.h>
+#include <sound/Sounds.h>
 
 class Map : public EventListener<StateEvent>, public EventListener<AccumulatedCommandsEvent>
 {
 public:
-	Map(class Input& _input, Networker& _networker, class EventSystem& _eventSystem, const class Configuration& config);
+	Map(class Input& _input, Networker& _networker, class EventSystem& _eventSystem, const class Configuration& config, Sounds& sounds);
 
 	~Map();
 
@@ -31,14 +32,17 @@ public:
     virtual void receiveEvent(StateEvent* event) override;
     virtual void receiveEvent(AccumulatedCommandsEvent* event) override;
 
+    class Sounds& sounds();
+
 protected:
     ChatSystem m_chats;
 	class Gamestate* m_gamestate;
-	class Input& m_input;
+	class Input& m_input; 
 	class Networker& m_networker;
 	class EventSystem& m_eventSystem;
-    class Configuration m_config;
-	
+    Configuration m_config;
+    class Sounds& m_sounds;
+
     bool trackpadMode = true;
 
 	int32_t m_selectedUnit = 0;
