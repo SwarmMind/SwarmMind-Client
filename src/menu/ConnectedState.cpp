@@ -78,8 +78,7 @@ void ConnectedState::draw(Renderer& renderer)
 using namespace std::placeholders;
 
 void ConnectedState::receiveEvent(InitStateEvent* event) {
-    Sounds sounds;
-    map = new Map{ input, networker, eventSystem, event->m_config, sounds};
+    map = new Map{ input, networker, eventSystem, event->m_config };
     m_renderer.clearStaticData();
     map->drawGridStatic(m_renderer);
     map->updateGameState(event->m_state);

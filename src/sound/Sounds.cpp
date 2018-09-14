@@ -20,7 +20,7 @@ void Sounds::play(SoundEnum soundName){
 }
 
 void Sounds::update() {
-    std::remove_if(m_sounds.begin(), m_sounds.end(), [](sf::Sound& sound) {return sound.getStatus() == sf::Sound::Stopped; });
+    std::remove_if(m_sounds.begin(), m_sounds.end(), [](sf::Sound& sound) {return sound.getStatus() == sf::Sound::Stopped;});
 }
 
 map<SoundEnum, std::string> Sounds::soundFiles() 

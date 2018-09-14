@@ -17,7 +17,7 @@
 class Map : public EventListener<StateEvent>, public EventListener<AccumulatedCommandsEvent>
 {
 public:
-	Map(class Input& _input, Networker& _networker, class EventSystem& _eventSystem, const class Configuration& config, Sounds& sounds);
+	Map(class Input& _input, Networker& _networker, class EventSystem& _eventSystem, const class Configuration& config);
 
 	~Map();
 
@@ -32,7 +32,7 @@ public:
     virtual void receiveEvent(StateEvent* event) override;
     virtual void receiveEvent(AccumulatedCommandsEvent* event) override;
 
-    class Sounds& sounds();
+    class Sounds& getSounds();
 
 protected:
     ChatSystem m_chats;
@@ -41,7 +41,8 @@ protected:
 	class Networker& m_networker;
 	class EventSystem& m_eventSystem;
     Configuration m_config;
-    class Sounds& m_sounds;
+    //class Sounds& m_sounds;
+    Sounds m_sounds;
 
     bool trackpadMode = true;
 

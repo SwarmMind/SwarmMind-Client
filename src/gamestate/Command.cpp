@@ -42,7 +42,7 @@ void MoveCommand::executeOn(Gamestate& state)
 
 	if (entity != nullptr)
 	{
-        state.m_map->sounds().play(SoundEnum::Walk); 
+        state.m_map->getSounds().play(SoundEnum::Walk); 
         entity->moveTo(entity->position() + direction);
 	}
 }
@@ -75,7 +75,7 @@ void DamageCommand::executeOn(Gamestate& state)
 	Entity* entity = state.getEntityByID(ID);
 	if (entity != nullptr)
 	{
-        state.m_map->sounds().play(SoundEnum::Shoot); 
+        state.m_map->getSounds().play(SoundEnum::Shoot); 
         ParticleSystem::spawnBloodParticles(entity->position(), direction);
 	}
 }

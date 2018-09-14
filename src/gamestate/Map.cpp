@@ -21,13 +21,13 @@
 
 using namespace std;
 
-Map::Map(Input& _input, Networker& _networker, EventSystem& _eventSystem, const Configuration& _config, Sounds& sounds)
+Map::Map(Input& _input, Networker& _networker, EventSystem& _eventSystem, const Configuration& _config)
 	: EventListener<StateEvent>{_eventSystem}
     , EventListener<AccumulatedCommandsEvent>{_eventSystem}
     , m_input{ _input }
 	, m_config{_config}
 	, m_networker{_networker}
-    , m_sounds{sounds}
+    , m_sounds{ }
     , m_gamestate{ new Gamestate{_eventSystem} }
 	, m_lastUpdate{glfwGetTime()}
 	, m_eventSystem{_eventSystem}
@@ -169,7 +169,7 @@ void Map::updateSelectionAction(Action action, int selectedPlayerNumber)
 	}
 }
 
-Sounds& Map::sounds()
+Sounds& Map::getSounds()
 {
     return m_sounds;
 }
