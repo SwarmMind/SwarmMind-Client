@@ -12,6 +12,7 @@ public:
 
     virtual ~InitStateEvent() = default;
 
+    double m_timeSinceLastRound;
     Configuration m_config;
     Gamestate* m_state;
 

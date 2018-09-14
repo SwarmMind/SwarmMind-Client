@@ -9,7 +9,6 @@
 #include <renderer/ParticleSystem.h>
 #include <game/Camera.h>
 
-#include <glbinding/ContextInfo.h>
 #include <glbinding/Version.h>
 #include <iostream>
 

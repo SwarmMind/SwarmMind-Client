@@ -4,12 +4,14 @@
 #include <glm/glm.hpp>
 #include <gamestate/Networker.h>
 #include <renderer/Sprites.h>
+#include <cstring>
 
-ChatSystem::ChatSystem(Input& input, Networker& networker, EventSystem& eventSystem)
+ChatSystem::ChatSystem(Input& input, Networker& networker, EventSystem& eventSystem, const std::string& preset_username)
     : EventListener<ChatEvent>{ eventSystem }
     , m_input{input}
-    , m_networker{ networker }
-{}
+    , m_networker{ networker } {
+	strcpy(m_userName, preset_username.c_str());
+}
 
 void ChatSystem::update(double deltaTime, double timeStamp)
 {

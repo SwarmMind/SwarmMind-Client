@@ -79,3 +79,26 @@ void DamageCommand::executeOn(Gamestate& state)
         ParticleSystem::spawnBloodParticles(entity->position(), direction);
 	}
 }
+
+
+
+//////////////////////////////////////////////////////////////////////////
+//                      SpawnCommand
+//////////////////////////////////////////////////////////////////////////
+SpawnCommand::SpawnCommand(uint32_t _ID, glm::vec2 position, bool isUnit)
+    : Command(_ID)
+    , m_position(position)
+    , m_isUnit(isUnit)
+{}
+
+void SpawnCommand::executeOn(Gamestate& state)
+{
+    if (m_isUnit)
+    {
+        state.units.emplace(ID, Unit(ID, m_position));
+    }
+    else
+    {
+        state.monsters.emplace(ID, Monster(ID, m_position));
+    }
+}

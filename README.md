@@ -19,7 +19,7 @@ On Windows:
 * Build the INSTALL project in Visual Studio on Release (x64/x32 depending on your operating system)
 
 ### Building glbinding
-Download [glbinding 2.1.4](https://github.com/cginternals/glbinding/releases/tag/v2.1.4) and extract the files into any directory.
+Download [glbinding 3.0.2](https://github.com/cginternals/glbinding/releases/tag/v3.0.2) and extract the files into any directory.
 In this directory create a /build folder and build glbinding into it.
 Compile glbinding using your favorite compiler.
 

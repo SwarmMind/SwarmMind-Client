@@ -3,11 +3,21 @@
 #include <imgui/imgui.h>
 #include <game/Game.h>
 #include <algorithm>
+#include <cstring>
+#include <gamestate/Map.h>
 
-MainMenuState::MainMenuState(Game* _game)
+MainMenuState::MainMenuState(Game* _game, EventSystem& eventSystem, Input& input, Renderer& renderer, const std::string& preset_host, const uint16_t preset_port)
 	: game{_game}
+    , m_input{input}
+    , m_renderer{renderer}
+    , m_eventSystem{eventSystem}
+    , m_networker(eventSystem)
+    , EventListener<InitStateEvent>(eventSystem)
 {
+	strcpy(address, preset_host.c_str());
+	port = preset_port;
 
+    m_networker.begin(m_renderer);
 }
 
 MainMenuState::~MainMenuState()
@@ -17,11 +27,20 @@ MainMenuState::~MainMenuState()
 
 void MainMenuState::update(double deltaTime, double timeStamp)
 {
-	
+    m_networker.update(deltaTime, timeStamp);
+    if (m_map)
+    {
+        m_map->update(deltaTime, timeStamp);
+    }
 }
 
 void MainMenuState::draw(Renderer& renderer)
 {
+    if (m_map)
+    {
+        m_map->draw(renderer);
+    }
+
 	ImVec2 position = ImGui::GetIO().DisplaySize;
 	position.x /= 2;
 	position.y = 100;
@@ -53,7 +72,7 @@ void MainMenuState::draw(Renderer& renderer)
 			{
 				if (ImGui::Button("Reset"))
 				{
-					port = defaultPort;
+					port = default_port;
 				}
 				ImGui::SameLine();
 				if (ImGui::InputInt("Port", &port, 1, 100))
@@ -67,5 +86,14 @@ void MainMenuState::draw(Renderer& renderer)
 		}
 	}
 	ImGui::End();
+}
+
+void MainMenuState::receiveEvent(InitStateEvent* event)
+{
+    m_renderer.clearStaticData();
+    m_map = std::make_unique<Map>(m_input, m_networker, m_eventSystem, event->m_config, "Player 1");
+    m_map->drawGridStatic(m_renderer);
+    m_map->updateGameState(event->m_state);
+    m_map->m_lastUpdate -= event->m_timeSinceLastRound;
 }
 

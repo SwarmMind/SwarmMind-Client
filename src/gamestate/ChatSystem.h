@@ -16,13 +16,15 @@ class Renderer;
 class ChatSystem : public EventListener<ChatEvent>
 {
 public:
-	ChatSystem(Input& input, Networker& networker, EventSystem& eventSystem);
+	ChatSystem(Input& input, Networker& networker, EventSystem& eventSystem, const std::string& preset_username = "Player");
 	virtual ~ChatSystem() = default;
 	
     void update(double deltaTime, double timeStamp);
 
     void draw(Renderer& renderer);
     virtual void receiveEvent(ChatEvent* event) override;
+
+	std::string username() const { return std::string{ m_userName }; }
 
 protected:
     void openPopup();

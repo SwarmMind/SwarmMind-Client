@@ -50,6 +50,7 @@ std::map <SpriteEnum, SpriteInitList> Sprites::spriteTextures()
 		{ SpriteEnum::SelectedBlock, {GridSpriteSheet, 0.25, 0, 0.25, 0.25}},
 		{ SpriteEnum::Unit, {GridSpriteSheet, 0.25, 0.25, 0.25, 0.25}},
 		{ SpriteEnum::Monster, {GridSpriteSheet, 0, 0, 0.25, 0.25}},
-        { SpriteEnum::ChatIcon, { GridSpriteSheet, 0.5, 0.25, 0.25, 0.25}}
+        { SpriteEnum::ChatIcon, { GridSpriteSheet, 0.5, 0.25, 0.25, 0.25}},
+        { SpriteEnum::WallBlock, { GridSpriteSheet, 0.5, 0.0, 0.25, 0.25 }}
 	});
 }

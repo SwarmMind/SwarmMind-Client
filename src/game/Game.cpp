@@ -7,7 +7,9 @@
 
 #include <glbinding/gl41core/gl.h>
 #include <glbinding/Binding.h>
-#include <glbinding/callbacks.h>
+#include <glbinding/Version.h>
+#include <glbinding-aux/ContextInfo.h>
+#include <glbinding-aux/types_to_string.h>
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
@@ -22,23 +24,20 @@
 #include <functional>
 #include <menu/MainMenuState.h>
 #include <menu/ConnectedState.h>
-#include <glbinding/ContextInfo.h>
-#include <glbinding/Version.h>
 
 using namespace std;
 
 void Game::initializeOpenGL() {
-    glbinding::Binding::initialize();
-    glbinding::setCallbackMaskExcept(glbinding::CallbackMask::After, { "glGetError" });
-    glbinding::setAfterCallback([](const glbinding::FunctionCall &)
+    glbinding::Binding::initialize(glfwGetProcAddress);
+    glbinding::Binding::setCallbackMaskExcept(glbinding::CallbackMask::After, { "glGetError" });
+    glbinding::Binding::setAfterCallback([](const glbinding::FunctionCall &)
     {
         const auto error = glGetError();
         if (error != 0)
             std::cout << "error: " << std::hex << error << std::endl;
     });
-
-    std::cout << "OpenGL Version: " << glbinding::ContextInfo::version() << std::endl;
-    std::cout << "GPU Vendor: " << glbinding::ContextInfo::vendor() << std::endl;
+    std::cout << "OpenGL Version: " << glbinding::aux::ContextInfo::version().toString() << std::endl;
+    std::cout << "GPU Vendor: " << glbinding::aux::ContextInfo::vendor() << std::endl;
 }
 
 GLFWwindow * Game::createWindow() {
@@ -47,7 +46,7 @@ GLFWwindow * Game::createWindow() {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, true);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	GLFWwindow *window = glfwCreateWindow(720, 720, "SwarmMind", nullptr, nullptr);
+	GLFWwindow *window = glfwCreateWindow(1280, 720, "SwarmMind", nullptr, nullptr);
 	if (!window)
 	{
 		throw std::runtime_error{
@@ -79,12 +78,20 @@ Game::Game()
 
 void Game::connectTo(std::string address, unsigned int port)
 {
-	menu = std::make_unique<ConnectedState>(*this, renderer, input, eventSystem, address, port);
+	settings.hostname = address;
+	settings.port = port;
+	settings.save();
+
+	menu = std::make_unique<ConnectedState>(*this, renderer, input, eventSystem, settings);
 }
 
 void Game::openMainMenu()
 {
-	menu = std::make_unique<MainMenuState>(this);
+	settings.read();
+
+    menu = nullptr; //Delete the ConnectedState first!
+                    //Important, because otherwise it is still registered as an EventListener
+	menu = std::make_unique<MainMenuState>(this, eventSystem, input, renderer, settings.hostname, settings.port);
 }
 
 void Game::initializeImGui()
@@ -151,7 +158,7 @@ void Game::drawDebug(double timeElapsed)
 			| ImGuiWindowFlags_NoMove
 			| ImGuiWindowFlags_NoScrollbar
 			| ImGuiWindowFlags_NoSavedSettings
-			| ImGuiWindowFlags_NoInputs));
+			| ImGuiWindowFlags_NoInputs))
 		{
 			width = ImGui::GetWindowWidth();
 			height = ImGui::GetWindowHeight();

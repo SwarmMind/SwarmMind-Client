@@ -17,22 +17,25 @@
 class Map : public EventListener<StateEvent>, public EventListener<AccumulatedCommandsEvent>
 {
 public:
-	Map(class Input& _input, Networker& _networker, class EventSystem& _eventSystem, const class Configuration& config);
+	Map(class Input& _input, Networker& _networker, class EventSystem& _eventSystem, const class Configuration& config, const std::string& preset_username);
 
 	~Map();
 
 	void updateGameState(class Gamestate* newState);
-
 	void update(double deltaTime, double timeStamp);
+
     void drawGridStatic(Renderer&);
 	void draw(class Renderer& renderer);
-
-	const double moveAnimationTime = 3.0;
+    void drawWallsStatic(class Renderer& renderer, std::vector<glm::vec2> blockadePositions);	
 
     virtual void receiveEvent(StateEvent* event) override;
     virtual void receiveEvent(AccumulatedCommandsEvent* event) override;
 
     class Sounds& getSounds();
+    std::string username() const { return m_chats.username(); }
+
+    const double moveAnimationTime = 3.0;
+	double m_lastUpdate;	 
 
 protected:
     ChatSystem m_chats;
@@ -50,7 +53,6 @@ protected:
 	bool selectedUnitIsValid();
 	glm::vec2 m_mouseClickPosition;
 
-	double m_lastUpdate;
     double m_roundDuration = 1.0; //set to 1 to avoid divide by zero error
     size_t m_numberOfGivenCommands = 0;
     size_t m_maxNumberOfCommands = 1; //set to 1 to avoid divide by zero error

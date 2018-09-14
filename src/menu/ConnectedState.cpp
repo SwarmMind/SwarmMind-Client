@@ -6,7 +6,7 @@
 #include <events/EventSystem.h>
 #include <sound/Sounds.h>
 
-ConnectedState::ConnectedState(Game& _game, Renderer& renderer, Input& _input, EventSystem& _eventSystem, std::string address, unsigned port)
+ConnectedState::ConnectedState(Game& _game, Renderer& renderer, Input& _input, EventSystem& _eventSystem, Settings& _settings)
 	: input{ _input }
 	, game{_game}
 	, map{nullptr}
@@ -15,20 +15,25 @@ ConnectedState::ConnectedState(Game& _game, Renderer& renderer, Input& _input, E
 	, eventSystem{_eventSystem}
     , EventListener<InitStateEvent>(_eventSystem)
     , EventListener<DisconnectEvent>(_eventSystem)
+	, settings{ _settings }
 
 {
-	networker.connect(address, port);
+	networker.connect(settings.hostname, settings.port);
 }
 
 ConnectedState::~ConnectedState()
 {
+	if (map) {
+		settings.username = map->username();
+		settings.save();
+	}
     m_renderer.clearStaticData();
 	delete map;
 }
 
 void ConnectedState::update(double deltaTime, double timeStamp)
 {
-	networker.update();
+	networker.update(deltaTime, timeStamp);
 	if (map != nullptr)
 	{
 		map->update(deltaTime, timeStamp);
@@ -78,10 +83,12 @@ void ConnectedState::draw(Renderer& renderer)
 using namespace std::placeholders;
 
 void ConnectedState::receiveEvent(InitStateEvent* event) {
-    map = new Map{ input, networker, eventSystem, event->m_config };
+    map = new Map{ input, networker, eventSystem, event->m_config, settings.username };
     m_renderer.clearStaticData();
     map->drawGridStatic(m_renderer);
+    map->drawWallsStatic(m_renderer, event->m_config.m_blockadePositions);
     map->updateGameState(event->m_state);
+    map->m_lastUpdate -= event->m_timeSinceLastRound;
 }
 
 void ConnectedState::receiveEvent(DisconnectEvent* event) {

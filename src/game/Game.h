@@ -7,6 +7,7 @@
 #include <menu/MenuState.h>
 #include <game/Camera.h>
 #include <events/EventSystem.h>
+#include <game/Settings.h>
 
 using namespace std;
 
@@ -35,6 +36,8 @@ protected:
 
 	Textures textures;
 	Sprites sprites;
+
+	Settings settings;
 
 public:
     Game();
