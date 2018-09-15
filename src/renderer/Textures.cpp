@@ -37,6 +37,11 @@ class Texture* Textures::get(TextureEnum texture)
 std::map<TextureEnum, string> Textures::texturePaths()
 {
 	return map<TextureEnum, string>({
-		{GridSpriteSheet, "res/gridSpriteSheet.png"}
+		{GridSpriteSheet, "res/gridSpriteSheet.png"},
+        {UnitTexture, "res/unit.png"},
+        {SelectionTexture, "res/selected.png"},
+        {GridTexture, "res/grid.png"},
+        {ChatTexture, "res/chat.png"},
+        {WallTexture, "res/box.png"}
 	});
 }

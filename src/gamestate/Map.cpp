@@ -117,7 +117,7 @@ void Map::updateMouseCommand(Action action, std::string command, double deltaTim
 		glm::vec2 delta = m_input.mousePositionInWorld() - m_mouseClickPosition;
 		if (glm::length(delta) > minimumDragDistance)
 		{
-			ParticleSystem::mouseDragParticles(m_input.mousePositionInWorld(), m_mouseClickPosition, action == Move ? glm::vec4(0.1, 0.8, 0.1, 0.7) : glm::vec4(1, 0.5, 0.1, 0.8), deltaTime);
+			ParticleSystem::mouseDragParticles(m_input.mousePositionInWorld(), m_mouseClickPosition, action == Move ? glm::vec4(0.1, 0.8, 0.1, 0.7) : glm::vec4(1, 0.1, 0.1, 0.8), deltaTime);
 		}
 	}
 }
@@ -216,7 +216,7 @@ void Map::draw(class Renderer& renderer)
 	auto it = units.find(m_selectedUnit);
 	if (it != units.cend())
 	{
-		renderer.drawSprite(glm::vec3{it->second.position() - glm::vec2(0.5f, 0.5f), 0.4}, 1, 1, SpriteEnum::SelectedBlock);
+		renderer.drawSprite(glm::vec3{it->second.position() - glm::vec2(0.6f, 0.6f), 0.4}, 1.2f, 1.2f, SpriteEnum::SelectedBlock);
 	}
 
     drawRoundProgress();

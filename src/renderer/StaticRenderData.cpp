@@ -1,7 +1,7 @@
 #include <renderer/StaticRenderData.h>
 #include <renderer/Texture.h>
 
-const int StaticRenderData::defaultBufferVertexSize = 1024;
+const int StaticRenderData::defaultBufferVertexSize = 2048;
 
 StaticRenderData::StaticRenderData(class Texture* texture)
     : m_texture{texture}

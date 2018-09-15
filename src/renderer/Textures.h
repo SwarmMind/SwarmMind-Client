@@ -6,7 +6,12 @@ using namespace std;
 
 enum TextureEnum
 {
-	GridSpriteSheet
+	GridSpriteSheet,
+    UnitTexture,
+    SelectionTexture,
+    GridTexture,
+    ChatTexture,
+    WallTexture
 };
 
 class Textures

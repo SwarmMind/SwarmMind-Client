@@ -116,7 +116,7 @@ void ParticleSystem::spawnAcknowledgeParticles(glm::vec2 position)
 
 		GLfloat lifeTime = randomFloatBetween(0.1, 0.5);
 
-		particles.addParticle(offset + position, direction, lifeTime, glm::vec4(randomFloat(),randomFloat(), randomFloat(), 0.8));
+		particles.addParticle(offset + position, direction, lifeTime, glm::vec4(1 , 0.8f, 0.f, 0.8));
 	}
 	addParticles(particles);
 }

@@ -17,5 +17,4 @@ public:
     }
 
     class Gamestate* m_state;
-
 };
