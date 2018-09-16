@@ -10,9 +10,30 @@
 using namespace std;
 
 enum class SoundEnum {
-    Shoot,
+    Background1, 
+    Background2, 
+    Background3, 
+    Background4,
+    Menu,
+    WalkCommand, 
     Walk,
-    NextRound    
+    AttackCommand, 
+    Attack1, 
+    Attack2, 
+    Attack3,
+    Hit1, 
+    Hit2, 
+    Hit3, 
+    Hit4, 
+    Hit5,
+    Die1, 
+    Die2, 
+    Die3, 
+    Die4, 
+    Die5,
+    NextRound1, 
+    NextRound2, 
+    EndingRound 
 };
 
 class Sounds

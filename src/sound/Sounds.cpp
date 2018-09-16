@@ -26,9 +26,36 @@ void Sounds::update() {
 map<SoundEnum, std::string> Sounds::soundFiles() 
 {
     return map<SoundEnum, std::string>({ 
-        {SoundEnum::Shoot, "sound/shot_and_reload.wav"},
-        {SoundEnum::Walk, "sound/unit_walking.wav"},
-        {SoundEnum::NextRound, "sound/next_round.wav"}    
+        { SoundEnum::Background1, "sound/background_songs/background_1.wav" }, // these songs aren't implemented yet
+        { SoundEnum::Background2, "sound/background_songs/background_2.wav" }, //
+        { SoundEnum::Background3, "sound/background_songs/background_3.wav" }, //
+        { SoundEnum::Background4, "sound/background_songs/background_4.wav" }, //
+
+        { SoundEnum::Menu, "sound/menu_songs/menu_and_tutorial.wav" }, //
+        
+        { SoundEnum::WalkCommand, "sound/given_command/walk_command_given.wav" }, //
+        { SoundEnum::Walk, "sound/unit_walk/unit_walking.wav" }, 
+
+        { SoundEnum::AttackCommand, "sound/given_command/shoot_command_given.wav" }, //
+        { SoundEnum::Attack1, "sound/unit_attack/shoot_1.wav" }, 
+        { SoundEnum::Attack2, "sound/unit_attack/shoot_2.wav" }, 
+        { SoundEnum::Attack3, "sound/unit_attack/shoot_3.wav" },   
+
+        { SoundEnum::Hit1, "sound/monster_hit/got_hitten_scream_1.wav" }, 
+        { SoundEnum::Hit2, "sound/monster_hit/got_hitten_scream_2.wav" }, 
+        { SoundEnum::Hit3, "sound/monster_hit/got_hitten_scream_3.wav" }, 
+        { SoundEnum::Hit4, "sound/monster_hit/got_hitten_scream_4.wav" }, 
+        { SoundEnum::Hit5, "sound/monster_hit/got_hitten_scream_5.wav" }, 
+
+        { SoundEnum::Die1, "sound/monster_die/dying_scream_1.wav" }, 
+        { SoundEnum::Die2, "sound/monster_die/dying_scream_2.wav" },
+        { SoundEnum::Die3, "sound/monster_die/dying_scream_3.wav" },
+        { SoundEnum::Die4, "sound/monster_die/dying_scream_4.wav" },
+        { SoundEnum::Die5, "sound/monster_die/dying_scream_5.wav" },
+
+        { SoundEnum::NextRound1, "sound/next_round/next_round.wav" }, //
+        { SoundEnum::NextRound2, "sound/next_round/next_round_2.wav" }, //
+        { SoundEnum::EndingRound, "sound/next_round/ticking.wav" } //
     });
 }
 
