@@ -182,9 +182,9 @@ void ChatSystem::drawChats(Renderer& renderer)
             | ImGuiWindowFlags_NoSavedSettings
             | ImGuiWindowFlags_NoInputs))
         {
-            ImGui::TextColored(ImVec4(1.0, 1.0, 0.2, alpha), chat.m_user.data());
+            ImGui::TextColored(ImVec4(0.2, 0.2, 0.2, alpha), chat.m_user.data());
             ImGui::Separator();
-            ImGui::TextColored(ImVec4(1, 1, 1, alpha), chat.m_text.data());
+            ImGui::TextColored(ImVec4(.4, .4, .4, alpha), chat.m_text.data());
         }
         ImGui::End();
     }

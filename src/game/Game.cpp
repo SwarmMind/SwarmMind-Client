@@ -102,6 +102,28 @@ void Game::initializeImGui()
 	ImGuiStyle& style = ImGui::GetStyle();
 	style.WindowRounding = 0;
 	
+    //Colors
+    ImVec4 windowBg = ImVec4(.9f, .9f, .9f, 1);
+    ImVec4 buttonBg = ImVec4(.8f, .8f, .8f, 1);
+    ImVec4 highlightColor = ImVec4(.9f, .7f, 0, 0.7f);
+    ImVec4 activeColor = ImVec4(.9f, .7f, 0, 1.f);
+    
+    //Window style
+    style.Colors[ImGuiCol_WindowBg] = windowBg;
+    style.Colors[ImGuiCol_TitleBg] = windowBg;
+    style.Colors[ImGuiCol_TitleBgActive] = buttonBg;
+    style.Colors[ImGuiCol_PopupBg] = windowBg;
+
+    //Window elements
+    style.Colors[ImGuiCol_Text] = ImVec4(.2, .2, .2, 1);
+    style.Colors[ImGuiCol_Button] = buttonBg;
+    style.Colors[ImGuiCol_ButtonHovered] = highlightColor;
+    style.Colors[ImGuiCol_ButtonActive] = activeColor;
+    style.Colors[ImGuiCol_TextSelectedBg] = highlightColor;
+    style.Colors[ImGuiCol_FrameBg] = buttonBg;
+    style.Colors[ImGuiCol_Header] = buttonBg;
+    style.Colors[ImGuiCol_HeaderHovered] = highlightColor;
+    style.Colors[ImGuiCol_HeaderActive] = activeColor;
 }
 
 Game::~Game() {
