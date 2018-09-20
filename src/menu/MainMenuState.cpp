@@ -56,11 +56,15 @@ void MainMenuState::draw(Renderer& renderer)
 		if (ImGui::InputText("Address", address, addressBufferSize, ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_AutoSelectAll))
 		{
 			game->connectTo(address, port);
+            ImGui::End();
+            return;
 		}
 
 		if (ImGui::Button("Connect!"))
 		{
 			game->connectTo(address, port);
+            ImGui::End();
+            return;
 		}
 
 		//For spacing only

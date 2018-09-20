@@ -81,6 +81,7 @@ void Game::connectTo(std::string address, unsigned int port)
 	settings.port = port;
 	settings.save();
 
+    renderer.clearStaticData();
 	menu = std::make_unique<ConnectedState>(*this, renderer, input, eventSystem, settings);
 }
 
