@@ -278,7 +278,6 @@ void GameNetworker::onChatReceive(sio::event event)
 {
     std::string message = event.get_message()->get_string();
     nlohmann::json jsonChat = nlohmann::json::parse(message);
-    ChatEntry chat = jsonChat;
-
-    eventSystem.postEvent(std::make_shared<ChatEvent>(chat));
+    
+	eventSystem.postEvent(std::make_shared<ChatEvent>(ChatEntry{ jsonChat }));
 }
