@@ -46,6 +46,7 @@ void Map::updateGameState(class Gamestate* newState)
 
 	m_lastUpdate = glfwGetTime();
     m_numberOfGivenCommands = 0;
+    m_gamestate->setMap(this);
 }
 
 void Map::receiveEvent(StateEvent* event)
@@ -91,11 +92,8 @@ void Map::updateMouseCommand(Action action, std::string command, double deltaTim
 	if (!isUnitClicked(m_mouseClickPosition))
 	{
         const auto unit = m_gamestate->units.find(m_selectedUnit);
-        if (unit != m_gamestate->units.end() &&
-            isDirect &&
-            m_input.isActionJustReleased(action)) {
-            glm::vec2 delta = m_input.mousePositionInWorld() -
-                              unit->second.position();
+        if (unit != m_gamestate->units.end() && isDirect && m_input.isActionJustReleased(action)) {
+            glm::vec2 delta = m_input.mousePositionInWorld() - unit->second.position();
 			sendCommand(command, glm::normalize(delta));
             ParticleSystem::spawnAcknowledgeParticles(m_input.mousePositionInWorld());
         }

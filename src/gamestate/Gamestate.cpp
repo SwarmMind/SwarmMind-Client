@@ -9,6 +9,7 @@ Gamestate::Gamestate(class EventSystem& eventSystem, std::map<uint32_t, Unit>& _
 	: EventListener<CommandEvent>(eventSystem)
 	, EventListener<AccumulatedCommandsEvent>(eventSystem)
 	, units{ _units }
+    , m_map{nullptr}
 	, monsters{ _monsters }
 {}
 
@@ -33,6 +34,10 @@ void Gamestate::update(double deltaTime)
 	{
 		monster.second.update(deltaTime);
 	}
+}
+
+void Gamestate::setMap(Map* map) {
+    m_map = map;
 }
 
 void Gamestate::draw(class Renderer& renderer)

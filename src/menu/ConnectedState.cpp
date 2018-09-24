@@ -4,6 +4,7 @@
 #include <game/Game.h>
 #include <renderer/Sprites.h>
 #include <events/EventSystem.h>
+#include <sound/Sounds.h>
 
 ConnectedState::ConnectedState(Game& _game, Renderer& renderer, Input& _input, EventSystem& _eventSystem, Settings& _settings)
 	: input{ _input }
@@ -90,6 +91,12 @@ void ConnectedState::receiveEvent(InitStateEvent* event) {
     map->drawWallsStatic(m_renderer, event->m_config.m_blockadePositions);
     map->updateGameState(event->m_state);
     map->m_lastUpdate -= event->m_timeSinceLastRound;
+
+    /*
+    if (networker.isConnected()) {
+        map.getSounds()->play(SoundEnum::Background);
+    }
+    */
 }
 
 void ConnectedState::receiveEvent(DisconnectEvent* event) {

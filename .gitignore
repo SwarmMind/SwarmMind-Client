@@ -3,3 +3,4 @@ imgui.ini
 x64/
 glbindingd.dll
 glbinding-auxd.dll
+settings\.txt

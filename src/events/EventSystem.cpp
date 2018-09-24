@@ -31,7 +31,7 @@ void EventSystem::processEvent(Event* _event)
     //The loop looks a bit complicated, but a normal for-each loop cannot be used in the case of the deletion of a listener during the loop
     std::vector<ListenerFunction*> finishedListeners;
     std::vector<ListenerFunction*>::iterator found;
-    while ((found = std::find_if(listeners.begin(), listeners.end(), [=](ListenerFunction* listener) {
+    while ((found = std::find_if(listeners.begin(), listeners.end(), [&](ListenerFunction* listener) {
         return std::find(finishedListeners.begin(), finishedListeners.end(), listener) == finishedListeners.end();
     })) != listeners.end())
     {

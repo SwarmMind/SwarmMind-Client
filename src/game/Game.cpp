@@ -63,12 +63,13 @@ GLFWwindow * Game::createWindow() {
 }
 
 Game::Game()
-    : window{ createWindow() }
-    , camera{ window, 10, 10, 11 }
-    , renderer{ window, camera }
+	: sounds{ eventSystem }
+    , window { createWindow() }
+    , camera { window, 10, 10, 11 }
+    , renderer { window, camera }
     , imguiRenderer{ window }
-    , input{ window, &camera }
-    , sprites{ textures }
+    , input { window, &camera }
+    , sprites { textures }
 {
 	initializeImGui();
 
@@ -83,6 +84,8 @@ void Game::connectTo(std::string address, unsigned int port)
 
     renderer.clearStaticData();
 	menu = std::make_unique<ConnectedState>(*this, renderer, input, eventSystem, settings);
+
+	sounds.inMainMenu(false);
 }
 
 void Game::openMainMenu()
@@ -92,6 +95,7 @@ void Game::openMainMenu()
     menu = nullptr; //Delete the ConnectedState first!
                     //Important, because otherwise it is still registered as an EventListener
 	menu = std::make_unique<MainMenuState>(this, eventSystem, input, renderer, settings);
+	sounds.inMainMenu(true);
 }
 
 void Game::initializeImGui()
@@ -140,17 +144,16 @@ void Game::processInputs(double deltaTime)
 
 void Game::update(double time, double timeStamp)
 {
-    imguiRenderer.preRender(); //Required before any update in order for popups to work!
+    imguiRenderer.preRender(); // required before any update in order for popups to work!
     menu->update(time, timeStamp);
+	sounds.update();
 }
 
 void Game::render(double timeElapsed)
 {
     renderer.preDraw();
-
 	menu->draw(renderer);
 	drawDebug(timeElapsed);
-
     renderer.draw(timeElapsed);
     imguiRenderer.render();
     glfwSwapBuffers(window);

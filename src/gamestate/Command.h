@@ -1,19 +1,33 @@
 #pragma once
 #include <cstdint>
 #include <glm/vec2.hpp>
+
 class Gamestate;
+
+enum class CommandType {
+	Die,
+	Move,
+	Attack,
+	Damage,
+	Spawn
+};
 
 class Command
 {
 public:
+	Command() = delete;
 	virtual ~Command() = default;
 
 	virtual void executeOn(Gamestate& state) = 0;
+
+	CommandType type() const;
 protected:
-	Command(uint32_t _ID);
+	Command(uint32_t _ID, CommandType _type);
 	uint32_t ID;
+    //class Sound& m_sound;
 	
 private:
+	const CommandType m_type;
 };
 
 class DieCommand : public Command
@@ -28,15 +42,12 @@ protected:
 private:
 };
 
-
-
-
 class DirectionalCommand : public Command
 {
 public:
 	virtual ~DirectionalCommand() = default;
 protected:
-	DirectionalCommand(uint32_t _ID, glm::vec2 _direction);
+	DirectionalCommand(uint32_t _ID, CommandType _type, glm::vec2 _direction);
 	glm::vec2 direction;
 };
 

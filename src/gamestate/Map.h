@@ -12,6 +12,7 @@
 #include <gamestate/ChatSystem.h>
 #include <events/StateEvent.h>
 #include <events/AccumulatedCommandsEvent.h>
+#include <sound/Sounds.h>
 
 class Map : public EventListener<StateEvent>, public EventListener<AccumulatedCommandsEvent>
 {
@@ -21,29 +22,28 @@ public:
 	~Map();
 
 	void updateGameState(class Gamestate* newState);
-
 	void update(double deltaTime, double timeStamp);
+
     void drawGridStatic(Renderer&);
 	void draw(class Renderer& renderer);
-
-	const double moveAnimationTime = 3.0;
+    void drawWallsStatic(class Renderer& renderer, std::vector<glm::vec2> blockadePositions);	
 
     virtual void receiveEvent(StateEvent* event) override;
     virtual void receiveEvent(AccumulatedCommandsEvent* event) override;
 
-	double m_lastUpdate;
+    std::string username() const { return m_chats.username(); }
 
-	std::string username() const { return m_chats.username(); }
+    const double moveAnimationTime = 3.0;
+	double m_lastUpdate;	 
 
-    void drawWallsStatic(class Renderer& renderer, std::vector<glm::vec2> blockadePositions);
 protected:
     ChatSystem m_chats;
 	class Gamestate* m_gamestate;
-	class Input& m_input;
+	class Input& m_input; 
 	class Networker& m_networker;
 	class EventSystem& m_eventSystem;
-    class Configuration m_config;
-	
+    Configuration m_config;
+    
     bool trackpadMode = true;
 
 	int32_t m_selectedUnit = 0;

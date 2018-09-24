@@ -8,8 +8,9 @@
 #include <game/Camera.h>
 #include <events/EventSystem.h>
 #include <game/Settings.h>
+#include <sound/Sounds.h>
 
-//static bool g_isZoomingEnabled;
+using namespace std;
 
 class Game {
     static GLFWwindow* createWindow();
@@ -23,15 +24,15 @@ class Game {
 	void initializeImGui();
 	
 protected:
-    GLFWwindow *window;
+	EventSystem eventSystem;
 
- 	Camera camera;
-   
+	Sounds sounds;
+	
+	GLFWwindow *window;
+ 	Camera camera;   
     OpenGLRenderer renderer;
     ImGuiRenderer imguiRenderer;
     Input input;
-
-	EventSystem eventSystem;
 
     std::unique_ptr<MenuState> menu;
 

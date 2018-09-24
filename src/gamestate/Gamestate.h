@@ -43,4 +43,6 @@ public:
 
 	std::map<uint32_t, Unit> units;
 	std::map<uint32_t, Monster> monsters;
+    class Map* m_map;
+    void setMap(class Map* map);
 };
