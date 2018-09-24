@@ -84,6 +84,8 @@ void Game::connectTo(std::string address, unsigned int port)
 	settings.save();
 
 	menu = std::make_unique<ConnectedState>(*this, renderer, input, eventSystem, settings);
+
+	sounds.inMainMenu(false);
 }
 
 void Game::openMainMenu()
@@ -93,6 +95,8 @@ void Game::openMainMenu()
     menu = nullptr; //Delete the ConnectedState first!
                     //Important, because otherwise it is still registered as an EventListener
 	menu = std::make_unique<MainMenuState>(this, eventSystem, input, renderer, settings.hostname, settings.port);
+
+	sounds.inMainMenu(true);
 }
 
 void Game::initializeImGui()

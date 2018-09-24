@@ -53,9 +53,15 @@ public:
 
 	void receiveEvent(CommandEvent* event);
 
-private:
+	void inMainMenu(bool in_menu);
+
+protected:
 	EventSystem& m_event_system;
     list<sf::Sound> m_sounds;
     map<SoundEnum, sf::SoundBuffer> m_buffers;
-    map<SoundEnum, std::string> soundFiles();
+    static const map<SoundEnum, std::string> soundFiles;
+
+private:
+	bool m_main_menu = true;
+	sf::Sound background;
 };
