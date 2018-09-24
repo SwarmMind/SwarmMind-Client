@@ -69,6 +69,7 @@ Game::Game()
     , imguiRenderer{ window }
     , input { window, &camera }
     , sprites { textures }
+	, sounds { eventSystem }
 {
 
 	initializeImGui();
@@ -120,6 +121,7 @@ void Game::update(double time, double timeStamp)
 {
     imguiRenderer.preRender(); // required before any update in order for popups to work!
     menu->update(time, timeStamp);
+	sounds.update();
 }
 
 void Game::render(double timeElapsed)

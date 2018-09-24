@@ -8,6 +8,7 @@
 #include <game/Camera.h>
 #include <events/EventSystem.h>
 #include <game/Settings.h>
+#include <sound/Sounds.h>
 
 using namespace std;
 
@@ -36,6 +37,8 @@ protected:
 
 	Textures textures;
 	Sprites sprites;
+
+	Sounds sounds;
 
 	Settings settings;
 

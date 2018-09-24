@@ -31,7 +31,6 @@ public:
     virtual void receiveEvent(StateEvent* event) override;
     virtual void receiveEvent(AccumulatedCommandsEvent* event) override;
 
-    class Sounds& getSounds();
     std::string username() const { return m_chats.username(); }
 
     const double moveAnimationTime = 3.0;
@@ -44,9 +43,7 @@ protected:
 	class Networker& m_networker;
 	class EventSystem& m_eventSystem;
     Configuration m_config;
-    //class Sounds& m_sounds;
-    Sounds m_sounds;
-
+    
     bool trackpadMode = true;
 
 	int32_t m_selectedUnit = 0;

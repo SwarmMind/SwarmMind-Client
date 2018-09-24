@@ -27,7 +27,6 @@ Map::Map(Input& _input, Networker& _networker, EventSystem& _eventSystem, const 
     , m_input{ _input }
 	, m_config{_config}
 	, m_networker{_networker}
-    , m_sounds{ }
     , m_gamestate{ new Gamestate{_eventSystem} }
 	, m_lastUpdate{glfwGetTime()}
 	, m_eventSystem{_eventSystem}
@@ -169,11 +168,6 @@ void Map::updateSelectionAction(Action action, int selectedPlayerNumber)
 	}
 }
 
-Sounds& Map::getSounds()
-{
-    return m_sounds;
-}
-
 void Map::update(double deltaTime, double timeStamp)
 {
 	if (m_gamestate == nullptr)
@@ -184,7 +178,6 @@ void Map::update(double deltaTime, double timeStamp)
 	
     updateSelection();
 	updateCommands(deltaTime);
-    m_sounds.update();
 }
 
 void Map::drawGridStatic(Renderer& renderer) 

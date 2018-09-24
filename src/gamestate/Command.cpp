@@ -9,15 +9,20 @@
 #include <time.h>
 
 
-Command::Command(uint32_t _ID)
-	: ID{_ID}
+Command::Command(uint32_t _ID, CommandType _type)
+	: m_type{_type}
+	, ID{_ID}
 {}
+
+CommandType Command::type() const {
+	return m_type;
+}
 
 //////////////////////////////////////////////////////////////////////////
 //						DieCommand
 //////////////////////////////////////////////////////////////////////////
 DieCommand::DieCommand(uint32_t _ID)
-	: Command(_ID)
+	: Command(_ID, CommandType::Die)
 {}
 
 void DieCommand::executeOn(Gamestate& state)
@@ -26,13 +31,13 @@ void DieCommand::executeOn(Gamestate& state)
     //const char dieSound[5] = { 'SoundEnum::Die1', 'SoundEnum::Die2', 'SoundEnum::Die3', 'SoundEnum::Die4', 'SoundEnum::Die5' };
     //int randomDie = rand() % 5; 
     //state.m_map->getSounds().play(dieSound[randomDie]);
-    state.m_map->getSounds().play(SoundEnum::Die1);
+    //state.m_map->getSounds().play(SoundEnum::Die1);
 
     state.deleteEntity(ID);
 }
 
-DirectionalCommand::DirectionalCommand(uint32_t _ID, glm::vec2 _direction)
-	: Command(_ID)
+DirectionalCommand::DirectionalCommand(uint32_t _ID, CommandType _type, glm::vec2 _direction)
+	: Command(_ID, _type)
 	, direction{_direction}
 {}
 
@@ -41,25 +46,25 @@ DirectionalCommand::DirectionalCommand(uint32_t _ID, glm::vec2 _direction)
 //////////////////////////////////////////////////////////////////////////
 
 MoveCommand::MoveCommand(uint32_t _ID, glm::vec2 _direction)
-	: DirectionalCommand(_ID, _direction)
+	: DirectionalCommand(_ID, CommandType::Move, _direction)
 {}
 
 void MoveCommand::executeOn(Gamestate& state)
 {
     Entity* entity = state.getEntityByID(ID);
 
-	if (entity != nullptr)
-	{
-        state.m_map->getSounds().play(SoundEnum::Walk); 
-        entity->moveTo(entity->position() + direction);
-	}
+	if (!entity) return;
+
+    //state.m_map->getSounds().play(SoundEnum::Walk); 
+    entity->moveTo(entity->position() + direction);
+
 }
 
 //////////////////////////////////////////////////////////////////////////	
 //						AttackCommand
 //////////////////////////////////////////////////////////////////////////
 AttackCommand::AttackCommand(uint32_t _ID, glm::vec2 _direction)
-	: DirectionalCommand(_ID, _direction)
+	: DirectionalCommand(_ID, CommandType::Attack, _direction)
 {}
 
 void AttackCommand::executeOn(Gamestate& state)
@@ -70,19 +75,19 @@ void AttackCommand::executeOn(Gamestate& state)
     //const char attackSound[3] = { 'SoundEnum::Attack1', 'SoundEnum::Attack2', 'SoundEnum::Attack3' };
     //int randomAttack = rand() % 3;
 
-	if (unit != nullptr)
-	{
-        //state.m_map->getSounds().play(attackSound[randomAttack]); 
-        state.m_map->getSounds().play(SoundEnum::Attack1); 
-        ParticleSystem::spawnShootParticles(unit->position() + glm::normalize(direction) * 0.3f, direction);
-	}
+	if (!unit) return;
+	
+    //state.m_map->getSounds().play(attackSound[randomAttack]); 
+    //state.m_map->getSounds().play(SoundEnum::Attack1); 
+    ParticleSystem::spawnShootParticles(unit->position() + glm::normalize(direction) * 0.3f, direction);
+	
 }
 
 //////////////////////////////////////////////////////////////////////////
 //						DamageCommand
 //////////////////////////////////////////////////////////////////////////
 DamageCommand::DamageCommand(uint32_t _ID, glm::vec2 _direction)
-	: DirectionalCommand(_ID, _direction)
+	: DirectionalCommand(_ID, CommandType::Damage, _direction)
 {}
 
 void DamageCommand::executeOn(Gamestate& state)
@@ -93,12 +98,12 @@ void DamageCommand::executeOn(Gamestate& state)
     //const char hitSound[5] = { 'SoundEnum::Hit1', 'SoundEnum::Hit2', 'SoundEnum::Hit3', 'SoundEnum::Hit4', 'SoundEnum::Hit5' };
     //int randomSound = rand() % 5;
 
-	if (entity != nullptr)
-	{
-        //state.m_map->getSounds().play(hitSound[randomSound]);
-        state.m_map->getSounds().play(SoundEnum::Hit1);
-        ParticleSystem::spawnBloodParticles(entity->position(), direction);
-	}
+	if (!entity) return;
+
+    //state.m_map->getSounds().play(hitSound[randomSound]);
+    //state.m_map->getSounds().play(SoundEnum::Hit1);
+    ParticleSystem::spawnBloodParticles(entity->position(), direction);
+
 }
 
 
@@ -107,7 +112,7 @@ void DamageCommand::executeOn(Gamestate& state)
 //                      SpawnCommand
 //////////////////////////////////////////////////////////////////////////
 SpawnCommand::SpawnCommand(uint32_t _ID, glm::vec2 position, bool isUnit)
-    : Command(_ID)
+    : Command(_ID, CommandType::Spawn)
     , m_position(position)
     , m_isUnit(isUnit)
 {}
