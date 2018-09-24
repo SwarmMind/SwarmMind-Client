@@ -75,6 +75,7 @@ after_build:
   - ps: cp build\src\$env:CONFIGURATION\SwarmMind-Client.exe package
   - ps: cp -r -v fonts package
   - ps: cp -r -v shaders package
+  - ps: cp -r -v sounds package
   - ps: cp -r -v res package
 
 artifacts:
