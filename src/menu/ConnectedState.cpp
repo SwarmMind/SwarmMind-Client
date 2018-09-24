@@ -61,6 +61,8 @@ void ConnectedState::drawStatus() {
 	{
 		if (ImGui::Button("Exit"))
 		{
+			settings.username = map->username();
+			settings.save();
 			game.openMainMenu();
 		}
 		

@@ -5,4 +5,5 @@ set(sources
 	game/Camera.h
 	game/Camera.cpp
 	game/Settings.h
+	game/Settings.cpp
 	PARENT_SCOPE)

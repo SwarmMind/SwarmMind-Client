@@ -6,16 +6,17 @@
 #include <cstring>
 #include <gamestate/Map.h>
 
-MainMenuState::MainMenuState(Game* _game, EventSystem& eventSystem, Input& input, Renderer& renderer, const std::string& preset_host, const uint16_t preset_port)
+MainMenuState::MainMenuState(Game* _game, EventSystem& eventSystem, Input& input, Renderer& renderer, Settings& settings)
 	: game{_game}
     , m_input{input}
     , m_renderer{renderer}
     , m_eventSystem{eventSystem}
     , m_networker(eventSystem)
     , EventListener<InitStateEvent>(eventSystem)
+	, m_settings{settings}
 {
-	strcpy(address, preset_host.c_str());
-	port = preset_port;
+	strcpy(address, m_settings.hostname.c_str());
+	port = m_settings.port;
 
     m_networker.begin(m_renderer);
 }
@@ -95,7 +96,7 @@ void MainMenuState::draw(Renderer& renderer)
 void MainMenuState::receiveEvent(InitStateEvent* event)
 {
     m_renderer.clearStaticData();
-    m_map = std::make_unique<Map>(m_input, m_networker, m_eventSystem, event->m_config, "Player 1");
+    m_map = std::make_unique<Map>(m_input, m_networker, m_eventSystem, event->m_config, m_settings.username);
     m_map->drawGridStatic(m_renderer);
     m_map->updateGameState(event->m_state);
     m_map->m_lastUpdate -= event->m_timeSinceLastRound;
