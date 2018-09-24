@@ -23,7 +23,10 @@ class Game {
 
 	void initializeImGui();
 	
-protected:   
+protected:
+	EventSystem eventSystem;
+
+	Sounds sounds;
 	
 	GLFWwindow *window;
  	Camera camera;   
@@ -31,14 +34,10 @@ protected:
     ImGuiRenderer imguiRenderer;
     Input input;
 
-    EventSystem eventSystem;
-
     std::unique_ptr<MenuState> menu;
 
 	Textures textures;
 	Sprites sprites;
-
-	Sounds sounds;
 
 	Settings settings;
 

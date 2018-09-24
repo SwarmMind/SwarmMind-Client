@@ -63,15 +63,14 @@ GLFWwindow * Game::createWindow() {
 }
 
 Game::Game()
-    : window { createWindow() }
+	: sounds{ eventSystem }
+    , window { createWindow() }
     , camera { window, 10, 10, 11 }
     , renderer { window, camera }
     , imguiRenderer{ window }
     , input { window, &camera }
     , sprites { textures }
-	, sounds { eventSystem }
 {
-
 	initializeImGui();
 
 	openMainMenu();
