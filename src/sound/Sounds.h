@@ -5,6 +5,8 @@
 #include <deque>
 #include <iostream>
 #include <list>
+#include <random>
+#include <memory>
 
 #include <SFML/Audio.hpp>
 
@@ -14,29 +16,15 @@
 using namespace std;
 
 enum class SoundEnum {
-    Background1, 
-    Background2, 
-    Background3, 
-    Background4,
+    Background,
     Menu,
     WalkCommand, 
     Walk,
     AttackCommand, 
-    Attack1, 
-    Attack2, 
-    Attack3,
-    Hit1, 
-    Hit2, 
-    Hit3, 
-    Hit4, 
-    Hit5,
-    Die1, 
-    Die2, 
-    Die3, 
-    Die4, 
-    Die5,
-    NextRound1, 
-    NextRound2, 
+    Attack,
+    Hit,
+    Die,
+    NextRound,
     EndingRound 
 };
 
@@ -49,6 +37,7 @@ public:
     ~Sounds();
 
     void play(SoundEnum soundName);
+	void playRandom(SoundEnum soundName);
     void update();
 
 	void receiveEvent(CommandEvent* event);
@@ -58,10 +47,20 @@ public:
 protected:
 	EventSystem& m_event_system;
     list<sf::Sound> m_sounds;
-    map<SoundEnum, sf::SoundBuffer> m_buffers;
-    static const map<SoundEnum, std::string> soundFiles;
+    multimap<SoundEnum, sf::SoundBuffer> m_buffers;
+
+	std::vector<std::shared_ptr<sf::Music>> menu_music;
+	std::vector<std::shared_ptr<sf::Music>> game_music;
+	std::shared_ptr<sf::Music> current_music;
+
+	void playBackground();
+
+	sf::SoundBuffer& selectRandom(SoundEnum soundName);
 
 private:
 	bool m_main_menu = true;
-	sf::Sound background;
+
+	std::mt19937_64 random;
+
+	static const multimap<SoundEnum, std::string> soundFiles;
 };

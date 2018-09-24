@@ -1,27 +1,48 @@
+#include <random>
+
 #include <sound/Sounds.h>
 
 Sounds::Sounds(EventSystem& event_system)
 	: m_event_system{event_system}
 	, EventListener<CommandEvent>(event_system)
+	, random{ std::random_device{}() }
+	, current_music{ nullptr }
 {
     for (auto pair : soundFiles)
     {
-        m_buffers[pair.first] = sf::SoundBuffer();
-        m_buffers[pair.first].loadFromFile(pair.second);
+		bool success;
+
+		std::cout << "Loading sound file \"" << pair.second << "\"... ";
+		std::cout.flush();
+		switch (pair.first) {
+		case SoundEnum::Background:
+			game_music.emplace_back(std::make_shared<sf::Music>());
+			success = game_music.back()->openFromFile(pair.second);
+			break;
+		case SoundEnum::Menu:
+			menu_music.emplace_back(std::make_shared<sf::Music>());
+			success = menu_music.back()->openFromFile(pair.second);
+			break;
+		default:
+			const auto it = m_buffers.emplace(pair.first, sf::SoundBuffer{});
+			success = it->second.loadFromFile(pair.second);
+			break;
+		};
+		if (success) std::cout << "[done]" << std::endl;
     }
+	playBackground();
 }
 
 Sounds::~Sounds()
 {
 }
 
-void Sounds::play(SoundEnum soundName){
-    m_sounds.emplace_back(m_buffers.at(soundName));
-    m_sounds.back().play();
-}
 
 void Sounds::update() {
     std::remove_if(m_sounds.begin(), m_sounds.end(), [](sf::Sound& sound) {return sound.getStatus() == sf::Sound::Stopped;});
+	if (current_music->getStatus() == sf::Sound::Stopped) {
+		playBackground();
+	}
 }
 
 void Sounds::receiveEvent(CommandEvent * event)
@@ -31,70 +52,90 @@ void Sounds::receiveEvent(CommandEvent * event)
 		play(SoundEnum::Walk);
 		break;
 	case CommandType::Attack:
-		play(SoundEnum::Attack1);
+		playRandom(SoundEnum::Attack);
 		break;
 	case CommandType::Damage:
-		play(SoundEnum::Hit1);
+		playRandom(SoundEnum::Hit);
 		break;
 	case CommandType::Die:
-		play(SoundEnum::Die1);
+		playRandom(SoundEnum::Die);
 		break;
 	default:
 		break;
 	}
 }
 
-void Sounds::inMainMenu(bool in_menu) {
-	m_main_menu = in_menu;
-
-	background.stop();
-
-	if (in_menu) {
-		background = sf::Sound{ m_buffers.at(SoundEnum::Menu) };
-	} else {
-		background = sf::Sound{ m_buffers.at(SoundEnum::Background1) };
-	}
-	background.play();
+void Sounds::play(SoundEnum soundName) {
+	m_sounds.emplace_back(m_buffers.find(soundName)->second);
+	m_sounds.back().play();
 }
 
-const map<SoundEnum, std::string> Sounds::soundFiles {
-		{ SoundEnum::Background1, "sound/background_songs/background_1.wav" }, // these songs aren't implemented yet
-		/*
-		{ SoundEnum::Background2, "sound/background_songs/background_2.wav" }, //
-		{ SoundEnum::Background3, "sound/background_songs/background_3.wav" }, //
-		{ SoundEnum::Background4, "sound/background_songs/background_4.wav" }, //
-		*/
+sf::SoundBuffer& Sounds::selectRandom(SoundEnum soundName) {
+	const auto range = m_buffers.equal_range(soundName);
+	std::uniform_int_distribution<std::multimap<SoundEnum, sf::SoundBuffer>::iterator::difference_type> dist{ 0, std::distance(range.first, range.second)-1 };
+	unsigned int advance = dist(random);
+	auto it = range.first;
+	while (advance--) it++;
+	return it->second;
+}
+
+void Sounds::playRandom(SoundEnum soundName) {
+	m_sounds.emplace_back(selectRandom(soundName));
+	m_sounds.back().play();
+}
+
+void Sounds::playBackground() {
+	if (current_music) current_music->stop();
+
+	if (m_main_menu) {
+		std::uniform_int_distribution<std::vector<sf::Music>::size_type> dist{ 0, menu_music.size()-1 };
+		current_music = menu_music.at(dist(random));
+	}
+	else {
+		std::uniform_int_distribution<std::vector<sf::Music>::size_type> dist{ 0, game_music.size()-1 };
+		current_music = game_music.at(dist(random));
+	}
+	current_music->setVolume(0.9);
+
+	current_music->play();
+}
+
+void Sounds::inMainMenu(bool in_menu) {
+	m_main_menu = in_menu;
+	
+	playBackground();
+}
+
+const multimap<SoundEnum, std::string> Sounds::soundFiles {
+		{ SoundEnum::Background, "sound/background_songs/background_1.wav" }, // these songs aren't implemented yet
+		{ SoundEnum::Background, "sound/background_songs/background_2.wav" }, //
+		{ SoundEnum::Background, "sound/background_songs/background_3.wav" }, //
+		{ SoundEnum::Background, "sound/background_songs/background_4.wav" }, //
+
 		{ SoundEnum::Menu, "sound/menu_songs/menu_and_tutorial.wav" }, //
-		/*
+		
 		{ SoundEnum::WalkCommand, "sound/given_command/walk_command_given.wav" }, //
-		*/
 		{ SoundEnum::Walk, "sound/unit_walk/unit_walking.wav" },
-		/*
+		
 		{ SoundEnum::AttackCommand, "sound/given_command/shoot_command_given.wav" }, //
-		*/
-		{ SoundEnum::Attack1, "sound/unit_attack/shoot_1.wav" },
-		/*
-		{ SoundEnum::Attack2, "sound/unit_attack/shoot_2.wav" },
-		{ SoundEnum::Attack3, "sound/unit_attack/shoot_3.wav" },
-		*/
-		{ SoundEnum::Hit1, "sound/monster_hit/got_hitten_scream_1.wav" },
-		/*
-		{ SoundEnum::Hit2, "sound/monster_hit/got_hitten_scream_2.wav" },
-		{ SoundEnum::Hit3, "sound/monster_hit/got_hitten_scream_3.wav" },
-		{ SoundEnum::Hit4, "sound/monster_hit/got_hitten_scream_4.wav" },
-		{ SoundEnum::Hit5, "sound/monster_hit/got_hitten_scream_5.wav" },
-		*/
-		{ SoundEnum::Die1, "sound/monster_die/dying_scream_1.wav" },
-		/*
-		{ SoundEnum::Die2, "sound/monster_die/dying_scream_2.wav" },
-		{ SoundEnum::Die3, "sound/monster_die/dying_scream_3.wav" },
-		{ SoundEnum::Die4, "sound/monster_die/dying_scream_4.wav" },
-		{ SoundEnum::Die5, "sound/monster_die/dying_scream_5.wav" },
-
-		{ SoundEnum::NextRound1, "sound/next_round/next_round.wav" }, //
-		{ SoundEnum::NextRound2, "sound/next_round/next_round_2.wav" }, //
+		{ SoundEnum::Attack, "sound/unit_attack/shoot_1.wav" },
+		{ SoundEnum::Attack, "sound/unit_attack/shoot_2.wav" },
+		{ SoundEnum::Attack, "sound/unit_attack/shoot_3.wav" },
+		
+		{ SoundEnum::Hit, "sound/monster_hit/got_hitten_scream_1.wav" },
+		{ SoundEnum::Hit, "sound/monster_hit/got_hitten_scream_2.wav" },
+		{ SoundEnum::Hit, "sound/monster_hit/got_hitten_scream_3.wav" },
+		{ SoundEnum::Hit, "sound/monster_hit/got_hitten_scream_4.wav" },
+		{ SoundEnum::Hit, "sound/monster_hit/got_hitten_scream_5.wav" },
+		
+		{ SoundEnum::Die, "sound/monster_die/dying_scream_1.wav" },
+		{ SoundEnum::Die, "sound/monster_die/dying_scream_2.wav" },
+		{ SoundEnum::Die, "sound/monster_die/dying_scream_3.wav" },
+		{ SoundEnum::Die, "sound/monster_die/dying_scream_4.wav" },
+		{ SoundEnum::Die, "sound/monster_die/dying_scream_5.wav" },
+		
+		{ SoundEnum::NextRound, "sound/next_round/next_round.wav" }, //
+		{ SoundEnum::NextRound, "sound/next_round/next_round_2.wav" }, //
 		{ SoundEnum::EndingRound, "sound/next_round/ticking.wav" } //
-
-		*/
 };
 
