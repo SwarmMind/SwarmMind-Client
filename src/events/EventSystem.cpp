@@ -28,18 +28,18 @@ void EventSystem::removeListener(ListenerFunction* listener)
 	}
 }
 
-void EventSystem::postEvent(std::shared_ptr<Event> _event)
+void EventSystem::postEvent(std::shared_ptr<Event> _event, double offset)
 {
 	std::lock_guard<std::mutex> queueGuard(queueLock);
-	eventQueue.emplace(_event);
+	eventQueue.emplace(_event, glfwGetTime() + offset);
 }
 
 void EventSystem::update(double deltaTime, double timeStamp)
 {
 	std::lock_guard<std::mutex> queueGuard(queueLock);
-	while (!eventQueue.empty())
+	while (!eventQueue.empty() && eventQueue.top().is_due())
 	{
-		processEvent(eventQueue.front());
+		processEvent(eventQueue.top().m_event);
 		eventQueue.pop();
 	}
 }

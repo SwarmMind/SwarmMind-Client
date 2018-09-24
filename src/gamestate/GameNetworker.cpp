@@ -185,24 +185,30 @@ std::shared_ptr<Command> GameNetworker::parseCommand(const nlohmann::json& jsonC
     return nullptr;
 }
 
+static const double offset(const CommandType& type) {
+	switch (type) {
+	case CommandType::Spawn:
+		return 0.4;
+	case CommandType::Move:
+		return 0.3;
+	case CommandType::Attack:
+	case CommandType::Damage:
+		return 0.0;
+	case CommandType::Die:
+		return 0.1;
+	}
+	return 0.0;
+}
+
 void GameNetworker::processCommands(nlohmann::json& jsonCommands)
 {
-    std::vector<std::shared_ptr<Command>> commands;
     for (const nlohmann::json& jsonCommand : jsonCommands)
     {
         std::shared_ptr<Command> command = parseCommand(jsonCommand);
-        if (command != nullptr)
-        {
-            commands.push_back(command);
+        if (command) {
+			eventSystem.postEvent(std::make_shared<CommandEvent>(command), offset(command->type()));
         }
     }
-
-	for (const std::shared_ptr<Command>& command : commands)
-	{
-		CommandEvent event;
-		event.command = command;
-		eventSystem.postEvent(std::make_shared<CommandEvent>(command));
-	}
 }
 
 void GameNetworker::onStateReceive(sio::event _event)
