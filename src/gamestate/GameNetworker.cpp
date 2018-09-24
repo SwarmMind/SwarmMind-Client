@@ -30,11 +30,7 @@ GameNetworker::GameNetworker(EventSystem& _eventSystem)
     sioSocket->on("chat", bind(&GameNetworker::onChatReceive, this, std::placeholders::_1));
 
     sioClient.set_reconnecting_listener([=]() {
-        lock_guard<mutex> queueGuard(queueLock);
-        eventQueue.push([=]() {
-            DisconnectEvent disconnectEvent;
-            eventSystem.processEvent(&disconnectEvent);
-        });
+        eventSystem.postEvent(std::make_shared<DisconnectEvent>());
     });
 }
 
@@ -118,18 +114,10 @@ void GameNetworker::sendChatMessage(struct ChatEntry& chatEntry)
 
 void GameNetworker::update(double deltaTime, double timeStamp)
 {
-    lock_guard<mutex> queueGuard(queueLock);
-    while (!eventQueue.empty())
-    {
-        function<void()> eventToRun = eventQueue.front();
-        eventToRun();
-        eventQueue.pop();
-    }
 }
 
-Gamestate* GameNetworker::parseGamestate(nlohmann::json state)
+std::shared_ptr<Gamestate> GameNetworker::parseGamestate(nlohmann::json state)
 {
-
     vector<nlohmann::json> jsonMonsters = state["npcs"];
     vector<nlohmann::json> jsonUnits = state["players"];
     std::map<uint32_t, Unit> units;
@@ -146,7 +134,7 @@ Gamestate* GameNetworker::parseGamestate(nlohmann::json state)
         Monster monster(jsonMonster);
         monsters.emplace(monster.id(), monster);
     }
-    return new Gamestate(eventSystem, units, monsters);
+    return std::make_shared<Gamestate>(eventSystem, units, monsters);
 }
 
 Configuration GameNetworker::parseConfiguration(std::string jsonString)
@@ -209,33 +197,21 @@ void GameNetworker::processCommands(nlohmann::json& jsonCommands)
         }
     }
 
-    {
-        std::lock_guard<std::mutex> queueGuard(queueLock);
-        eventQueue.push([=]() {
-            for (const std::shared_ptr<Command>& command : commands)
-            {
-                CommandEvent event;
-                event.command = command;
-                eventSystem.processEvent(&event);
-            }
-        });
-    }
+	for (const std::shared_ptr<Command>& command : commands)
+	{
+		CommandEvent event;
+		event.command = command;
+		eventSystem.postEvent(std::make_shared<CommandEvent>(command));
+	}
 }
 
 void GameNetworker::onStateReceive(sio::event _event)
 {
     const string jsonMessage = _event.get_message()->get_string();
     nlohmann::json jsonState = nlohmann::json::parse(jsonMessage);
-    Gamestate* state = parseGamestate(jsonState);
+    auto state = parseGamestate(jsonState);
 
-    {
-        lock_guard<mutex> queueGuard(queueLock);
-        eventQueue.push([=]() {
-            StateEvent stateEvent;
-            stateEvent.m_state = state;
-            eventSystem.processEvent(&stateEvent);
-        });
-    }
+	eventSystem.postEvent(std::make_shared<StateEvent>(state));
 
     processCommands(jsonState["commands"]);
 }
@@ -245,19 +221,10 @@ void GameNetworker::onInitStateReceive(sio::event _event)
     const string jsonMessage = _event.get_message()->get_string();
     const nlohmann::json initState = nlohmann::json::parse(jsonMessage);
     const Configuration config = parseConfiguration(initState["config"].dump());
-    Gamestate* state = parseGamestate(initState["state"]);
+    auto state = parseGamestate(initState["state"]);
     double timeSinceLastRound = initState["config"]["timeSinceLastRound"];
 
-    {
-        lock_guard<mutex> queueGuard(queueLock);
-        eventQueue.push([=]() {
-            InitStateEvent initStateEvent;
-            initStateEvent.m_state = state;
-            initStateEvent.m_config = config;
-            initStateEvent.m_timeSinceLastRound = timeSinceLastRound;
-            eventSystem.processEvent(&initStateEvent);
-        });
-    }
+    eventSystem.postEvent(std::make_shared<InitStateEvent>(timeSinceLastRound, config, state));
 }
 
 void GameNetworker::onAccumulatedCommandsReceive(sio::event _event)
@@ -289,16 +256,7 @@ void GameNetworker::onAccumulatedCommandsReceive(sio::event _event)
     size_t numberOfGivenCommands = json["numberOfGivenCommands"];
     size_t maxNumberOfCommands = json["maxNumberOfCommands"];
 
-    {
-        std::lock_guard<std::mutex> queueGuard(queueLock);
-        eventQueue.push([=]() {
-            AccumulatedCommandsEvent accumulatedCommandsEvent;
-            accumulatedCommandsEvent.commands = commandsList;
-            accumulatedCommandsEvent.numberOfGivenCommands = numberOfGivenCommands;
-            accumulatedCommandsEvent.maxNumberOfCommands = maxNumberOfCommands;
-            eventSystem.processEvent(&accumulatedCommandsEvent);
-        });
-    }
+    eventSystem.postEvent(std::make_shared<AccumulatedCommandsEvent>(commandsList, numberOfGivenCommands, maxNumberOfCommands));
 }
 
 void from_json(const nlohmann::json& json, ChatEntry& chat)
@@ -316,12 +274,5 @@ void GameNetworker::onChatReceive(sio::event event)
     nlohmann::json jsonChat = nlohmann::json::parse(message);
     ChatEntry chat = jsonChat;
 
-    {
-        std::lock_guard<std::mutex> queueGuard(queueLock);
-        eventQueue.push([=]() {
-            ChatEvent chatEvent;
-            chatEvent.m_chatEntry = chat;
-            eventSystem.processEvent(&chatEvent);
-        });
-    }
+    eventSystem.postEvent(std::make_shared<ChatEvent>(chat));
 }

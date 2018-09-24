@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 #include <renderer/Textures.h>
 #include <renderer/Sprites.h>
 #include <gamestate/Gamestate.h>
@@ -21,7 +23,7 @@ public:
 
 	~Map();
 
-	void updateGameState(class Gamestate* newState);
+	void updateGameState(std::shared_ptr<Gamestate> newState);
 	void update(double deltaTime, double timeStamp);
 
     void drawGridStatic(Renderer&);
@@ -38,7 +40,7 @@ public:
 
 protected:
     ChatSystem m_chats;
-	class Gamestate* m_gamestate;
+	std::shared_ptr<Gamestate> m_gamestate;
 	class Input& m_input; 
 	class Networker& m_networker;
 	class EventSystem& m_eventSystem;

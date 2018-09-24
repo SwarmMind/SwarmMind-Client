@@ -33,16 +33,13 @@ private:
     std::shared_ptr<sio::socket> sioSocket;
     unsigned reconnectAttempts = -1;
     unsigned m_reconnectDelay = 100;
-
-    std::mutex queueLock;
-    std::queue<std::function<void()>> eventQueue;
-
+	
     void onStateReceive(sio::event event);
     void onInitStateReceive(sio::event event);
     void onAccumulatedCommandsReceive(sio::event event);
     void onChatReceive(sio::event event);
 
-    Gamestate* parseGamestate(nlohmann::json state);
+    std::shared_ptr<Gamestate> parseGamestate(nlohmann::json state);
     Configuration parseConfiguration(std::string jsonString);
     std::shared_ptr<class Command> parseCommand(const nlohmann::json& jsonCommand);
     void processCommands(nlohmann::json& commands);

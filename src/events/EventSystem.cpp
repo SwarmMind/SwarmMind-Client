@@ -1,6 +1,8 @@
-#include <events/EventSystem.h>
 #include <algorithm>
-#include <assert.h>
+#include <mutex>
+#include <cassert>
+
+#include <events/EventSystem.h>
 
 EventSystem::EventSystem()
 {
@@ -26,7 +28,23 @@ void EventSystem::removeListener(ListenerFunction* listener)
 	}
 }
 
-void EventSystem::processEvent(Event* _event)
+void EventSystem::postEvent(std::shared_ptr<Event> _event)
+{
+	std::lock_guard<std::mutex> queueGuard(queueLock);
+	eventQueue.emplace(_event);
+}
+
+void EventSystem::update(double deltaTime, double timeStamp)
+{
+	std::lock_guard<std::mutex> queueGuard(queueLock);
+	while (!eventQueue.empty())
+	{
+		processEvent(eventQueue.front());
+		eventQueue.pop();
+	}
+}
+
+void EventSystem::processEvent(std::shared_ptr<Event> _event)
 {
     //The loop looks a bit complicated, but a normal for-each loop cannot be used in the case of the deletion of a listener during the loop
     std::vector<ListenerFunction*> finishedListeners;
@@ -36,7 +54,7 @@ void EventSystem::processEvent(Event* _event)
     })) != listeners.end())
     {
         ListenerFunction* listener = *found;
-        (*listener)(_event);
+        (*listener)(_event.get());
         finishedListeners.push_back(listener);
     }
 }

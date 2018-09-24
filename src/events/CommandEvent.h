@@ -9,6 +9,9 @@ class CommandEvent : public Event
 {
 public:
 	CommandEvent() = default;
+	CommandEvent(const std::shared_ptr<Command>& _command)
+		: command{ _command }
+	{}
 
 	virtual ~CommandEvent() = default;
 

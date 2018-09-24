@@ -27,7 +27,7 @@ Map::Map(Input& _input, Networker& _networker, EventSystem& _eventSystem, const 
     , m_input{ _input }
 	, m_config{_config}
 	, m_networker{_networker}
-    , m_gamestate{ new Gamestate{_eventSystem} }
+    , m_gamestate{ std::make_shared<Gamestate>(_eventSystem) }
 	, m_lastUpdate{glfwGetTime()}
 	, m_eventSystem{_eventSystem}
     , m_chats{_input, _networker, _eventSystem, preset_username}
@@ -36,12 +36,10 @@ Map::Map(Input& _input, Networker& _networker, EventSystem& _eventSystem, const 
 
 Map::~Map()
 {
-	delete m_gamestate;
 }
 
-void Map::updateGameState(class Gamestate* newState)
+void Map::updateGameState(std::shared_ptr<Gamestate> newState)
 {
-    delete m_gamestate;
 	m_gamestate = newState;
 
 	m_lastUpdate = glfwGetTime();
@@ -52,13 +50,12 @@ void Map::updateGameState(class Gamestate* newState)
 void Map::receiveEvent(StateEvent* event)
 {
     updateGameState(event->m_state);
-    event->m_state = nullptr;
 }
 
 void Map::receiveEvent(AccumulatedCommandsEvent* event)
 {
-    m_numberOfGivenCommands = event->numberOfGivenCommands;
-    m_maxNumberOfCommands = event->maxNumberOfCommands;
+    m_numberOfGivenCommands = event->m_numberOfGivenCommands;
+    m_maxNumberOfCommands = event->m_maxNumberOfCommands;
 }
 
 void Map::sendCommand(std::string action, glm::vec2 direction)

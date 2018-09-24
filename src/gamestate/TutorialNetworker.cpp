@@ -21,20 +21,13 @@ void TutorialNetworker::sendCommand(uint32_t unitID, std::string action, glm::ve
     {
         commands.attackDirections = { direction };
     }
-
-    AccumulatedCommandsEvent commandsEvent;
-    commandsEvent.commands = { commands };
-    commandsEvent.maxNumberOfCommands = 1;
-    commandsEvent.numberOfGivenCommands = 0;
-
-    m_eventSystem.processEvent(&commandsEvent);
+	
+	m_eventSystem.processEvent(std::make_shared<AccumulatedCommandsEvent>(std::vector<AccumulatedCommands>{ commands }, 0, 1));
 }
 
 void TutorialNetworker::sendChatMessage(struct ChatEntry& chatEntry)
 {
-    ChatEvent chatEvent;
-    chatEvent.m_chatEntry = chatEntry;
-    m_eventSystem.processEvent(&chatEvent);
+    m_eventSystem.processEvent(std::make_shared<ChatEvent>(chatEntry));
 }
 
 void TutorialNetworker::update(double deltaTime, double timeStamp)
@@ -59,20 +52,16 @@ void TutorialNetworker::update(double deltaTime, double timeStamp)
         chatEntry.m_timeStamp = timeStamp;
         chatEntry.m_user = "Tutorial";
         
-        ChatEvent chatEvent;
-        chatEvent.m_chatEntry = chatEntry;
-        m_eventSystem.processEvent(&chatEvent);
+        m_eventSystem.processEvent(std::make_shared<ChatEvent>(chatEntry));
     }
 }
 
 void TutorialNetworker::begin(Renderer& renderer)
 {
-    InitStateEvent startEvent;
     Configuration config;
     config.m_roundTime = m_roundTime;
     config.m_sizeX = m_mapSize;
     config.m_sizeY = m_mapSize;
-    startEvent.m_config = config;
 
     m_unitPosition = glm::vec2(m_mapSize / 2, m_mapSize / 2) + 0.5f;
     std::map<uint32_t, Unit> units;
@@ -86,9 +75,7 @@ void TutorialNetworker::begin(Renderer& renderer)
     uint32_t monsterID = m_unitID + 3;
     monsters.emplace(monsterID, Monster(monsterID, m_monsterPosition));
 
-    startEvent.m_state = new Gamestate(m_eventSystem, units, monsters);
-
-    m_eventSystem.processEvent(&startEvent);
+	m_eventSystem.processEvent(std::make_shared<InitStateEvent>(0.0, config, std::make_shared<Gamestate>(m_eventSystem, units, monsters)));
 
 
     createMessages();
