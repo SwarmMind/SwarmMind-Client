@@ -95,7 +95,7 @@ void Sounds::playBackground() {
 		std::uniform_int_distribution<std::vector<sf::Music>::size_type> dist{ 0, game_music.size()-1 };
 		current_music = game_music.at(dist(random));
 	}
-	current_music->setVolume(0.9);
+	current_music->setVolume(70.0);
 
 	current_music->play();
 }
