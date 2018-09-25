@@ -200,26 +200,38 @@ static const double offset(const CommandType& type) {
 	return 0.0;
 }
 
-void GameNetworker::processCommands(nlohmann::json& jsonCommands)
+std::vector<std::shared_ptr<Command>> GameNetworker::processCommands(const nlohmann::json& jsonCommands)
 {
+	std::vector<std::shared_ptr<Command>> commands;
     for (const nlohmann::json& jsonCommand : jsonCommands)
     {
         std::shared_ptr<Command> command = parseCommand(jsonCommand);
-        if (command) {
-			eventSystem.postEvent(std::make_shared<CommandEvent>(command), offset(command->type()));
+		if (command) {
+			commands.emplace_back(command);
         }
     }
+	return commands;
 }
 
 void GameNetworker::onStateReceive(sio::event _event)
 {
     const string jsonMessage = _event.get_message()->get_string();
-    nlohmann::json jsonState = nlohmann::json::parse(jsonMessage);
-    auto state = parseGamestate(jsonState);
+    const nlohmann::json jsonState = nlohmann::json::parse(jsonMessage);
+    const auto state = parseGamestate(jsonState);
+	const auto jsonCommands = jsonState["commands"];
 
-	eventSystem.postEvent(std::make_shared<StateEvent>(state));
 
-    processCommands(jsonState["commands"]);
+	std::vector<TimedEvent> events;
+	events.reserve(jsonCommands.size() + 1);
+	events.emplace_back(std::make_shared<StateEvent>(state));
+	for (const nlohmann::json& jsonCommand : jsonCommands)
+	{
+		if (std::shared_ptr<Command> command = parseCommand(jsonCommand)) {
+			events.emplace_back(std::make_shared<CommandEvent>(command), offset(command->type()));
+		}
+	}
+
+	eventSystem.postEvents(events);
 }
 
 void GameNetworker::onInitStateReceive(sio::event _event)

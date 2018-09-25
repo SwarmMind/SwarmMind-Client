@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <mutex>
 #include <cassert>
+#include <functional>
 
 #include <events/EventSystem.h>
 
@@ -28,18 +29,29 @@ void EventSystem::removeListener(ListenerFunction* listener)
 	}
 }
 
-void EventSystem::postEvent(std::shared_ptr<Event> _event, double offset)
+void EventSystem::postEvent(const std::shared_ptr<Event> event) {
+	postEvent(TimedEvent{ event });
+}
+
+void EventSystem::postEvent(const TimedEvent& event)
 {
-	std::lock_guard<std::mutex> queueGuard(queueLock);
-	eventQueue.emplace(_event, glfwGetTime() + offset);
+	std::lock_guard<std::mutex> queueGuard{ queueLock };
+	eventQueue.emplace(event);
+}
+
+void EventSystem::postEvents(const std::vector<TimedEvent>& events)
+{
+	std::lock_guard<std::mutex> queueGuard{ queueLock };
+	std::for_each(events.cbegin(), events.cend(), [&](const auto& event) { eventQueue.push(event); });
 }
 
 void EventSystem::update(double deltaTime, double timeStamp)
 {
-	std::lock_guard<std::mutex> queueGuard(queueLock);
-	while (!eventQueue.empty() && eventQueue.top().is_due())
+	std::lock_guard<std::mutex> queueGuard{ queueLock };
+	const double now = glfwGetTime();
+	while (!eventQueue.empty() && eventQueue.top().is_due_at(now))
 	{
-		processEvent(eventQueue.top().m_event);
+		processEvent(eventQueue.top().get());
 		eventQueue.pop();
 	}
 }

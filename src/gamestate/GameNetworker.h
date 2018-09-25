@@ -42,5 +42,5 @@ private:
     std::shared_ptr<Gamestate> parseGamestate(nlohmann::json state);
     Configuration parseConfiguration(std::string jsonString);
     std::shared_ptr<class Command> parseCommand(const nlohmann::json& jsonCommand);
-    void processCommands(nlohmann::json& commands);
+    std::vector<std::shared_ptr<Command>> processCommands(const nlohmann::json& commands);
 };
