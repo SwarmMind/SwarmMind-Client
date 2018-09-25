@@ -21,43 +21,41 @@
 
 using namespace std;
 
-Map::Map(Input& _input, Networker& _networker, EventSystem& _eventSystem, const Configuration& _config)
+Map::Map(Input& _input, Networker& _networker, EventSystem& _eventSystem, const Configuration& _config, const std::string& preset_username)
 	: EventListener<StateEvent>{_eventSystem}
     , EventListener<AccumulatedCommandsEvent>{_eventSystem}
     , m_input{ _input }
 	, m_config{_config}
 	, m_networker{_networker}
-    , m_gamestate{ new Gamestate{_eventSystem} }
+    , m_gamestate{ std::make_shared<Gamestate>(_eventSystem) }
 	, m_lastUpdate{glfwGetTime()}
 	, m_eventSystem{_eventSystem}
-    , m_chats{_input, _networker, _eventSystem}
+    , m_chats{_input, _networker, _eventSystem, preset_username}
     , m_roundDuration{_config.m_roundTime}
 {}
 
 Map::~Map()
 {
-	delete m_gamestate;
 }
 
-void Map::updateGameState(class Gamestate* newState)
+void Map::updateGameState(std::shared_ptr<Gamestate> newState)
 {
-    delete m_gamestate;
 	m_gamestate = newState;
 
 	m_lastUpdate = glfwGetTime();
     m_numberOfGivenCommands = 0;
+    m_gamestate->setMap(this);
 }
 
 void Map::receiveEvent(StateEvent* event)
 {
     updateGameState(event->m_state);
-    event->m_state = nullptr;
 }
 
 void Map::receiveEvent(AccumulatedCommandsEvent* event)
 {
-    m_numberOfGivenCommands = event->numberOfGivenCommands;
-    m_maxNumberOfCommands = event->maxNumberOfCommands;
+    m_numberOfGivenCommands = event->m_numberOfGivenCommands;
+    m_maxNumberOfCommands = event->m_maxNumberOfCommands;
 }
 
 void Map::sendCommand(std::string action, glm::vec2 direction)
@@ -91,11 +89,8 @@ void Map::updateMouseCommand(Action action, std::string command, double deltaTim
 	if (!isUnitClicked(m_mouseClickPosition))
 	{
         const auto unit = m_gamestate->units.find(m_selectedUnit);
-        if (unit != m_gamestate->units.end() &&
-            isDirect &&
-            m_input.isActionJustReleased(action)) {
-            glm::vec2 delta = m_input.mousePositionInWorld() -
-                              unit->second.position();
+        if (unit != m_gamestate->units.end() && isDirect && m_input.isActionJustReleased(action)) {
+            glm::vec2 delta = m_input.mousePositionInWorld() - unit->second.position();
 			sendCommand(command, glm::normalize(delta));
             ParticleSystem::spawnAcknowledgeParticles(m_input.mousePositionInWorld());
         }
@@ -117,7 +112,7 @@ void Map::updateMouseCommand(Action action, std::string command, double deltaTim
 		glm::vec2 delta = m_input.mousePositionInWorld() - m_mouseClickPosition;
 		if (glm::length(delta) > minimumDragDistance)
 		{
-			ParticleSystem::mouseDragParticles(m_input.mousePositionInWorld(), m_mouseClickPosition, action == Move ? glm::vec4(0.1, 0.8, 0.1, 0.7) : glm::vec4(1, 0.5, 0.1, 0.8), deltaTime);
+			ParticleSystem::mouseDragParticles(m_input.mousePositionInWorld(), m_mouseClickPosition, action == Move ? glm::vec4(0.1, 0.8, 0.1, 0.7) : glm::vec4(1, 0.1, 0.1, 0.8), deltaTime);
 		}
 	}
 }
@@ -193,6 +188,14 @@ void Map::drawGridStatic(Renderer& renderer)
     }
 }
 
+void Map::drawWallsStatic(class Renderer& renderer, std::vector<glm::vec2> blockadePositions)
+{
+    for (glm::vec2 position : blockadePositions)
+    {
+        renderer.addStaticSprite(glm::vec3(position, 1.0), 1.0, 1.0, SpriteEnum::WallBlock);
+    }
+}
+
 void Map::drawEntities(Renderer& renderer) 
 {
 	m_gamestate->draw(renderer);
@@ -208,7 +211,7 @@ void Map::draw(class Renderer& renderer)
 	auto it = units.find(m_selectedUnit);
 	if (it != units.cend())
 	{
-		renderer.drawSprite(glm::vec3{it->second.position() - glm::vec2(0.5f, 0.5f), 0.4}, 1, 1, SpriteEnum::SelectedBlock);
+		renderer.drawSprite(glm::vec3{it->second.position() - glm::vec2(0.6f, 0.6f), 0.4}, 1.2f, 1.2f, SpriteEnum::SelectedBlock);
 	}
 
     drawRoundProgress();
@@ -217,9 +220,9 @@ void Map::draw(class Renderer& renderer)
 void Map::drawRoundProgress()
 {
     ImVec2 imGuiDisplaySize = ImGui::GetIO().DisplaySize;
-    ImVec2 position(imGuiDisplaySize.x / 2.0, imGuiDisplaySize.y - 30);
-    ImGui::SetNextWindowPos(position, ImGuiCond_Always, ImVec2(0.5, 1.0));
-    ImGui::SetNextWindowSize(ImVec2(imGuiDisplaySize.x / 2.0, 0.0f), ImGuiCond_Always);
+    ImVec2 position(imGuiDisplaySize.x / 2.0f, imGuiDisplaySize.y - 30.0f);
+    ImGui::SetNextWindowPos(position, ImGuiCond_Always, ImVec2(0.5f, 1.0f));
+    ImGui::SetNextWindowSize(ImVec2(imGuiDisplaySize.x / 2.0f, 0.0f), ImGuiCond_Always);
     if (ImGui::Begin("RoundProgressWindow", nullptr,
         ImGuiWindowFlags_NoTitleBar
         | ImGuiWindowFlags_NoCollapse
@@ -229,12 +232,12 @@ void Map::drawRoundProgress()
     {
         ImGui::TextUnformatted("Round Progress");
 
-        ImGui::ProgressBar(static_cast<double>(m_numberOfGivenCommands) / m_maxNumberOfCommands, ImVec2(-1, 0), "");
+        ImGui::ProgressBar(static_cast<double>(m_numberOfGivenCommands) / m_maxNumberOfCommands, ImVec2(-1.0f, 0.0f), "");
         ImGui::SameLine(ImGui::GetTextLineHeightWithSpacing());
         ImGui::TextUnformatted("Commands");
 
 
-        ImGui::ProgressBar((glfwGetTime() - m_lastUpdate) / m_roundDuration, ImVec2(-1, 0), "");
+        ImGui::ProgressBar((glfwGetTime() - m_lastUpdate) / m_roundDuration, ImVec2(-1.0f, 0.0f), "");
         ImGui::SameLine(ImGui::GetTextLineHeightWithSpacing());
         ImGui::TextUnformatted("Time");
     }

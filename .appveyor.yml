@@ -7,6 +7,7 @@ environment:
   GLFW_VER: 3.2.1
   GLM_VER: 0.9.9.0
   GLBINDING_VER: 3.0.2
+  SFML_VER: 2.5.0
 cache:
   - C:\projects\glfw
   - C:\projects\glbinding
@@ -59,11 +60,16 @@ install:
   - cmake -DCMAKE_BUILD_TYPE=%CONFIGURATION% -DCMAKE_INSTALL_PREFIX=C:\deps\sioclient -DCMAKE_CXX_FLAGS="/D_SCL_SECURE_NO_WARNINGS /EHsc" -DBOOST_ROOT=C:\Libraries\boost_1_67_0 -DBOOST_VER=1.67.0 -G "Visual Studio 15 2017 Win64" ../sioclient
   - cmake --build . --config %CONFIGURATION%
   - cmake --build . --config %CONFIGURATION% --target install
+  
+  - if not exist "C:\deps\sfml" mkdir "C:\deps\sfml"
+  - ps: appveyor DownloadFile "https://www.sfml-dev.org/files/SFML-$env:SFML_VER-windows-vc15-64-bit.zip" -FileName "C:\deps\sfml\sfml.zip"
+  - cd "C:\deps\sfml"
+  - 7z x sfml.zip
 
 before_build:
   - cd C:\projects\swarmmind-client
   - mkdir build && cd build
-  - cmake -DCMAKE_BUILD_TYPE=$env:CONFIGURATION -DCMAKE_PREFIX_PATH=C:\deps\glfw;C:\deps\glbinding;C:\deps\sioclient -DSIOCLIENT_USE_FIND_PACKAGE=ON -G "Visual Studio 15 2017 Win64" ..
+  - cmake -DCMAKE_BUILD_TYPE=%CONFIGURATION% -DCMAKE_PREFIX_PATH=C:\deps\glfw;C:\deps\glbinding;C:\deps\sioclient;C:\deps\sfml\SFML-%SFML_VER% -DSIOCLIENT_USE_FIND_PACKAGE=ON -G "Visual Studio 15 2017 Win64" ..
 build:
   project: build\SwarmMind-Client.sln
   verbosity: minimal
@@ -75,6 +81,7 @@ after_build:
   - ps: cp build\src\$env:CONFIGURATION\SwarmMind-Client.exe package
   - ps: cp -r -v fonts package
   - ps: cp -r -v shaders package
+  - ps: cp -r -v sound package
   - ps: cp -r -v res package
 
 artifacts:

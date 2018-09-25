@@ -1,6 +1,8 @@
 find_package(glfw3 REQUIRED)
 find_package(glbinding REQUIRED)
 find_package(glm REQUIRED)
+set(SFML_STATIC_LIBRARIES TRUE)
+find_package(SFML COMPONENTS audio REQUIRED)
 
 set(sources "main.cpp")
 
@@ -13,10 +15,11 @@ add_subdirectory(input)
 add_subdirectory(game)
 add_subdirectory(menu)
 add_subdirectory(events)
+add_subdirectory(sound)
 
 add_executable(SwarmMind-Client ${sources})
 
-target_link_libraries(SwarmMind-Client PRIVATE imgui)
+target_link_libraries(SwarmMind-Client PRIVATE imgui sfml-audio)
 
 #Replicate the directory structure in Visual Studio filters
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${sources})

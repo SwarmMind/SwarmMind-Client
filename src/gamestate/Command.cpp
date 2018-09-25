@@ -2,74 +2,104 @@
 #include <gamestate/Entity.h>
 #include <gamestate/Gamestate.h>
 #include <renderer/ParticleSystem.h>
+#include <sound/Sounds.h>
+#include <gamestate/Gamestate.h>
+#include <gamestate/Map.h>
+#include <stdlib.h>
+#include <time.h>
 
-Command::Command(uint32_t _ID)
-	: ID{_ID}
+
+Command::Command(uint32_t _ID, CommandType _type)
+	: m_type{_type}
+	, ID{_ID}
 {}
+
+CommandType Command::type() const {
+	return m_type;
+}
 
 //////////////////////////////////////////////////////////////////////////
 //						DieCommand
 //////////////////////////////////////////////////////////////////////////
 DieCommand::DieCommand(uint32_t _ID)
-	: Command(_ID)
+	: Command(_ID, CommandType::Die)
 {}
 
 void DieCommand::executeOn(Gamestate& state)
 {
-	state.deleteEntity(ID);
+    state.deleteEntity(ID);
 }
 
-DirectionalCommand::DirectionalCommand(uint32_t _ID, glm::vec2 _direction)
-	: Command(_ID)
+DirectionalCommand::DirectionalCommand(uint32_t _ID, CommandType _type, glm::vec2 _direction)
+	: Command(_ID, _type)
 	, direction{_direction}
 {}
 
+//////////////////////////////////////////////////////////////////////////	
+//						 MoveCommand
+//////////////////////////////////////////////////////////////////////////
+
 MoveCommand::MoveCommand(uint32_t _ID, glm::vec2 _direction)
-	: DirectionalCommand{_ID, _direction}
+	: DirectionalCommand(_ID, CommandType::Move, _direction)
 {}
 
 void MoveCommand::executeOn(Gamestate& state)
 {
-	Entity* entity = state.getEntityByID(ID);
-	if (entity != nullptr)
-	{
-		entity->moveTo(entity->position() + direction);
-	}
+    Entity* entity = state.getEntityByID(ID);
+	if (!entity) return;
+
+    entity->moveTo(entity->position() + direction);
 }
-
-
-
 
 //////////////////////////////////////////////////////////////////////////	
 //						AttackCommand
 //////////////////////////////////////////////////////////////////////////
 AttackCommand::AttackCommand(uint32_t _ID, glm::vec2 _direction)
-	: DirectionalCommand(_ID, _direction)
+	: DirectionalCommand(_ID, CommandType::Attack, _direction)
 {}
 
 void AttackCommand::executeOn(Gamestate& state)
 {
 	Unit* unit = dynamic_cast<Unit*>(state.getEntityByID(ID));
-	if (unit != nullptr)
-	{
-		ParticleSystem::spawnShootParticles(unit->position() + glm::normalize(direction) * 0.3f, direction);
-	}
+	if (!unit) return;
+	
+    ParticleSystem::spawnShootParticles(unit->position() + glm::normalize(direction) * 0.3f, direction);
 }
-
-
 
 //////////////////////////////////////////////////////////////////////////
 //						DamageCommand
 //////////////////////////////////////////////////////////////////////////
 DamageCommand::DamageCommand(uint32_t _ID, glm::vec2 _direction)
-	: DirectionalCommand(_ID, _direction)
+	: DirectionalCommand(_ID, CommandType::Damage, _direction)
 {}
 
 void DamageCommand::executeOn(Gamestate& state)
 {
 	Entity* entity = state.getEntityByID(ID);
-	if (entity != nullptr)
-	{
-		ParticleSystem::spawnBloodParticles(entity->position(), direction);
-	}
+	if (!entity) return;
+
+    ParticleSystem::spawnBloodParticles(entity->position(), direction);
+}
+
+
+
+//////////////////////////////////////////////////////////////////////////
+//                      SpawnCommand
+//////////////////////////////////////////////////////////////////////////
+SpawnCommand::SpawnCommand(uint32_t _ID, glm::vec2 position, bool isUnit)
+    : Command(_ID, CommandType::Spawn)
+    , m_position(position)
+    , m_isUnit(isUnit)
+{}
+
+void SpawnCommand::executeOn(Gamestate& state)
+{
+    if (m_isUnit)
+    {
+        state.units.emplace(ID, Unit(ID, m_position));
+    }
+    else
+    {
+        state.monsters.emplace(ID, Monster(ID, m_position));
+    }
 }

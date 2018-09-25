@@ -16,6 +16,8 @@
 class Configuration 
 {
 public:
+    std::vector<glm::vec2> m_blockadePositions;
+
 	uint32_t m_sizeX;
 	uint32_t m_sizeY;
 
@@ -41,4 +43,6 @@ public:
 
 	std::map<uint32_t, Unit> units;
 	std::map<uint32_t, Monster> monsters;
+    class Map* m_map;
+    void setMap(class Map* map);
 };

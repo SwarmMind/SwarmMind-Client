@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 #include <renderer/Textures.h>
 #include <renderer/Sprites.h>
 #include <gamestate/Gamestate.h>
@@ -12,34 +14,38 @@
 #include <gamestate/ChatSystem.h>
 #include <events/StateEvent.h>
 #include <events/AccumulatedCommandsEvent.h>
+#include <sound/Sounds.h>
 
 class Map : public EventListener<StateEvent>, public EventListener<AccumulatedCommandsEvent>
 {
 public:
-	Map(class Input& _input, Networker& _networker, class EventSystem& _eventSystem, const class Configuration& config);
+	Map(class Input& _input, Networker& _networker, class EventSystem& _eventSystem, const class Configuration& config, const std::string& preset_username);
 
 	~Map();
 
-	void updateGameState(class Gamestate* newState);
-
+	void updateGameState(std::shared_ptr<Gamestate> newState);
 	void update(double deltaTime, double timeStamp);
+
     void drawGridStatic(Renderer&);
 	void draw(class Renderer& renderer);
-
-	const double moveAnimationTime = 3.0;
+    void drawWallsStatic(class Renderer& renderer, std::vector<glm::vec2> blockadePositions);	
 
     virtual void receiveEvent(StateEvent* event) override;
     virtual void receiveEvent(AccumulatedCommandsEvent* event) override;
 
-	double m_lastUpdate;
+    std::string username() const { return m_chats.username(); }
+
+    const double moveAnimationTime = 3.0;
+	double m_lastUpdate;	 
+
 protected:
     ChatSystem m_chats;
-	class Gamestate* m_gamestate;
-	class Input& m_input;
+	std::shared_ptr<Gamestate> m_gamestate;
+	class Input& m_input; 
 	class Networker& m_networker;
 	class EventSystem& m_eventSystem;
-    class Configuration m_config;
-	
+    Configuration m_config;
+    
     bool trackpadMode = true;
 
 	int32_t m_selectedUnit = 0;

@@ -51,21 +51,21 @@ void ParticleRenderer::initializeStaticData()
 	glGenTextures(1, &staticParticleData);
 	glBindTexture(GL_TEXTURE_2D, staticParticleData);
 
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, textureSize, textureSize, 0, GL_RGBA, GL_FLOAT, nullptr);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, (GLsizei)textureSize, (GLsizei)textureSize, 0, GL_RGBA, GL_FLOAT, nullptr);
 	setTextureParameters();
 
 	
 	glGenTextures(1, &particleColor);
 	glBindTexture(GL_TEXTURE_2D, particleColor);
 	
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, textureSize, textureSize, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, (GLsizei)textureSize, (GLsizei)textureSize, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
 	setTextureParameters();
 }
 
 void ParticleRenderer::initializeDynamicData(unsigned int index)
 {
 	glBindTexture(GL_TEXTURE_2D, dynamicParticleData[index]);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, textureSize, textureSize, 0, GL_RGBA, GL_FLOAT, nullptr);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, (GLsizei)textureSize, (GLsizei)textureSize, 0, GL_RGBA, GL_FLOAT, nullptr);
 	setTextureParameters();
 
 	glBindFramebuffer(GL_FRAMEBUFFER, frameBuffers[index]);
@@ -143,7 +143,7 @@ void ParticleRenderer::intializeUniforms()
 
 	glUseProgram(particleDrawingProgram);
 	GLuint textureSizeUniform = glGetUniformLocation(particleDrawingProgram, "particleTextureSize");
-	glUniform1ui(textureSizeUniform, textureSize);
+	glUniform1ui(textureSizeUniform, (GLuint)textureSize);
 	GLuint particleColorSampler = glGetUniformLocation(particleDrawingProgram, "particleColorSampler");
 	glUniform1i(particleColorSampler, 1);
 
@@ -172,7 +172,7 @@ void ParticleRenderer::setFrameBufferTextures(int index)
 	glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, dynamicParticleData[index], 0);
 
 	std::array<GLenum, 1> drawBuffers = { GL_COLOR_ATTACHMENT0 };
-	glDrawBuffers(drawBuffers.size(), drawBuffers.data());
+	glDrawBuffers((GLsizei)drawBuffers.size(), drawBuffers.data());
 }
 
 void ParticleRenderer::addParticlesFromQueue()
@@ -189,11 +189,11 @@ void ParticleRenderer::updateParticles(double deltaTime)
 {
 	glDisable(GL_BLEND);
 	glDisable(GL_DEPTH_TEST);
-	glViewport(0, 0, textureSize, textureSize);
+	glViewport(0, 0, (GLsizei)textureSize, (GLsizei)textureSize);
 	glUseProgram(particleUpdateProgram);
 	glBindVertexArray(updateVao);
 
-	glUniform1f(deltaTimeUniform, deltaTime);
+	glUniform1f(deltaTimeUniform, (GLfloat)deltaTime);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, frameBuffers[back]);
 	glActiveTexture(GL_TEXTURE1);
@@ -229,7 +229,7 @@ void ParticleRenderer::drawParticles()
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, dynamicParticleData[front]);
 
-	glDrawArraysInstanced(GL_TRIANGLES, 0, 6, textureSize * textureSize);
+	glDrawArraysInstanced(GL_TRIANGLES, 0, 6, (GLsizei)(textureSize * textureSize));
 
 	glDepthMask(GL_TRUE);
 }
@@ -256,21 +256,21 @@ void ParticleRenderer::addParticles(ParticleSystem particles)
 	assert(particles.dynamicData.size() == particles.staticData.size());
 	assert(particles.dynamicData.size() == particles.color.size());
 
-	unsigned int dataOffset = 0;
-	unsigned int dataSize = particles.dynamicData.size() / 4;
+	size_t dataOffset = 0;
+	size_t dataSize = particles.dynamicData.size() / 4;
 	while (dataOffset < dataSize)
 	{
 		//write the particle data, one row at a time
-		unsigned int xOffset = textureOffset % textureSize;
-		unsigned int yOffset = textureOffset / textureSize	;
-		unsigned int remainingWidth = std::min(textureSize - xOffset, dataSize - dataOffset);
+		size_t xOffset = textureOffset % textureSize;
+		size_t yOffset = textureOffset / textureSize	;
+		size_t remainingWidth = std::min(textureSize - xOffset, dataSize - dataOffset);
 
 		glBindTexture(GL_TEXTURE_2D, dynamicParticleData[front]);
 		glTexSubImage2D(GL_TEXTURE_2D, 
 			0, 
-			xOffset, 
-			yOffset, 
-			remainingWidth, 
+			(GLint)xOffset, 
+			(GLint)yOffset,
+			(GLsizei)remainingWidth, 
 			1, 
 			GL_RGBA, GL_FLOAT, 
 			particles.dynamicData.data() + dataOffset * 4);
@@ -278,9 +278,9 @@ void ParticleRenderer::addParticles(ParticleSystem particles)
 		glBindTexture(GL_TEXTURE_2D, staticParticleData);
 		glTexSubImage2D(GL_TEXTURE_2D,
 			0,
-			xOffset,
-			yOffset,
-			remainingWidth,
+			(GLint)xOffset,
+			(GLint)yOffset,
+			(GLsizei)remainingWidth,
 			1,
 			GL_RGBA,
 			GL_FLOAT,
@@ -289,9 +289,9 @@ void ParticleRenderer::addParticles(ParticleSystem particles)
 		glBindTexture(GL_TEXTURE_2D, particleColor);
 		glTexSubImage2D(GL_TEXTURE_2D,
 			0,
-			xOffset,
-			yOffset,
-			remainingWidth,
+			(GLint)xOffset,
+			(GLint)yOffset,
+			(GLsizei)remainingWidth,
 			1,
 			GL_RGBA,
 			GL_UNSIGNED_BYTE,

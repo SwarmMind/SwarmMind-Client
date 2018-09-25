@@ -8,6 +8,8 @@ template <class T>
 class EventListener
 {
 public:
+	EventListener() = delete;
+
 	EventListener(EventSystem& system)
 		: _eventSystem { system }
 	{

@@ -36,7 +36,6 @@ void Game::initializeOpenGL() {
         if (error != 0)
             std::cout << "error: " << std::hex << error << std::endl;
     });
-	
     std::cout << "OpenGL Version: " << glbinding::aux::ContextInfo::version().toString() << std::endl;
     std::cout << "GPU Vendor: " << glbinding::aux::ContextInfo::vendor() << std::endl;
 }
@@ -47,7 +46,7 @@ GLFWwindow * Game::createWindow() {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, true);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	GLFWwindow *window = glfwCreateWindow(720, 720, "SwarmMind", nullptr, nullptr);
+	GLFWwindow *window = glfwCreateWindow(1280, 720, "SwarmMind", nullptr, nullptr);
 	if (!window)
 	{
 		throw std::runtime_error{
@@ -64,12 +63,13 @@ GLFWwindow * Game::createWindow() {
 }
 
 Game::Game()
-    : window{ createWindow() }
-    , camera{ window, 10, 10, 11 }
-    , renderer{ window, camera }
+	: sounds{ eventSystem }
+    , window { createWindow() }
+    , camera { window, 10, 10, 11 }
+    , renderer { window, camera }
     , imguiRenderer{ window }
-    , input{ window, &camera }
-    , sprites{ textures }
+    , input { window, &camera }
+    , sprites { textures }
 {
 	initializeImGui();
 
@@ -78,12 +78,24 @@ Game::Game()
 
 void Game::connectTo(std::string address, unsigned int port)
 {
-	menu = std::make_unique<ConnectedState>(*this, renderer, input, eventSystem, address, port);
+	settings.hostname = address;
+	settings.port = port;
+	settings.save();
+
+    renderer.clearStaticData();
+	menu = std::make_unique<ConnectedState>(*this, renderer, input, eventSystem, settings);
+
+	sounds.inMainMenu(false);
 }
 
 void Game::openMainMenu()
 {
-	menu = std::make_unique<MainMenuState>(this);
+	settings.read();
+
+    menu = nullptr; //Delete the ConnectedState first!
+                    //Important, because otherwise it is still registered as an EventListener
+	menu = std::make_unique<MainMenuState>(this, eventSystem, input, renderer, settings);
+	sounds.inMainMenu(true);
 }
 
 void Game::initializeImGui()
@@ -95,6 +107,28 @@ void Game::initializeImGui()
 	ImGuiStyle& style = ImGui::GetStyle();
 	style.WindowRounding = 0;
 	
+    //Colors
+    ImVec4 windowBg = ImVec4(.9f, .9f, .9f, 1);
+    ImVec4 buttonBg = ImVec4(.8f, .8f, .8f, 1);
+    ImVec4 highlightColor = ImVec4(.9f, .7f, 0, 0.7f);
+    ImVec4 activeColor = ImVec4(.9f, .7f, 0, 1.f);
+    
+    //Window style
+    style.Colors[ImGuiCol_WindowBg] = windowBg;
+    style.Colors[ImGuiCol_TitleBg] = windowBg;
+    style.Colors[ImGuiCol_TitleBgActive] = buttonBg;
+    style.Colors[ImGuiCol_PopupBg] = windowBg;
+
+    //Window elements
+    style.Colors[ImGuiCol_Text] = ImVec4(.2f, .2f, .2f, 1.0f);
+    style.Colors[ImGuiCol_Button] = buttonBg;
+    style.Colors[ImGuiCol_ButtonHovered] = highlightColor;
+    style.Colors[ImGuiCol_ButtonActive] = activeColor;
+    style.Colors[ImGuiCol_TextSelectedBg] = highlightColor;
+    style.Colors[ImGuiCol_FrameBg] = buttonBg;
+    style.Colors[ImGuiCol_Header] = buttonBg;
+    style.Colors[ImGuiCol_HeaderHovered] = highlightColor;
+    style.Colors[ImGuiCol_HeaderActive] = activeColor;
 }
 
 Game::~Game() {
@@ -110,17 +144,17 @@ void Game::processInputs(double deltaTime)
 
 void Game::update(double time, double timeStamp)
 {
-    imguiRenderer.preRender(); //Required before any update in order for popups to work!
+    imguiRenderer.preRender(); // required before any update in order for popups to work!
+	eventSystem.update(time, timeStamp);
     menu->update(time, timeStamp);
+	sounds.update();
 }
 
 void Game::render(double timeElapsed)
 {
     renderer.preDraw();
-
 	menu->draw(renderer);
 	drawDebug(timeElapsed);
-
     renderer.draw(timeElapsed);
     imguiRenderer.render();
     glfwSwapBuffers(window);
@@ -156,9 +190,9 @@ void Game::drawDebug(double timeElapsed)
 		{
 			width = ImGui::GetWindowWidth();
 			height = ImGui::GetWindowHeight();
-			ImGui::TextColored(ImVec4(0.7, 0.1, 0.1, 0.5), "Leon");
+			ImGui::TextColored(ImVec4(0.7f, 0.1f, 0.1f, 0.5f), "Leon");
 			ImGui::Separator();
-			ImGui::TextColored(ImVec4(0.8, 0.8, 0.8, 0.5), "My Fancy chat window!");
+			ImGui::TextColored(ImVec4(0.8f, 0.8f, 0.8f, 0.5f), "My Fancy chat window!");
 		}
 		ImGui::End();
 
