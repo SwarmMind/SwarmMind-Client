@@ -79,7 +79,7 @@ void Gamestate::receiveEvent(CommandEvent* event)
 
 void Gamestate::receiveEvent(AccumulatedCommandsEvent* event)
 {
-	for (AccumulatedCommands commands : event->commands)
+	for (AccumulatedCommands commands : event->m_commands)
 	{
 		Unit* unit = dynamic_cast<Unit*>(getEntityByID(commands.ID));
 		if (unit != nullptr)

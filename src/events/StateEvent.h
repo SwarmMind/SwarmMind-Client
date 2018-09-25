@@ -7,14 +7,14 @@
 class StateEvent : public Event
 {
 public:
-    StateEvent() 
-        : m_state{nullptr}
+    StateEvent()
     {}
+	StateEvent(std::shared_ptr<Gamestate> state)
+		: m_state(state)
+	{}
 
     virtual ~StateEvent()
-    {
-        delete m_state;
-    }
+    {}
 
-    class Gamestate* m_state;
+    std::shared_ptr<Gamestate> m_state;
 };
