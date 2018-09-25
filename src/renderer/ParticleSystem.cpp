@@ -44,10 +44,10 @@ void ParticleSystem::spawnBloodParticles(glm::vec2 position, glm::vec2 direction
 		offset = glm::normalize(offset);
 		glm::vec2 particleDirection = offset + direction * randomFloatBetween(1.f, 2.f);
 
-		offset *= randomFloatBetween(0, 0.3);
-		particleDirection *= randomFloatBetween(0.5, 1);
+		offset *= randomFloatBetween(0, 0.3f);
+		particleDirection *= randomFloatBetween(0.5f, 1.0f);
 
-		GLfloat lifeTime = randomFloatBetween(0.2, 0.7);
+		GLfloat lifeTime = randomFloatBetween(0.2f, 0.7f);
 
 		GLubyte r = 200, g = 10, b = 20;
 		randomizeColor(r, g, b, 30);
@@ -70,13 +70,13 @@ void ParticleSystem::spawnShootParticles(glm::vec2 position, glm::vec2 direction
 	//Muzzle flash
 	for (size_t i = 0; i < 200; i++)
 	{
-		float angle = randomFloatBetween(-10, 10);
+		float angle = randomFloatBetween(-10.0f, 10.0f);
 		glm::vec2 randomizedDirection = glm::rotate(direction, glm::radians(angle));
 		glm::vec2 velocity = randomizedDirection * randomFloatBetween(0.2f, 1.f);
 		glm::vec2 offset = glm::normalize(glm::vec2(randomFloatBetween(-1.f, -1.f), randomFloatBetween(-1.f, 1.f))) * randomFloatBetween(0, 0.2f);
 		offset += randomizedDirection * randomFloatBetween(0.f, 0.3f);
 
-		GLfloat lifeTime = randomFloatBetween(0.2, 0.7);
+		GLfloat lifeTime = randomFloatBetween(0.2f, 0.7f);
 
 		glm::vec4 color(1.f, 0.64f, 0.f, 0.5f);
 		color = randomizeColor(color, 0.2f, true);
@@ -91,12 +91,12 @@ void ParticleSystem::mouseDragParticles(glm::vec2 mousePosition, glm::vec2 targe
 {
 	ParticleSystem particles;
 	for (size_t i = 0; i <= 100 * deltaTime; i++) {
-		glm::vec2 offset(randomFloatBetween(-1, 1), randomFloatBetween(-1, 1));
+		glm::vec2 offset(randomFloatBetween(-1.0f, 1.0f), randomFloatBetween(-1.0f, 1.0f));
 		offset = glm::normalize(offset) * randomFloatBetween(0.f, 0.2f);
 
 		glm::vec2 position = offset + mousePosition;
 		glm::vec2 velocity = target - position;
-		float lifeTime = randomFloatBetween(0.3, 0.7);
+		float lifeTime = randomFloatBetween(0.3f, 0.7f);
 		particles.addParticle(position, velocity, lifeTime, color);
 	}
 	addParticles(particles);
@@ -111,12 +111,12 @@ void ParticleSystem::spawnAcknowledgeParticles(glm::vec2 position)
 		offset = glm::normalize(offset);
 		glm::vec2 direction = offset;
 
-		offset *= randomFloatBetween(0, 0.1);
-		direction *= randomFloatBetween(0.5, 1);
+		offset *= randomFloatBetween(0.0f, 0.1f);
+		direction *= randomFloatBetween(0.5f, 1.0f);
 
-		GLfloat lifeTime = randomFloatBetween(0.1, 0.5);
+		GLfloat lifeTime = randomFloatBetween(0.1f, 0.5f);
 
-		particles.addParticle(offset + position, direction, lifeTime, glm::vec4(1 , 0.8f, 0.f, 0.8));
+		particles.addParticle(offset + position, direction, lifeTime, glm::vec4(1.0f, 0.8f, 0.f, 0.8f));
 	}
 	addParticles(particles);
 }
@@ -135,9 +135,11 @@ float ParticleSystem::randomFloat()
 
 void ParticleSystem::randomizeColor(GLubyte& r, GLubyte& g, GLubyte b, GLubyte maximumDeviation)
 {
-	r = clamp(r + randomFloatBetween(-maximumDeviation, maximumDeviation), 0.f, 255.f);
-	g = clamp(g + randomFloatBetween(-maximumDeviation, maximumDeviation), 0.f, 255.f);
-	b = clamp(b + randomFloatBetween(-maximumDeviation, maximumDeviation), 0.f, 255.f);
+	const float from = (float)-maximumDeviation;
+	const float to = (float)maximumDeviation;
+	r = (GLubyte)clamp((float)r + randomFloatBetween(from, to), 0.f, 255.f);
+	g = (GLubyte)clamp((float)g + randomFloatBetween(from, to), 0.f, 255.f);
+	b = (GLubyte)clamp((float)b + randomFloatBetween(from, to), 0.f, 255.f);
 }
 
 glm::vec4 ParticleSystem::randomizeColor(glm::vec4 color, float maximumDeviation, bool randomizeAlpha /*= false*/)
@@ -162,11 +164,11 @@ void ParticleSystem::addParticle(GLfloat x, GLfloat y, GLfloat xVelocity, GLfloa
 	dynamicData.push_back(x);
 	dynamicData.push_back(y);
 	dynamicData.push_back(lifetime);
-	dynamicData.push_back(0);
+	dynamicData.push_back(0.0f);
 
 	staticData.push_back(xVelocity);
 	staticData.push_back(yVelocity);
-	staticData.push_back(0);
+	staticData.push_back(0.0f);
 	staticData.push_back(0);
 
 	color.push_back(r);

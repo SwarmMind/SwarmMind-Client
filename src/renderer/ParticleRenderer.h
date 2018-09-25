@@ -20,9 +20,9 @@ public:
 	void addParticles(ParticleSystem particles);
 
 private:
-	unsigned int particleCount;
-	unsigned int textureSize = 256;
-	GLfloat particleSize = 0.04;
+	size_t particleCount;
+	size_t textureSize = 256;
+	GLfloat particleSize = 0.04f;
 
 	unsigned int front = 0;
 	unsigned int back = 1;
@@ -44,7 +44,7 @@ private:
 
 	GLuint deltaTimeUniform;
 
-	unsigned int textureOffset = 0;
+	size_t textureOffset = 0;
 
 	//setup
 	void initializeStaticData();

@@ -85,16 +85,16 @@ float Input::cameraMovementSpeed() {
 void Input::moveCamera(double deltaTime) 
 {
 	if (isActionPressed(MoveCameraDown)) {
-		_camera->setCamera(_camera->getX(), _camera->getY() - cameraMovementSpeed() * deltaTime, _camera->getHeight());
+		_camera->setCamera(_camera->getX(), _camera->getY() - cameraMovementSpeed() * (float)deltaTime, _camera->getHeight());
 	}
 	if (isActionPressed(MoveCameraUp)) {
-		_camera->setCamera(_camera->getX(), _camera->getY() + cameraMovementSpeed() * deltaTime, _camera->getHeight());
+		_camera->setCamera(_camera->getX(), _camera->getY() + cameraMovementSpeed() * (float)deltaTime, _camera->getHeight());
 	}
 	if (isActionPressed(MoveCameraRight)) {
-		_camera->setCamera(_camera->getX() + cameraMovementSpeed() * deltaTime, _camera->getY(), _camera->getHeight());
+		_camera->setCamera(_camera->getX() + cameraMovementSpeed() * (float)deltaTime, _camera->getY(), _camera->getHeight());
 	}
 	if (isActionPressed(MoveCameraLeft)) {
-		_camera->setCamera(_camera->getX() - cameraMovementSpeed() * deltaTime, _camera->getY(), _camera->getHeight());
+		_camera->setCamera(_camera->getX() - cameraMovementSpeed() * (float)deltaTime, _camera->getY(), _camera->getHeight());
 	}
 
 

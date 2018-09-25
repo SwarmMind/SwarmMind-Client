@@ -134,7 +134,7 @@ void ChatSystem::draw(Renderer& renderer)
 
 float ChatSystem::calculateAlpha(Camera &camera)
 {
-    return 1.0 - glm::smoothstep(8.f, 10.f, camera.getHeight());
+    return 1.0f - glm::smoothstep(8.f, 10.f, camera.getHeight());
 }
 
 void ChatSystem::drawChatIcons(Renderer& renderer)
@@ -156,7 +156,7 @@ void ChatSystem::drawChats(Renderer& renderer)
     glm::vec2 cameraPosition = glm::vec2(camera.getX(), camera.getY());
     glm::vec2 cameraView = glm::vec2(camera.getWidth(), camera.getHeight());
 
-    float alpha = calculateAlpha(renderer.camera());
+    const float alpha = calculateAlpha(renderer.camera());
 
     for (size_t i = 0; i < m_chats.size(); i++)
     {
@@ -171,7 +171,7 @@ void ChatSystem::drawChats(Renderer& renderer)
         //flip y
         position.y = displaySize.y - position.y;
 
-        ImGui::SetNextWindowBgAlpha(alpha * 0.7);
+        ImGui::SetNextWindowBgAlpha(alpha * 0.7f);
         ImGui::SetNextWindowPos(ImVec2(position.x, position.y), ImGuiCond_Always);
         if (ImGui::Begin((std::string("ChatWindow") + to_string(i)).data(),
             nullptr,
@@ -182,9 +182,9 @@ void ChatSystem::drawChats(Renderer& renderer)
             | ImGuiWindowFlags_NoSavedSettings
             | ImGuiWindowFlags_NoInputs))
         {
-            ImGui::TextColored(ImVec4(0.2, 0.2, 0.2, alpha), chat.m_user.data());
+            ImGui::TextColored(ImVec4(0.2f, 0.2f, 0.2f, alpha), chat.m_user.data());
             ImGui::Separator();
-            ImGui::TextColored(ImVec4(.4, .4, .4, alpha), chat.m_text.data());
+            ImGui::TextColored(ImVec4(.4f, .4f, .4f, alpha), chat.m_text.data());
         }
         ImGui::End();
     }

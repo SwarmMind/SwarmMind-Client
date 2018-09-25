@@ -120,7 +120,7 @@ void Game::initializeImGui()
     style.Colors[ImGuiCol_PopupBg] = windowBg;
 
     //Window elements
-    style.Colors[ImGuiCol_Text] = ImVec4(.2, .2, .2, 1);
+    style.Colors[ImGuiCol_Text] = ImVec4(.2f, .2f, .2f, 1.0f);
     style.Colors[ImGuiCol_Button] = buttonBg;
     style.Colors[ImGuiCol_ButtonHovered] = highlightColor;
     style.Colors[ImGuiCol_ButtonActive] = activeColor;
@@ -190,9 +190,9 @@ void Game::drawDebug(double timeElapsed)
 		{
 			width = ImGui::GetWindowWidth();
 			height = ImGui::GetWindowHeight();
-			ImGui::TextColored(ImVec4(0.7, 0.1, 0.1, 0.5), "Leon");
+			ImGui::TextColored(ImVec4(0.7f, 0.1f, 0.1f, 0.5f), "Leon");
 			ImGui::Separator();
-			ImGui::TextColored(ImVec4(0.8, 0.8, 0.8, 0.5), "My Fancy chat window!");
+			ImGui::TextColored(ImVec4(0.8f, 0.8f, 0.8f, 0.5f), "My Fancy chat window!");
 		}
 		ImGui::End();
 

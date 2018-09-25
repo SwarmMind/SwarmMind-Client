@@ -73,7 +73,7 @@ void Sounds::play(SoundEnum soundName) {
 sf::SoundBuffer& Sounds::selectRandom(SoundEnum soundName) {
 	const auto range = m_buffers.equal_range(soundName);
 	std::uniform_int_distribution<std::multimap<SoundEnum, sf::SoundBuffer>::iterator::difference_type> dist{ 0, std::distance(range.first, range.second)-1 };
-	unsigned int advance = dist(random);
+	auto advance = dist(random);
 	auto it = range.first;
 	while (advance--) it++;
 	return it->second;

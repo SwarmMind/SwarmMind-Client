@@ -220,9 +220,9 @@ void Map::draw(class Renderer& renderer)
 void Map::drawRoundProgress()
 {
     ImVec2 imGuiDisplaySize = ImGui::GetIO().DisplaySize;
-    ImVec2 position(imGuiDisplaySize.x / 2.0, imGuiDisplaySize.y - 30);
-    ImGui::SetNextWindowPos(position, ImGuiCond_Always, ImVec2(0.5, 1.0));
-    ImGui::SetNextWindowSize(ImVec2(imGuiDisplaySize.x / 2.0, 0.0f), ImGuiCond_Always);
+    ImVec2 position(imGuiDisplaySize.x / 2.0f, imGuiDisplaySize.y - 30.0f);
+    ImGui::SetNextWindowPos(position, ImGuiCond_Always, ImVec2(0.5f, 1.0f));
+    ImGui::SetNextWindowSize(ImVec2(imGuiDisplaySize.x / 2.0f, 0.0f), ImGuiCond_Always);
     if (ImGui::Begin("RoundProgressWindow", nullptr,
         ImGuiWindowFlags_NoTitleBar
         | ImGuiWindowFlags_NoCollapse
@@ -232,12 +232,12 @@ void Map::drawRoundProgress()
     {
         ImGui::TextUnformatted("Round Progress");
 
-        ImGui::ProgressBar(static_cast<double>(m_numberOfGivenCommands) / m_maxNumberOfCommands, ImVec2(-1, 0), "");
+        ImGui::ProgressBar(static_cast<double>(m_numberOfGivenCommands) / m_maxNumberOfCommands, ImVec2(-1.0f, 0.0f), "");
         ImGui::SameLine(ImGui::GetTextLineHeightWithSpacing());
         ImGui::TextUnformatted("Commands");
 
 
-        ImGui::ProgressBar((glfwGetTime() - m_lastUpdate) / m_roundDuration, ImVec2(-1, 0), "");
+        ImGui::ProgressBar((glfwGetTime() - m_lastUpdate) / m_roundDuration, ImVec2(-1.0f, 0.0f), "");
         ImGui::SameLine(ImGui::GetTextLineHeightWithSpacing());
         ImGui::TextUnformatted("Time");
     }
