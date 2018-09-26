@@ -48,9 +48,7 @@ void EventSystem::postEvents(const std::vector<TimedEvent>& events)
 void EventSystem::update(double deltaTime, double timeStamp)
 {
 	std::lock_guard<std::mutex> queueGuard{ queueLock };
-	const double now = glfwGetTime();
-	while (!eventQueue.empty() && eventQueue.top().is_due_at(now))
-	{
+	while (!eventQueue.empty() && eventQueue.top().is_due_at(timeStamp)) {
 		processEvent(eventQueue.top().get());
 		eventQueue.pop();
 	}
