@@ -83,6 +83,7 @@ after_build:
   - ps: cp -r -v shaders package
   - ps: cp -r -v sound package
   - ps: cp -r -v res package
+  - ps: cp C:\deps\sfml\SFML-$env:SFML_VER\bin\openal32.dll package
 
 artifacts:
   - path: package
