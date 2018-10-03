@@ -71,7 +71,7 @@ install:
 before_build:
   - cd C:\projects\swarmmind-client
   - mkdir build && cd build
-  - cmake -DCMAKE_BUILD_TYPE=%CONFIGURATION% -DCMAKE_PREFIX_PATH=C:\deps\glfw;C:\deps\glbinding;C:\deps\sioclient;C:\deps\sfml\SFML-%SFML_VER% -DSIOCLIENT_USE_FIND_PACKAGE=ON -G "Visual Studio 15 2017 Win64" ..
+  - cmake -DCMAKE_BUILD_TYPE=%CONFIGURATION% -DCMAKE_PREFIX_PATH=C:\deps\glfw;C:\deps\glbinding;C:\deps\sioclient;C:\deps\sfml\SFML-%SFML_VER% -G "Visual Studio 15 2017 Win64" ..
 build:
   project: build\SwarmMind-Client.sln
   verbosity: minimal
