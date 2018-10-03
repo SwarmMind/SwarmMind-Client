@@ -2,7 +2,7 @@
 
 #include <array>
 #include <vector>
-#include <glm/vec4.hpp>
+#include <glm/vec2.hpp>
 #include <glbinding/gl41core/gl.h>
 using namespace gl41core;
 
