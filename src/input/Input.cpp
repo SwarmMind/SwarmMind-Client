@@ -8,8 +8,8 @@
 using namespace std;
 
 Input::Input(GLFWwindow* window, Camera* camera)
-	: _window{window} 
-	, _camera{camera}
+	: m_window{window} 
+	, m_camera{camera}
 {
 	actionStatus[Move]       =  ActionStatus({ GLFW_MOUSE_BUTTON_LEFT });
     actionStatus[MoveDirect] =  ActionStatus({ KeyBinding { GLFW_MOUSE_BUTTON_LEFT, GLFW_MOD_SHIFT } });
@@ -30,16 +30,16 @@ Input::Input(GLFWwindow* window, Camera* camera)
 
 	actionStatus[Debug] = ActionStatus({ GLFW_KEY_PERIOD });
 
-	glfwSetWindowUserPointer(_window, this);
+	glfwSetWindowUserPointer(m_window, this);
 	auto scrollLambda = [](GLFWwindow* window, double xoffset, double yoffset) {
 		static_cast<Input*>(glfwGetWindowUserPointer(window))->scrollCallback(window, xoffset, yoffset);		
 	};
-	glfwSetScrollCallback(_window, scrollLambda);
+	glfwSetScrollCallback(m_window, scrollLambda);
 }
 
 Input::~Input() 
 {
-	glfwSetScrollCallback(_window, nullptr);
+	glfwSetScrollCallback(m_window, nullptr);
 }
 
 bool Input::isActionReleased(Action action)
@@ -75,26 +75,26 @@ void Input::update(double deltaTime)
 
 void Input::scrollCallback(GLFWwindow* window, double xoffset, double yoffset) 
 {
-    _camera->setCamera(_camera->getX(), _camera->getY(), std::max(2.0 ,std::min(_camera->getHeight() - yoffset, 20.0)));
+    m_camera->setHeight(std::max(2.0f, std::min(m_camera->height() - static_cast<float>(yoffset), 20.0f)));
 }
 
 float Input::cameraMovementSpeed() {
-	return _camera->getHeight();
+	return m_camera->height();
 }
 
 void Input::moveCamera(double deltaTime) 
 {
 	if (isActionPressed(MoveCameraDown)) {
-		_camera->setCamera(_camera->getX(), _camera->getY() - cameraMovementSpeed() * (float)deltaTime, _camera->getHeight());
+		m_camera->scroll(Orientation::Vertical, true, deltaTime);
 	}
 	if (isActionPressed(MoveCameraUp)) {
-		_camera->setCamera(_camera->getX(), _camera->getY() + cameraMovementSpeed() * (float)deltaTime, _camera->getHeight());
+		m_camera->scroll(Orientation::Vertical, false, deltaTime);
 	}
 	if (isActionPressed(MoveCameraRight)) {
-		_camera->setCamera(_camera->getX() + cameraMovementSpeed() * (float)deltaTime, _camera->getY(), _camera->getHeight());
+		m_camera->scroll(Orientation::Horizontal, false, deltaTime);
 	}
 	if (isActionPressed(MoveCameraLeft)) {
-		_camera->setCamera(_camera->getX() - cameraMovementSpeed() * (float)deltaTime, _camera->getY(), _camera->getHeight());
+		m_camera->scroll(Orientation::Horizontal, true, deltaTime);
 	}
 
 
@@ -104,8 +104,7 @@ void Input::moveCamera(double deltaTime)
     }
     if (isActionPressed(MoveCamera))
     {
-        glm::vec2 delta = mousePositionInWorld() - m_mouseMoveClickPosition;
-        _camera->setCamera(_camera->getX() - delta.x, _camera->getY() - delta.y, _camera->getHeight());
+		m_camera->move(m_mouseMoveClickPosition - mousePositionInWorld());
     }
 }
 
@@ -129,7 +128,7 @@ bool Input::isAnyKeyPressed(std::vector<KeyBinding> glfwKeys)
 	bool imGuiConsumesInput = ImGui::GetIO().WantCaptureKeyboard;
 	for (KeyBinding keyCode: glfwKeys)
 	{
-		if (glfwGetKey(_window, keyCode.m_key) == GLFW_PRESS &&
+		if (glfwGetKey(m_window, keyCode.m_key) == GLFW_PRESS &&
             ((keyCode.m_modifiers & GLFW_MOD_SHIFT) != 0) == ImGui::GetIO().KeyShift &&
             !imGuiConsumesInput)
 		{
@@ -143,7 +142,7 @@ bool Input::isMousePressed(std::vector<KeyBinding> glfwKeys) {
 	bool imGuiConsumesInput = ImGui::GetIO().WantCaptureMouse;
 
 	for (KeyBinding mouseCode : glfwKeys) {
-    	if (glfwGetMouseButton(_window, mouseCode.m_key) == GLFW_PRESS &&
+    	if (glfwGetMouseButton(m_window, mouseCode.m_key) == GLFW_PRESS &&
             ((mouseCode.m_modifiers & GLFW_MOD_SHIFT) != 0) == ImGui::GetIO().KeyShift &&
             !imGuiConsumesInput) {
 	    		return true;
@@ -153,13 +152,11 @@ bool Input::isMousePressed(std::vector<KeyBinding> glfwKeys) {
 }
 
 void Input::setMousePosition() {
-	glfwGetCursorPos(_window, &_xMousePosition, &_yMousePosition);
+	glfwGetCursorPos(m_window, &m_xMousePosition, &m_yMousePosition);
 }
 
-glm::vec2 Input::getMousePosition() {
-	float xFloatMousePosition = (float)_xMousePosition;
-	float yFloatMousePosition = (float)_yMousePosition;
-	return glm::vec2(xFloatMousePosition, yFloatMousePosition);
+glm::vec2 Input::getMousePosition() const {
+	return glm::vec2( static_cast<float>(m_xMousePosition), static_cast<float>(m_yMousePosition));
 }
 
 glm::vec2 Input::mousePositionInWorld() {
@@ -169,7 +166,7 @@ glm::vec2 Input::mousePositionInWorld() {
 glm::vec2 Input::screenToWorldCoordinate(glm::vec2 mousePosition) {
 
 	int bufferWidth, bufferHeight;
-	glfwGetWindowSize(_window, &bufferWidth, &bufferHeight);
+	glfwGetWindowSize(m_window, &bufferWidth, &bufferHeight);
 	
 	// set origin to lower left corner
 	mousePosition.y = bufferHeight - mousePosition.y;
@@ -182,8 +179,9 @@ glm::vec2 Input::screenToWorldCoordinate(glm::vec2 mousePosition) {
 	mousePosition.x = mousePosition.x * 2 - 1;
 	mousePosition.y = mousePosition.y * 2 - 1; 
 	
-	mousePosition.x = mousePosition.x * _camera->getWidth() + _camera->getX();
-	mousePosition.y = mousePosition.y * _camera->getHeight() + _camera->getY();	
+	const auto pos = m_camera->position();
+	mousePosition.x = mousePosition.x * m_camera->width() + pos.x;
+	mousePosition.y = mousePosition.y * m_camera->height() + pos.y;	
 
 	return glm::vec2(mousePosition.x, mousePosition.y);
 }

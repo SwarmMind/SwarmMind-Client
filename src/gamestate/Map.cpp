@@ -232,12 +232,12 @@ void Map::drawRoundProgress()
     {
         ImGui::TextUnformatted("Round Progress");
 
-        ImGui::ProgressBar(static_cast<double>(m_numberOfGivenCommands) / m_maxNumberOfCommands, ImVec2(-1.0f, 0.0f), "");
+        ImGui::ProgressBar(static_cast<float>(m_numberOfGivenCommands) / m_maxNumberOfCommands, ImVec2(-1.0f, 0.0f), "");
         ImGui::SameLine(ImGui::GetTextLineHeightWithSpacing());
         ImGui::TextUnformatted("Commands");
 
 
-        ImGui::ProgressBar((glfwGetTime() - m_lastUpdate) / m_roundDuration, ImVec2(-1.0f, 0.0f), "");
+        ImGui::ProgressBar(static_cast<float>((glfwGetTime() - m_lastUpdate) / m_roundDuration), ImVec2(-1.0f, 0.0f), "");
         ImGui::SameLine(ImGui::GetTextLineHeightWithSpacing());
         ImGui::TextUnformatted("Time");
     }

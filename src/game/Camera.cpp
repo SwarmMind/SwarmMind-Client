@@ -3,16 +3,15 @@
 
 
 Camera::Camera(GLFWwindow* window) 
-	: _window{ window }
+	: m_window{ window }
 {
 
 }
 
 Camera::Camera(GLFWwindow* window, float x, float y, float height)
-    : _window{ window }
-    , _x{ x }
-    , _y{ y }
-    , _height{ height } {
+    : m_window{ window }
+    , m_pos{ x, y }
+    , m_height{ height } {
 
 }
 
@@ -21,31 +20,53 @@ Camera::~Camera()
 
 }
 
-void Camera::setCamera(float x, float y, float height)
-{
-	_x = x;
-	_y = y;
-	_height = height;
+void Camera::scroll(const Orientation orientation, const bool reverse, const double deltaTime) {
+	const float speed = static_cast<float>(deltaTime) * m_height * (reverse ? (-1.0f) : 1.0f);
+
+	switch (orientation) {
+	case Orientation::Horizontal:
+		m_pos.x += speed;
+		break;
+	case Orientation::Vertical:
+		m_pos.y += speed;
+		break;
+	}
 }
 
-float Camera::getWidth() 
+void Camera::move(const glm::vec2 direction) {
+	m_pos += direction;
+}
+
+void Camera::setPosition(const float x, const float y)
+{
+	m_pos.x = x;
+	m_pos.y = y;
+}
+
+void Camera::setHeight(float height)
+{
+	m_height = height;
+}
+
+float Camera::width() const noexcept
 {
 	int bufferWidth, bufferHeight;
-	glfwGetFramebufferSize(_window, &bufferWidth, &bufferHeight);
-	return (static_cast<float>(bufferWidth) / static_cast<float>(bufferHeight)) * _height;
+	glfwGetFramebufferSize(m_window, &bufferWidth, &bufferHeight);
+	return (static_cast<float>(bufferWidth) / static_cast<float>(bufferHeight)) * m_height;
 }
 
-float Camera::getHeight() 
+float Camera::height() const noexcept
 {
-	return _height;
+	return m_height;
 }
 
-float Camera::getX() 
+glm::vec2 Camera::position() const noexcept
 {
-	return _x;
+	return m_pos;
 }
 
-float Camera::getY() 
+glm::vec2 Camera::extent() const noexcept
 {
-	return _y;
+	return glm::vec2{ width(), m_height };
 }
+

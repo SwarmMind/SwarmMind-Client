@@ -81,7 +81,8 @@ void TutorialNetworker::begin(Renderer& renderer)
     createMessages();
     m_delayToNextMessage = m_messages.front().m_delay;
 
-    renderer.camera().setCamera(14, 11, 7);
+    renderer.camera().setPosition(14, 11);
+	renderer.camera().setHeight(7);
 }
 
 void TutorialNetworker::createMessages()

@@ -68,12 +68,12 @@ public:
 
 private:
 	unordered_map<Action, ActionStatus> actionStatus;
-	GLFWwindow* _window;
-	Camera* _camera;
+	GLFWwindow* m_window;
+	Camera* m_camera;
 
     glm::vec2 m_mouseMoveClickPosition;
-	double _xMousePosition, _yMousePosition;
-	glm::vec2 getMousePosition();
+	double m_xMousePosition, m_yMousePosition;
+	glm::vec2 getMousePosition() const;
 	
 	void updateAction(Action action);
 

@@ -56,11 +56,12 @@ OpenGLRenderer::~OpenGLRenderer()
 void OpenGLRenderer::uploadCamera()
 {
 	glUseProgram(program);
-	glUniform1f(xLocation, m_camera.getX());
-	glUniform1f(yLocation, m_camera.getY());
+	const auto pos = m_camera.position();
+	glUniform1f(xLocation, pos.x);
+	glUniform1f(yLocation, pos.y);
 
-	glUniform1f(widthLocation, m_camera.getWidth());
-	glUniform1f(heightLocation, m_camera.getHeight());
+	glUniform1f(widthLocation, m_camera.width());
+	glUniform1f(heightLocation, m_camera.height());
 }
 
 std::array<GLfloat, 6*5> spriteVertices(glm::vec3 pos, float width, float height, Sprite* sprite) {

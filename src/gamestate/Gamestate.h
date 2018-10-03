@@ -18,8 +18,8 @@ class Configuration
 public:
     std::vector<glm::vec2> m_blockadePositions;
 
-	uint32_t m_sizeX;
-	uint32_t m_sizeY;
+	float m_sizeX;
+	float m_sizeY;
 
     double m_roundTime = 1.0;
 };

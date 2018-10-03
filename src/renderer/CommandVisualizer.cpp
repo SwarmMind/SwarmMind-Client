@@ -80,7 +80,7 @@ void CommandVisualizer::setCommands(std::vector<glm::vec2> directions)
 	float maxAlpha = *std::max_element(vertexAlphas.begin(), vertexAlphas.end());
 	for (size_t i = 0; i < vertexAlphas.size(); i++)
 	{
-		vertexColors.at(i * 4 + 3) = 255 * (vertexAlphas.at(i) / maxAlpha);
+		vertexColors.at(i * 4 + 3) = static_cast<GLubyte>(255.0f * (vertexAlphas.at(i) / maxAlpha));
 	}
 
 	//First and last vertex must have the same values

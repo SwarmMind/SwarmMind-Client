@@ -237,8 +237,9 @@ void ParticleRenderer::drawParticles()
 void ParticleRenderer::uploadCamera(int frameBufferWidth, int frameBufferHeight)
 {
 	glUseProgram(particleDrawingProgram);
-	glUniform2f(cameraPositionUniform, camera.getX(), camera.getY());
-	glUniform2f(cameraSizeUniform, camera.getWidth(), camera.getHeight());
+	const auto pos = camera.position(), extent = camera.extent();
+	glUniform2f(cameraPositionUniform, pos.x, pos.y);
+	glUniform2f(cameraSizeUniform, extent.x, extent.y);
 }
 
 void ParticleRenderer::draw(double deltaTime)

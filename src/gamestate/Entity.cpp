@@ -37,7 +37,7 @@ void Entity::moveTo(glm::vec2 position)
 void Entity::update(double deltaTime)
 {
 	glm::vec2 difference = targetPos - currentPosition;
-	float distanceToMove = velocity * deltaTime;
+	float distanceToMove = velocity * static_cast<float>(deltaTime);
 	if (glm::length(difference) <= distanceToMove)
 	{
 		currentPosition = targetPos;
