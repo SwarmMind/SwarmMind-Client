@@ -83,5 +83,4 @@ private:
 
 	void scrollCallback(GLFWwindow* window, double xoffset, double yoffset);
 	void moveCamera(double deltaTime);
-	float cameraMovementSpeed();
 };

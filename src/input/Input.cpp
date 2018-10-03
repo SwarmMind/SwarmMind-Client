@@ -78,10 +78,6 @@ void Input::scrollCallback(GLFWwindow* window, double xoffset, double yoffset)
     m_camera->setHeight(std::max(2.0f, std::min(m_camera->height() - static_cast<float>(yoffset), 20.0f)));
 }
 
-float Input::cameraMovementSpeed() {
-	return m_camera->height();
-}
-
 void Input::moveCamera(double deltaTime) 
 {
 	if (isActionPressed(MoveCameraDown)) {
