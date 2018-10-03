@@ -2,6 +2,8 @@
 
 #include <vector>
 #include <queue>
+#include <random>
+
 #include <glbinding/gl41core/gl.h>
 #include <glm/fwd.hpp>
 using namespace gl41core;
@@ -10,7 +12,7 @@ class ParticleSystem
 {
 public:
 	ParticleSystem();
-
+	//ParticleSystem(const ParticleSystem& rhs) = delete;
 	~ParticleSystem();
 
 	std::vector<GLfloat> dynamicData;
@@ -44,12 +46,9 @@ private:
 	static std::queue<ParticleSystem> particleQueue;
 	
 	//helper functions for random
-	static float randomFloat();
-	static void randomizeColor(GLubyte& r, GLubyte& g, GLubyte b, GLubyte maximumDeviation);
 	static glm::vec4 randomizeColor(glm::vec4 color, float maximumDeviation, bool randomizeAlpha = false);
-	template<class T>
-	static T clamp(T value, T minimum, T maximum);
-
+	
 	static float randomFloatBetween(float minimum, float maximum);
 
+	static glm::vec2 randomOffset(float maximum);
 };
