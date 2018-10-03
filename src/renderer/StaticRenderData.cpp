@@ -34,7 +34,7 @@ StaticRenderData::StaticRenderData(const StaticRenderData& other)
     glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
     glBufferData(GL_ARRAY_BUFFER, m_bufferVertexSize * vertexSize(), nullptr, GL_STATIC_DRAW);
     glBindBuffer(GL_COPY_READ_BUFFER, other.m_vbo);
-    glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_ARRAY_BUFFER, 0, 0, m_bufferVertexSize);
+    glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_ARRAY_BUFFER, 0, 0, m_bufferVertexSize * vertexSize());
 
     unsigned int stride = m_floatsPerVertex * sizeof(GLfloat);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, 0);
