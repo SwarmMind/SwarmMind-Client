@@ -179,7 +179,7 @@ void ParticleSystem::addParticle(GLfloat x, GLfloat y, GLfloat xVelocity, GLfloa
 
 void ParticleSystem::addParticle(glm::vec2 position, glm::vec2 velocity, float lifeTime, glm::vec4 color)
 {
-	const auto as_byte = [](float x) { return static_cast<GLubyte>(x); };
+	const auto as_byte = [](float x) { return static_cast<GLubyte>(x * 255.0f); };
 	addParticle(
 		position.x, position.y,
 		velocity.x, velocity.y,
