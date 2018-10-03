@@ -12,8 +12,6 @@ environment:
     - GLM_VER: 0.9.9.2
 matrix:
   fast_finish: true
-  allow_failures:
-    - GLM_VER: 0.9.9.2
 cache:
   - C:\projects\glfw
   - C:\projects\glbinding
