@@ -5,9 +5,11 @@ configuration:
   - Debug
 environment:
   GLFW_VER: 3.2.1
-  GLM_VER: 0.9.9.0
   GLBINDING_VER: 3.0.2
   SFML_VER: 2.5.0
+  matrix:
+	- GLM_VER: 0.9.9.0
+	- GLM_VER: 0.9.9.2
 cache:
   - C:\projects\glfw
   - C:\projects\glbinding
