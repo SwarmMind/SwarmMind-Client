@@ -193,7 +193,7 @@ void ParticleRenderer::updateParticles(double deltaTime)
 	glUseProgram(particleUpdateProgram);
 	glBindVertexArray(updateVao);
 
-	glUniform1f(deltaTimeUniform, (GLfloat)deltaTime);
+	glUniform1f(deltaTimeUniform, static_cast<GLfloat>(deltaTime));
 
 	glBindFramebuffer(GL_FRAMEBUFFER, frameBuffers[back]);
 	glActiveTexture(GL_TEXTURE1);

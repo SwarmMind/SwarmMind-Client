@@ -19,7 +19,7 @@ public:
 
 	void moveTo(glm::vec2 position);
 
-	void update(float deltaTime);
+	void update(double deltaTime);
 	virtual void draw(class Renderer& renderer);
 protected:
 	Entity(std::uint32_t _id, glm::vec2 _position);

@@ -34,7 +34,7 @@ void Entity::moveTo(glm::vec2 position)
 	targetPos = position;
 }
 
-void Entity::update(float deltaTime)
+void Entity::update(double deltaTime)
 {
 	glm::vec2 difference = targetPos - currentPosition;
 	float distanceToMove = velocity * deltaTime;
@@ -61,7 +61,7 @@ void Entity::draw(class Renderer& renderer)
 Unit::Unit(std::uint32_t _id, glm::vec2 _position)
 	: Entity(_id, _position)
 	, attackVisualizer(255, 30, 30)
-	, moveVisualizer(30, 255, 30, 0.7)
+	, moveVisualizer(30, 255, 30, 0.7f)
 {}
 
 Unit::Unit(const nlohmann::json& json)
