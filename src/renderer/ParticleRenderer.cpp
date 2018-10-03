@@ -177,11 +177,11 @@ void ParticleRenderer::setFrameBufferTextures(int index)
 
 void ParticleRenderer::addParticlesFromQueue()
 {
-	std::queue<ParticleSystem>& particleSystems = ParticleSystem::particlesToSpawn();
-	while (particleSystems.size() > 0)
+	std::queue<Particles>& particles = ParticleSystem::particlesToSpawn();
+	while (!particles.empty())
 	{
-		addParticles(particleSystems.front());
-		particleSystems.pop();
+		addParticles(particles.front());
+		particles.pop();
 	}
 }
 
@@ -251,7 +251,7 @@ void ParticleRenderer::draw(double deltaTime)
 	drawParticles();
 }
 
-void ParticleRenderer::addParticles(ParticleSystem particles)
+void ParticleRenderer::addParticles(Particles particles)
 {
 	assert(particles.dynamicData.size() % 4 == 0);
 	assert(particles.dynamicData.size() == particles.staticData.size());
