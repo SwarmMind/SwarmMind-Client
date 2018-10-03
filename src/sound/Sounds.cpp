@@ -1,5 +1,5 @@
 #include <random>
-
+#include <cstdint>
 #include <sound/Sounds.h>
 
 Sounds::Sounds(EventSystem& event_system)
@@ -8,11 +8,12 @@ Sounds::Sounds(EventSystem& event_system)
 	, random{ std::random_device{}() }
 	, current_music{ nullptr }
 {
-    for (auto pair : soundFiles)
-    {
+	const size_t filecount = soundFiles.size();
+	uint32_t current_file = 1;
+    for (const auto pair: soundFiles) {
 		bool success;
 
-		std::cout << "Loading sound file \"" << pair.second << "\"... ";
+		std::cout << "[" << current_file++ << "/" << filecount << "] Loading \"" << pair.second << "\"... ";
 		std::cout.flush();
 		switch (pair.first) {
 		case SoundEnum::Background:
