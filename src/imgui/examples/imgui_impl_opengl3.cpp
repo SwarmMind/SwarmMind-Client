@@ -309,7 +309,8 @@ void ImGui_ImplOpenGL3_DestroyFontsTexture()
 // If you get an error please report on github. You may try different GL context version or GLSL version.
 static bool CheckShader(GLuint handle, const char* desc)
 {
-    GLint status = 0, log_length = 0;
+	GLboolean status = GL_FALSE;
+	GLint log_length = 0;
     glGetShaderiv(handle, GL_COMPILE_STATUS, &status);
     glGetShaderiv(handle, GL_INFO_LOG_LENGTH, &log_length);
     if (status == GL_FALSE)
@@ -327,7 +328,8 @@ static bool CheckShader(GLuint handle, const char* desc)
 // If you get an error please report on github. You may try different GL context version or GLSL version.
 static bool CheckProgram(GLuint handle, const char* desc)
 {
-    GLint status = 0, log_length = 0;
+	GLboolean status = GL_FALSE;
+	GLint log_length = 0;
     glGetProgramiv(handle, GL_LINK_STATUS, &status);
     glGetProgramiv(handle, GL_INFO_LOG_LENGTH, &log_length);
     if (status == GL_FALSE)
