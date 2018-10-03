@@ -3,14 +3,17 @@ set(sources
     imgui.cpp
     imgui.h
     imgui_draw.cpp
+    imgui_widgets.cpp
     imgui_internal.h
-    stb_rect_pack.h
-    stb_textedit.h
-    stb_truetype.h
-    examples/opengl3_example/imgui_impl_glfw_gl3.cpp
-    examples/opengl3_example/imgui_impl_glfw_gl3.h)
+    imstb_rectpack.h
+    imstb_textedit.h
+    imstb_truetype.h
+    examples/imgui_impl_glfw.cpp
+    examples/imgui_impl_glfw.h
+    examples/imgui_impl_opengl3.cpp
+    examples/imgui_impl_opengl3.h)
 
 add_library(imgui STATIC ${sources})
 target_include_directories(imgui PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(imgui PRIVATE glbinding::glbinding glfw)
+target_link_libraries(imgui PUBLIC glbinding::glbinding glfw)
 
