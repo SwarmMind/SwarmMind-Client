@@ -1,6 +1,10 @@
 #pragma once
+
 #include <map>
+#include <memory>
+
 #include <renderer/Textures.h>
+#include <renderer/Sprite.h>
 
 using namespace std;
 
@@ -26,9 +30,9 @@ public:
 
 	~Sprites();
 
-	class Sprite* get(SpriteEnum sprite);
+	std::shared_ptr<Sprite> get(SpriteEnum sprite);
 
 private:
 	map<SpriteEnum, SpriteInitList> spriteTextures();
-	map<SpriteEnum, class Sprite*> sprites;
+	map<SpriteEnum, std::shared_ptr<Sprite>> sprites;
 };

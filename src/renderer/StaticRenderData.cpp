@@ -3,7 +3,7 @@
 
 const int StaticRenderData::defaultBufferVertexSize = 8192;
 
-StaticRenderData::StaticRenderData(class Texture* texture)
+StaticRenderData::StaticRenderData(std::shared_ptr<Texture> texture)
     : m_texture{texture}
     , m_bufferVertexSize{defaultBufferVertexSize}
 {
@@ -81,7 +81,7 @@ void StaticRenderData::draw()
     glDrawArrays(GL_TRIANGLES, 0, vertexCount);
 }
 
-class Texture* StaticRenderData::texture()
+std::shared_ptr<Texture> StaticRenderData::texture()
 {
     return m_texture;
 }

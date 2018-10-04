@@ -64,11 +64,11 @@ void OpenGLRenderer::uploadCamera()
 	glUniform1f(heightLocation, m_camera.height());
 }
 
-std::array<GLfloat, 6*5> spriteVertices(glm::vec3 pos, float width, float height, Sprite* sprite) {
-	GLfloat u = sprite->u();
-	GLfloat v = sprite->v();
-	GLfloat u2 = sprite->u2();
-	GLfloat v2 = sprite->v2();
+std::array<GLfloat, 6*5> spriteVertices(glm::vec3 pos, float width, float height, std::shared_ptr<Sprite> sprite) {
+	GLfloat u = sprite->u;
+	GLfloat v = sprite->v;
+	GLfloat u2 = sprite->u2;
+	GLfloat v2 = sprite->v2;
 
 	return std::array<GLfloat, 6*5> {
 		pos.x,			pos.y,			pos.z,			u,	v,
@@ -84,20 +84,19 @@ std::array<GLfloat, 6*5> spriteVertices(glm::vec3 pos, float width, float height
 *	\brief draws a sprite at the specified position
 *	\param z has to be between 0 and 1, where 1 is the most "in front" and 0 is the most "in back"
 */
-void OpenGLRenderer::drawSprite(glm::vec3 pos, float width, float height, Sprite* sprite)
+void OpenGLRenderer::drawSprite(glm::vec3 pos, float width, float height, std::shared_ptr<Sprite> sprite)
 {
 	unsigned int vertsPerSprite = 6;
 	unsigned int floatsPerVert = 5;
 	unsigned int floatsPerSprite = floatsPerVert * vertsPerSprite;
 
-	Texture* texture = sprite->texture();
-	TextureRenderData& textureData = renderData[texture];
+	TextureRenderData& textureData = renderData[sprite->texture->ID()];
 	
     const auto data = spriteVertices(pos, width, height, sprite);
 
 	if (!textureData.addData(floatsPerSprite, data.data()))
 	{
-		drawTexture(texture);
+		drawTexture(sprite->texture->ID());
 		textureData.addData(floatsPerSprite, data.data());
 	}
 }
@@ -112,21 +111,19 @@ Camera& OpenGLRenderer::camera()
     return m_camera;
 }
 
-void OpenGLRenderer::addStaticSprite(glm::vec3 pos, float width, float height, Sprite* sprite)
+void OpenGLRenderer::addStaticSprite(glm::vec3 pos, float width, float height, std::shared_ptr<Sprite> sprite)
 {
     unsigned int vertsPerSprite = 6;
     unsigned int floatsPerVert = 5;
     unsigned int floatsPerSprite = floatsPerVert * vertsPerSprite;
 
-    Texture* texture = sprite->texture();
-   
     auto iterator = std::find_if(m_staticRenderData.begin(), m_staticRenderData.end(), [=](StaticRenderData& data) {
-        return texture->ID() == data.texture()->ID();
+        return sprite->texture->ID() == data.texture()->ID();
     });
     bool found = iterator != m_staticRenderData.end();
     if (!found)
     {
-        m_staticRenderData.emplace_back(StaticRenderData(texture));
+        m_staticRenderData.emplace_back(StaticRenderData(sprite->texture));
     }
     StaticRenderData& renderData = found ? *iterator : m_staticRenderData.back();
 
@@ -149,10 +146,10 @@ void OpenGLRenderer::drawCommandVisualizer(glm::vec3 pos, CommandVisualizer& vis
 	commandRenderer.drawCommandVisualizer(pos, visualizer);
 }
 
-void OpenGLRenderer::drawTexture(Texture* texture)
+void OpenGLRenderer::drawTexture(TextureID textureID)
 {
-	TextureRenderData& textureData = renderData[texture];
-	glBindTexture(GL_TEXTURE_2D, texture->ID());
+	TextureRenderData& textureData = renderData[textureID];
+	glBindTexture(GL_TEXTURE_2D, textureID);
 
 	textureData.draw();
 }

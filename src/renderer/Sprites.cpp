@@ -12,7 +12,7 @@ Sprites::Sprites(class Textures& textures)
 	for (auto& spriteInit : spriteList)
 	{
 		SpriteInitList initList = spriteInit.second;
-		sprites[spriteInit.first] = new Sprite(
+		sprites[spriteInit.first] = std::make_shared<Sprite>(
 			textures[initList.texture],
 			initList.u,
 			initList.v,
@@ -24,13 +24,9 @@ Sprites::Sprites(class Textures& textures)
 
 Sprites::~Sprites()
 {
-	for (auto& sprite : sprites)
-	{
-		delete sprite.second;
-	}
 }
 
-class Sprite* Sprites::get(SpriteEnum sprite)
+std::shared_ptr<Sprite> Sprites::get(SpriteEnum sprite)
 {
 	auto iterator = sprites.find(sprite);
 	if (iterator == sprites.end())

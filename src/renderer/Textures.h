@@ -1,6 +1,9 @@
 #pragma once
 #include <map>
 #include <string>
+#include <memory>
+
+#include <renderer/Texture.h>
 
 using namespace std;
 
@@ -20,11 +23,11 @@ public:
 	Textures();
 
 	~Textures();
-	class Texture* operator[](TextureEnum texture);
-	class Texture* get(TextureEnum texture);
+	std::shared_ptr<Texture> operator[](TextureEnum texture);
+	std::shared_ptr<Texture> get(TextureEnum texture);
 
 private:
-	map<TextureEnum, class Texture*> textures;
+	map<TextureEnum, std::shared_ptr<Texture>> textures;
 	map<TextureEnum, string> texturePaths();
 
 };
