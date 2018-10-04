@@ -93,7 +93,7 @@ void ConnectedState::receiveEvent(InitStateEvent* event) {
     map->updateGameState(event->m_state);
     map->m_lastUpdate -= event->m_timeSinceLastRound;
 
-	eventSystem.postEvent(std::make_shared<SoundEvent>(SoundEnum::NextRound));
+	eventSystem.processEvent(std::make_shared<SoundEvent>(SoundEnum::NextRound));
 }
 
 void ConnectedState::receiveEvent(DisconnectEvent* event) {
