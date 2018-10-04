@@ -86,14 +86,15 @@ void Sounds::playRandom(SoundEnum soundName) {
 }
 
 void Sounds::playBackground() {
+	using dist_type = std::uniform_int_distribution<std::vector<sf::Music>::size_type>;
 	if (current_music) current_music->stop();
 
 	if (m_main_menu) {
-		std::uniform_int_distribution<std::vector<sf::Music>::size_type> dist{ 0, menu_music.size()-1 };
+		dist_type dist{ 0, menu_music.size()-1 };
 		current_music = menu_music.at(dist(random));
 	}
 	else {
-		std::uniform_int_distribution<std::vector<sf::Music>::size_type> dist{ 0, game_music.size()-1 };
+		dist_type dist{ 0, game_music.size()-1 };
 		current_music = game_music.at(dist(random));
 	}
 	current_music->setVolume(70.0);
