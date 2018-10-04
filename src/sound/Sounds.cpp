@@ -142,8 +142,8 @@ const multimap<SoundEnum, std::string> Sounds::soundFiles {
 		{ SoundEnum::Die, "sound/monster_die/dying_scream_4.wav" },
 		{ SoundEnum::Die, "sound/monster_die/dying_scream_5.wav" },
 		
-		{ SoundEnum::NextRound, "sound/next_round/next_round.wav" }, //
-		{ SoundEnum::NextRound, "sound/next_round/next_round_2.wav" }, //
+		{ SoundEnum::NextRound, "sound/next_round/next_round.wav" },
+		{ SoundEnum::NextRound, "sound/next_round/next_round_2.wav" },
 		{ SoundEnum::EndingRound, "sound/next_round/ticking.wav" } //
 };
 
