@@ -108,12 +108,12 @@ void Sounds::inMainMenu(bool in_menu) {
 }
 
 const multimap<SoundEnum, std::string> Sounds::soundFiles {
-		{ SoundEnum::Background, "sound/background_songs/background_1.wav" }, // these songs aren't implemented yet
-		{ SoundEnum::Background, "sound/background_songs/background_2.wav" }, //
-		{ SoundEnum::Background, "sound/background_songs/background_3.wav" }, //
-		{ SoundEnum::Background, "sound/background_songs/background_4.wav" }, //
+		{ SoundEnum::Background, "sound/background_songs/background_1.flac" },
+		{ SoundEnum::Background, "sound/background_songs/background_2.flac" },
+		{ SoundEnum::Background, "sound/background_songs/background_3.flac" },
+		{ SoundEnum::Background, "sound/background_songs/background_4.flac" },
 
-		{ SoundEnum::Menu, "sound/menu_songs/menu_and_tutorial.wav" }, //
+		{ SoundEnum::Menu, "sound/menu_songs/menu_and_tutorial.flac" },
 		
 		{ SoundEnum::WalkCommand, "sound/given_command/walk_command_given.wav" }, //
 		{ SoundEnum::Walk, "sound/unit_walk/unit_walking.wav" },
