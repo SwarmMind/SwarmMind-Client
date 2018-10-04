@@ -77,6 +77,8 @@ void Map::updateCommandAction(Action action, std::string command, std::string di
 
 void Map::updateMouseCommand(Action action, std::string command, double deltaTime, bool isDirect = false)
 {
+	const SoundEnum actionSound = (action == Move || action == MoveDirect) ? SoundEnum::WalkCommand : SoundEnum::AttackCommand;
+
 	const float minimumDragDistance = 0.5;
 	if (m_input.isActionJustPressed(action))
 	{
@@ -93,6 +95,7 @@ void Map::updateMouseCommand(Action action, std::string command, double deltaTim
             glm::vec2 delta = m_input.mousePositionInWorld() - unit->second.position();
 			sendCommand(command, glm::normalize(delta));
             ParticleSystem::spawnAcknowledgeParticles(m_input.mousePositionInWorld());
+			m_eventSystem.postEvent(std::make_shared<SoundEvent>(actionSound));
         }
 		return;
 	}
@@ -104,6 +107,7 @@ void Map::updateMouseCommand(Action action, std::string command, double deltaTim
 		{
 			sendCommand(command, glm::normalize(delta));
 			ParticleSystem::spawnAcknowledgeParticles(m_input.mousePositionInWorld());
+			m_eventSystem.postEvent(std::make_shared<SoundEvent>(actionSound));
 		}
 	}
 

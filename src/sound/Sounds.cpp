@@ -5,6 +5,7 @@
 Sounds::Sounds(EventSystem& event_system)
 	: m_event_system{event_system}
 	, EventListener<CommandEvent>(event_system)
+	, EventListener<SoundEvent>(event_system)
 	, random{ std::random_device{}() }
 	, current_music{ nullptr }
 {
@@ -44,6 +45,11 @@ void Sounds::update() {
 	if (current_music->getStatus() == sf::Sound::Stopped) {
 		playBackground();
 	}
+}
+
+void Sounds::receiveEvent(SoundEvent * event)
+{
+	playRandom(event->m_sound);
 }
 
 void Sounds::receiveEvent(CommandEvent * event)
@@ -116,10 +122,10 @@ const multimap<SoundEnum, std::string> Sounds::soundFiles {
 
 		{ SoundEnum::Menu, "sound/menu_songs/menu_and_tutorial.flac" },
 		
-		{ SoundEnum::WalkCommand, "sound/given_command/walk_command_given.wav" }, //
+		{ SoundEnum::WalkCommand, "sound/given_command/walk_command_given.wav" }, 
 		{ SoundEnum::Walk, "sound/unit_walk/unit_walking.wav" },
 		
-		{ SoundEnum::AttackCommand, "sound/given_command/shoot_command_given.wav" }, //
+		{ SoundEnum::AttackCommand, "sound/given_command/shoot_command_given.wav" },
 		{ SoundEnum::Attack, "sound/unit_attack/shoot_1.wav" },
 		{ SoundEnum::Attack, "sound/unit_attack/shoot_2.wav" },
 		{ SoundEnum::Attack, "sound/unit_attack/shoot_3.wav" },

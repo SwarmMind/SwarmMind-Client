@@ -12,6 +12,7 @@
 
 #include <events/EventListener.h>
 #include <events/CommandEvent.h>
+#include <events/SoundEvent.h>
 
 using namespace std;
 
@@ -28,7 +29,7 @@ enum class SoundEnum {
     EndingRound 
 };
 
-class Sounds : public EventListener<CommandEvent>
+class Sounds : public EventListener<CommandEvent>, public EventListener<SoundEvent>
 {
 public:
     Sounds() = delete;
@@ -41,6 +42,7 @@ public:
     void update();
 
 	void receiveEvent(CommandEvent* event);
+	void receiveEvent(SoundEvent* event);
 
 	void inMainMenu(bool in_menu);
 

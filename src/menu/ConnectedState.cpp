@@ -1,10 +1,13 @@
-#include <menu/ConnectedState.h>
 #include <functional>
+
 #include <imgui/imgui.h>
 #include <game/Game.h>
 #include <renderer/Sprites.h>
 #include <events/EventSystem.h>
+#include <events/SoundEvent.h>
 #include <sound/Sounds.h>
+
+#include <menu/ConnectedState.h>
 
 ConnectedState::ConnectedState(Game& _game, Renderer& renderer, Input& _input, EventSystem& _eventSystem, Settings& _settings)
 	: input{ _input }
@@ -15,7 +18,6 @@ ConnectedState::ConnectedState(Game& _game, Renderer& renderer, Input& _input, E
     , EventListener<InitStateEvent>(_eventSystem)
     , EventListener<DisconnectEvent>(_eventSystem)
 	, settings{ _settings }
-
 {
 	networker.connect(settings.hostname, settings.port);
 }
@@ -90,6 +92,8 @@ void ConnectedState::receiveEvent(InitStateEvent* event) {
     map->drawWallsStatic(m_renderer, event->m_config.m_blockadePositions);
     map->updateGameState(event->m_state);
     map->m_lastUpdate -= event->m_timeSinceLastRound;
+
+	eventSystem.postEvent(std::make_shared<SoundEvent>(SoundEnum::NextRound));
 }
 
 void ConnectedState::receiveEvent(DisconnectEvent* event) {
