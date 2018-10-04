@@ -1,12 +1,14 @@
 #pragma once
 
+#include <memory>
+#include <cstdint>
+
 #include <game/Settings.h>
 #include <menu/MenuState.h>
 #include <gamestate/TutorialNetworker.h>
 #include <events/EventSystem.h>
 #include <events/EventListener.h>
 #include <events/InitStateEvent.h>
-#include <memory>
 
 class MainMenuState : public MenuState, public EventListener<InitStateEvent>
 {
@@ -30,10 +32,5 @@ private:
     class EventSystem& m_eventSystem;
 	Settings& m_settings;
 
-	int addressBufferSize = 256;
-	char address[256];
-	
-	int port;
-	int minimumPort = 0;
-	int maximumPort = 65535;
+	int port_input;
 };

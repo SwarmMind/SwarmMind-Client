@@ -11,7 +11,9 @@ set(sources
     examples/imgui_impl_glfw.cpp
     examples/imgui_impl_glfw.h
     examples/imgui_impl_opengl3.cpp
-    examples/imgui_impl_opengl3.h)
+    examples/imgui_impl_opengl3.h
+    misc/stl/imgui_stl.cpp
+    misc/stl/imgui_stl.h)
 
 add_library(imgui STATIC ${sources})
 target_include_directories(imgui PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
