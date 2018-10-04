@@ -9,7 +9,6 @@
 ConnectedState::ConnectedState(Game& _game, Renderer& renderer, Input& _input, EventSystem& _eventSystem, Settings& _settings)
 	: input{ _input }
 	, game{_game}
-	, map{nullptr}
     , m_renderer{renderer}
 	, networker{_eventSystem}
 	, eventSystem{_eventSystem}
@@ -28,7 +27,6 @@ ConnectedState::~ConnectedState()
 		settings.save();
 	}
     m_renderer.clearStaticData();
-	delete map;
 }
 
 void ConnectedState::update(double deltaTime, double timeStamp)
@@ -77,9 +75,8 @@ void ConnectedState::drawStatus() {
 
 void ConnectedState::draw(Renderer& renderer)
 {
-	if (map != nullptr)
-	{
-		map->draw(renderer);
+    if (map) {
+        map->draw(renderer);
 	}
 	drawStatus();
 }
@@ -87,22 +84,15 @@ void ConnectedState::draw(Renderer& renderer)
 using namespace std::placeholders;
 
 void ConnectedState::receiveEvent(InitStateEvent* event) {
-    map = new Map{ input, networker, eventSystem, event->m_config, settings.username };
+    map = std::make_unique<Map>(input, networker, eventSystem, event->m_config, settings.username);
     m_renderer.clearStaticData();
     map->drawGridStatic(m_renderer);
     map->drawWallsStatic(m_renderer, event->m_config.m_blockadePositions);
     map->updateGameState(event->m_state);
     map->m_lastUpdate -= event->m_timeSinceLastRound;
-
-    /*
-    if (networker.isConnected()) {
-        map.getSounds()->play(SoundEnum::Background);
-    }
-    */
 }
 
 void ConnectedState::receiveEvent(DisconnectEvent* event) {
-    delete map;
-    map = nullptr;
+    map.release();
     m_renderer.clearStaticData();
 }
