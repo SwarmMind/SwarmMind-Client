@@ -27,23 +27,12 @@ GLuint Texture::ID()
 
 std::vector<unsigned char> Texture::loadData(string fileName)
 {
-	vector<unsigned char> invertedData;
-	unsigned int errorCode = lodepng::decode(invertedData, width, height, fileName);
+	vector<unsigned char> data;
+	unsigned int errorCode = lodepng::decode(data, width, height, fileName);
 	if (errorCode != 0)
 	{
 		throw runtime_error(string("Error while loading png: ") + string(fileName) + " Error message: " + lodepng_error_text(errorCode));
 	}
 
-	vector<unsigned char> correctedData(invertedData.size());
-	for (size_t y = 0; y < height; y++)
-	{
-		for (size_t x = 0; x < width; x++)
-		{
-			for (size_t c = 0; c < 4; c++)
-			{
-				correctedData.at((height - 1 - y) * width * 4 + 4 * x + c) = invertedData.at(y * width * 4 + 4 * x + c);
-			}
-		}
-	}
-	return correctedData;
+	return data;
 }

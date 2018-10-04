@@ -6,8 +6,8 @@ Sprite::Sprite(Texture* texture, float u, float v, float uvWidth, float uvHeight
 	: _texture{ texture }
 	, _u{ u }
 	, _v{ v }
-	, _u2{ u + uvWidth }
-	, _v2{ v + uvHeight }
+	, _u2{ u - uvWidth }
+	, _v2{ v - uvHeight }
 {}
 
 Sprite::~Sprite()
