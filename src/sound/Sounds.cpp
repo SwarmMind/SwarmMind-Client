@@ -127,28 +127,28 @@ const multimap<SoundEnum, std::string> Sounds::soundFiles {
 
 		{ SoundEnum::Menu, "sound/menu_songs/menu_and_tutorial.flac" },
 		
-		{ SoundEnum::WalkCommand, "sound/given_command/walk_command_given.wav" }, 
-		{ SoundEnum::Walk, "sound/unit_walk/unit_walking.wav" },
+		{ SoundEnum::WalkCommand, "sound/given_command/walk_command_given.flac" }, 
+		{ SoundEnum::Walk, "sound/unit_walk/unit_walking.flac" },
 		
-		{ SoundEnum::AttackCommand, "sound/given_command/shoot_command_given.wav" },
-		{ SoundEnum::Attack, "sound/unit_attack/shoot_1.wav" },
-		{ SoundEnum::Attack, "sound/unit_attack/shoot_2.wav" },
-		{ SoundEnum::Attack, "sound/unit_attack/shoot_3.wav" },
+		{ SoundEnum::AttackCommand, "sound/given_command/shoot_command_given.flac" },
+		{ SoundEnum::Attack, "sound/unit_attack/shoot_1.flac" },
+		{ SoundEnum::Attack, "sound/unit_attack/shoot_2.flac" },
+		{ SoundEnum::Attack, "sound/unit_attack/shoot_3.flac" },
 		
-		{ SoundEnum::Hit, "sound/monster_hit/got_hitten_scream_1.wav" },
-		{ SoundEnum::Hit, "sound/monster_hit/got_hitten_scream_2.wav" },
-		{ SoundEnum::Hit, "sound/monster_hit/got_hitten_scream_3.wav" },
-		{ SoundEnum::Hit, "sound/monster_hit/got_hitten_scream_4.wav" },
-		{ SoundEnum::Hit, "sound/monster_hit/got_hitten_scream_5.wav" },
+		{ SoundEnum::Hit, "sound/monster_hit/hit_scream_1.flac" },
+		{ SoundEnum::Hit, "sound/monster_hit/hit_scream_2.flac" },
+		{ SoundEnum::Hit, "sound/monster_hit/hit_scream_3.flac" },
+		{ SoundEnum::Hit, "sound/monster_hit/hit_scream_4.flac" },
+		{ SoundEnum::Hit, "sound/monster_hit/hit_scream_5.flac" },
 		
-		{ SoundEnum::Die, "sound/monster_die/dying_scream_1.wav" },
-		{ SoundEnum::Die, "sound/monster_die/dying_scream_2.wav" },
-		{ SoundEnum::Die, "sound/monster_die/dying_scream_3.wav" },
-		{ SoundEnum::Die, "sound/monster_die/dying_scream_4.wav" },
-		{ SoundEnum::Die, "sound/monster_die/dying_scream_5.wav" },
+		{ SoundEnum::Die, "sound/monster_die/dying_scream_1.flac" },
+		{ SoundEnum::Die, "sound/monster_die/dying_scream_2.flac" },
+		{ SoundEnum::Die, "sound/monster_die/dying_scream_3.flac" },
+		{ SoundEnum::Die, "sound/monster_die/dying_scream_4.flac" },
+		{ SoundEnum::Die, "sound/monster_die/dying_scream_5.flac" },
 		
-		{ SoundEnum::NextRound, "sound/next_round/next_round.wav" },
-		{ SoundEnum::NextRound, "sound/next_round/next_round_2.wav" },
-		{ SoundEnum::EndingRound, "sound/next_round/ticking.wav" } //
+		{ SoundEnum::NextRound, "sound/next_round/next_round_1.flac" },
+		{ SoundEnum::NextRound, "sound/next_round/next_round_2.flac" },
+		{ SoundEnum::EndingRound, "sound/next_round/ticking.flac" } //
 };
 
