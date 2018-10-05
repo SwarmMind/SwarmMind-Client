@@ -6,8 +6,7 @@
 
 Textures::Textures()
 {
-	map<TextureEnum, string> paths = texturePaths();
-	for (auto& path : paths)
+	for (auto& path : texturePaths)
 	{
 		textures[path.first] = std::make_shared<Texture>(path.second);
 	}
@@ -32,14 +31,11 @@ std::shared_ptr<Texture> Textures::get(TextureEnum texture)
 	return iterator->second;
 }
 
-std::map<TextureEnum, string> Textures::texturePaths()
-{
-	return map<TextureEnum, string>({
+const std::map<TextureEnum, string> Textures::texturePaths = {
 		{MonsterTexture, "res/monster.png"},
         {UnitTexture, "res/unit.png"},
         {SelectionTexture, "res/selected.png"},
         {GridTexture, "res/grid.png"},
         {ChatTexture, "res/chat.png"},
         {WallTexture, "res/box.png"}
-	});
-}
+};
