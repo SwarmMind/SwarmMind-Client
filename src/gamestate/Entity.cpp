@@ -51,7 +51,7 @@ void Entity::update(double deltaTime)
 
 void Entity::draw(class Renderer& renderer)
 {
-	renderer.drawSprite(glm::vec3(position() - glm::vec2(0.5f, 0.5f), 1), 1, 1, sprite(), m_direction);
+	renderer.drawSprite(glm::vec3(position() - glm::vec2(0.5f, 0.5f), 1), 1, 1, sprite());
 }
 
 
