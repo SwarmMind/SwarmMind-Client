@@ -12,7 +12,7 @@ CommandVisualizationRenderer::CommandVisualizationRenderer(Camera& _camera)
 {
     for (size_t i = 0; i < offsets.size(); i++)
     {
-        offsets.at(i) = i * (CommandVisualizer::numVertices + 1);
+        offsets.at(i) = static_cast<GLint>(i * (CommandVisualizer::numVertices + 1));
     }
 
     for (auto& count : counts)
@@ -61,8 +61,9 @@ void CommandVisualizationRenderer::preDraw()
     GLuint positionLocation = glGetUniformLocation(m_program, "camPosition");
     GLuint sizeLocation = glGetUniformLocation(m_program, "camSize");
 
-    glUniform2f(positionLocation, camera.getX(), camera.getY());
-    glUniform2f(sizeLocation, camera.getWidth(), camera.getHeight());
+	const auto pos = camera.position(), extent = camera.extent();
+    glUniform2f(positionLocation, pos.x, pos.y);
+    glUniform2f(sizeLocation, extent.x, extent.y);
 }
 
 void CommandVisualizationRenderer::draw()

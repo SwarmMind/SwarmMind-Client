@@ -28,7 +28,7 @@
 using namespace std;
 
 void Game::initializeOpenGL() {
-    glbinding::Binding::initialize(glfwGetProcAddress);
+    glbinding::Binding::initialize(glfwGetProcAddress, false);
     glbinding::Binding::setCallbackMaskExcept(glbinding::CallbackMask::After, { "glGetError" });
     glbinding::Binding::setAfterCallback([](const glbinding::FunctionCall &)
     {

@@ -25,13 +25,13 @@ public:
 	void preDraw();
 
 	virtual void drawSprite(glm::vec3 pos, float width, float height, SpriteEnum sprite) override;
-	virtual void drawSprite(glm::vec3 pos, float width, float height, Sprite* sprite) override;
+	virtual void drawSprite(glm::vec3 pos, float width, float height, std::shared_ptr<Sprite> sprite) override;
 	virtual void drawCommandVisualizer(glm::vec3 pos, CommandVisualizer& visualizer) override;
 	void draw(double deltaTime);
 
     virtual Camera& camera() override;
 
-    virtual void addStaticSprite(glm::vec3 pos, float width, float height, Sprite* sprite) override;
+    virtual void addStaticSprite(glm::vec3 pos, float width, float height, std::shared_ptr<Sprite> sprite) override;
     virtual void addStaticSprite(glm::vec3 pos, float width, float height, SpriteEnum sprite) override;
     virtual void clearStaticData() override;
 
@@ -46,8 +46,8 @@ private:
     std::vector<StaticRenderData> m_staticRenderData;
 
 	//Texture render data
-	std::unordered_map<class Texture*, TextureRenderData> renderData;
-	void drawTexture(class Texture* texture);
+	std::unordered_map<TextureID, TextureRenderData> renderData;
+	void drawTexture(TextureID texture);
 
 	//Camera
 	GLFWwindow* window = nullptr;

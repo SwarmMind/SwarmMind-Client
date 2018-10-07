@@ -1,9 +1,12 @@
 #include <menu/MainMenuState.h>
 
-#include <imgui/imgui.h>
-#include <game/Game.h>
 #include <algorithm>
 #include <cstring>
+#include <cstdint>
+
+#include <imgui/imgui.h>
+#include <imgui/misc/stl/imgui_stl.h>
+#include <game/Game.h>
 #include <gamestate/Map.h>
 
 MainMenuState::MainMenuState(Game* _game, EventSystem& eventSystem, Input& input, Renderer& renderer, Settings& settings)
@@ -15,9 +18,7 @@ MainMenuState::MainMenuState(Game* _game, EventSystem& eventSystem, Input& input
     , EventListener<InitStateEvent>(eventSystem)
 	, m_settings{settings}
 {
-	strcpy(address, m_settings.hostname.c_str());
-	port = m_settings.port;
-
+	port_input = m_settings.port;
     m_networker.begin(m_renderer);
 }
 
@@ -54,16 +55,16 @@ void MainMenuState::draw(Renderer& renderer)
 		| ImGuiWindowFlags_AlwaysAutoResize
 		| ImGuiWindowFlags_NoMove))
 	{
-		if (ImGui::InputText("Address", address, addressBufferSize, ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_AutoSelectAll))
+		if (ImGui::InputText("Address", &m_settings.hostname, ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_AutoSelectAll))
 		{
-			game->connectTo(address, port);
+			game->connectTo(m_settings.hostname, m_settings.port);
             ImGui::End();
             return;
 		}
 
 		if (ImGui::Button("Connect!"))
 		{
-			game->connectTo(address, port);
+			game->connectTo(m_settings.hostname, m_settings.port);
             ImGui::End();
             return;
 		}
@@ -77,15 +78,14 @@ void MainMenuState::draw(Renderer& renderer)
 			{
 				if (ImGui::Button("Reset"))
 				{
-					port = default_port;
+					m_settings.port = port_input = default_port;
 				}
 				ImGui::SameLine();
-				if (ImGui::InputInt("Port", &port, 1, 100))
+				if (ImGui::InputInt("Port", &port_input, 1, 100))
 				{
-					port = std::min(port, maximumPort);
-					port = std::max(port, minimumPort);
+					port_input = std::min(std::max(port_input, 0), USHRT_MAX);
+					m_settings.port = static_cast<uint16_t>(port_input);
 				}
-
 			}
 			ImGui::EndChild();
 		}

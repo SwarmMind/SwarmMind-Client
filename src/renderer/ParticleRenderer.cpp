@@ -177,11 +177,11 @@ void ParticleRenderer::setFrameBufferTextures(int index)
 
 void ParticleRenderer::addParticlesFromQueue()
 {
-	std::queue<ParticleSystem>& particleSystems = ParticleSystem::particlesToSpawn();
-	while (particleSystems.size() > 0)
+	std::queue<Particles>& particles = ParticleSystem::particlesToSpawn();
+	while (!particles.empty())
 	{
-		addParticles(particleSystems.front());
-		particleSystems.pop();
+		addParticles(particles.front());
+		particles.pop();
 	}
 }
 
@@ -193,7 +193,7 @@ void ParticleRenderer::updateParticles(double deltaTime)
 	glUseProgram(particleUpdateProgram);
 	glBindVertexArray(updateVao);
 
-	glUniform1f(deltaTimeUniform, (GLfloat)deltaTime);
+	glUniform1f(deltaTimeUniform, static_cast<GLfloat>(deltaTime));
 
 	glBindFramebuffer(GL_FRAMEBUFFER, frameBuffers[back]);
 	glActiveTexture(GL_TEXTURE1);
@@ -237,8 +237,9 @@ void ParticleRenderer::drawParticles()
 void ParticleRenderer::uploadCamera(int frameBufferWidth, int frameBufferHeight)
 {
 	glUseProgram(particleDrawingProgram);
-	glUniform2f(cameraPositionUniform, camera.getX(), camera.getY());
-	glUniform2f(cameraSizeUniform, camera.getWidth(), camera.getHeight());
+	const auto pos = camera.position(), extent = camera.extent();
+	glUniform2f(cameraPositionUniform, pos.x, pos.y);
+	glUniform2f(cameraSizeUniform, extent.x, extent.y);
 }
 
 void ParticleRenderer::draw(double deltaTime)
@@ -250,7 +251,7 @@ void ParticleRenderer::draw(double deltaTime)
 	drawParticles();
 }
 
-void ParticleRenderer::addParticles(ParticleSystem particles)
+void ParticleRenderer::addParticles(Particles particles)
 {
 	assert(particles.dynamicData.size() % 4 == 0);
 	assert(particles.dynamicData.size() == particles.staticData.size());

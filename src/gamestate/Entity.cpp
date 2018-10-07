@@ -2,49 +2,50 @@
 #include <renderer/Renderer.h>
 #include <nlohmann/json.hpp>
 
-Entity::Entity(std::uint32_t _id, glm::vec2 _position)
-	: ID{_id}
-	, currentPosition{_position}
-	, targetPos{_position}
+Entity::Entity(std::uint32_t id, glm::vec2 position)
+	: m_id{id}
+	, m_currentPosition{position}
+	, m_targetPos{position}
+	, m_direction{0.0f, 1.0f}
 {}
 
 
 glm::vec2 Entity::position() const
 {
-	return currentPosition;
+	return m_currentPosition;
 }
 
 uint32_t Entity::id() const
 {
-	return ID;
-}
-
-uint32_t Entity::intid() const
-{
-	return ID;
+	return m_id;
 }
 
 bool Entity::operator<(const Entity& rhs) const
 {
-	return intid() < rhs.intid();
+	return id() < rhs.id();
 }
 
 void Entity::moveTo(glm::vec2 position)
 {
-	targetPos = position;
+	m_targetPos = position;
 }
 
-void Entity::update(float deltaTime)
+void Entity::rotate(glm::vec2 direction)
 {
-	glm::vec2 difference = targetPos - currentPosition;
-	float distanceToMove = velocity * deltaTime;
+	m_direction = direction;
+}
+
+void Entity::update(double deltaTime)
+{
+	glm::vec2 difference = m_targetPos - m_currentPosition;
+	float distanceToMove = m_velocity * static_cast<float>(deltaTime);
 	if (glm::length(difference) <= distanceToMove)
 	{
-		currentPosition = targetPos;
+		m_currentPosition = m_targetPos;
 	}
 	else 
 	{
-		currentPosition += glm::normalize(difference) * distanceToMove;
+		m_currentPosition += glm::normalize(difference) * distanceToMove;
 	}
 }
 
@@ -61,7 +62,7 @@ void Entity::draw(class Renderer& renderer)
 Unit::Unit(std::uint32_t _id, glm::vec2 _position)
 	: Entity(_id, _position)
 	, attackVisualizer(255, 30, 30)
-	, moveVisualizer(30, 255, 30, 0.7)
+	, moveVisualizer(30, 255, 30, 0.7f)
 {}
 
 Unit::Unit(const nlohmann::json& json)

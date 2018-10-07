@@ -49,6 +49,8 @@ void MoveCommand::executeOn(Gamestate& state)
 	if (!entity) return;
 
     entity->moveTo(entity->position() + direction);
+
+	entity->rotate(direction);
 }
 
 //////////////////////////////////////////////////////////////////////////	
@@ -64,6 +66,8 @@ void AttackCommand::executeOn(Gamestate& state)
 	if (!unit) return;
 	
     ParticleSystem::spawnShootParticles(unit->position() + glm::normalize(direction) * 0.3f, direction);
+
+	unit->rotate(direction);
 }
 
 //////////////////////////////////////////////////////////////////////////

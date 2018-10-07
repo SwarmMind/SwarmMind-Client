@@ -11,4 +11,5 @@ set(sources
 	${CMAKE_CURRENT_SOURCE_DIR}/EventSystem.h
 	${CMAKE_CURRENT_SOURCE_DIR}/InitStateEvent.h
 	${CMAKE_CURRENT_SOURCE_DIR}/StateEvent.h
+	${CMAKE_CURRENT_SOURCE_DIR}/SoundEvent.h
 	PARENT_SCOPE)

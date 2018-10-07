@@ -1,11 +1,13 @@
 #pragma once
 
+#include <string>
+#include <map>
+#include <memory>
+
 #include <menu/MenuState.h>
 #include <gamestate/GameNetworker.h>
 #include <gamestate/Map.h>
 #include <input/Input.h>
-#include <string>
-#include <map>
 #include <events/EventListener.h>
 #include <events/InitStateEvent.h>
 #include <events/StateEvent.h>
@@ -33,6 +35,6 @@ private:
 	class EventSystem& eventSystem;
 	GameNetworker networker;
 	Input& input;
-	Map* map;
+	std::unique_ptr<Map> map;
 	Settings& settings;
 };

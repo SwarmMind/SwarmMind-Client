@@ -17,7 +17,7 @@ public:
 
 	void draw(double deltaTime);
 
-	void addParticles(ParticleSystem particles);
+	void addParticles(Particles particles);
 
 private:
 	size_t particleCount;

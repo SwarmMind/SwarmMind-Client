@@ -1,30 +1,27 @@
-#include <renderer/Textures.h>
-#include <renderer/Texture.h>
+#include <memory>
 #include <stdexcept>
+
+#include <renderer/Texture.h>
+#include <renderer/Textures.h>
 
 Textures::Textures()
 {
-	map<TextureEnum, string> paths = texturePaths();
-	for (auto& path : paths)
+	for (auto& path : texturePaths)
 	{
-		textures[path.first] = new Texture(path.second);
+		textures[path.first] = std::make_shared<Texture>(path.second);
 	}
 }
 
 Textures::~Textures()
 {
-	for (auto& texture : textures)
-	{
-		delete texture.second;
-	}
 }
 
-Texture * Textures::operator[](TextureEnum texture)
+std::shared_ptr<Texture> Textures::operator[](TextureEnum texture)
 {
 	return get(texture);
 }
 
-class Texture* Textures::get(TextureEnum texture)
+std::shared_ptr<Texture> Textures::get(TextureEnum texture)
 {
 	auto iterator = textures.find(texture);
 	if (iterator == textures.end())
@@ -34,14 +31,11 @@ class Texture* Textures::get(TextureEnum texture)
 	return iterator->second;
 }
 
-std::map<TextureEnum, string> Textures::texturePaths()
-{
-	return map<TextureEnum, string>({
+const std::map<TextureEnum, string> Textures::texturePaths = {
 		{MonsterTexture, "res/monster.png"},
         {UnitTexture, "res/unit.png"},
         {SelectionTexture, "res/selected.png"},
         {GridTexture, "res/grid.png"},
         {ChatTexture, "res/chat.png"},
         {WallTexture, "res/box.png"}
-	});
-}
+};

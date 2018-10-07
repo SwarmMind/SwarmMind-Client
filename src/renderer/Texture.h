@@ -7,6 +7,8 @@
 using namespace gl41core;
 using namespace std;
 
+using TextureID = GLuint;
+
 class Texture
 {
 public:
@@ -14,7 +16,7 @@ public:
 
 	~Texture();
 
-	GLuint ID();
+	TextureID ID();
 
 private:
 	vector<unsigned char> loadData(string fileName);

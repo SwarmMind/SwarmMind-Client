@@ -14,12 +14,12 @@ public:
 
 	glm::vec2 position() const;
 	uint32_t id() const;
-	uint32_t intid() const;
 	bool operator<(const Entity& rhs) const;
 
 	void moveTo(glm::vec2 position);
+	void rotate(glm::vec2 direction);
 
-	void update(float deltaTime);
+	void update(double deltaTime);
 	virtual void draw(class Renderer& renderer);
 protected:
 	Entity(std::uint32_t _id, glm::vec2 _position);
@@ -27,11 +27,10 @@ protected:
 
 
 private:
-	glm::vec2 currentPosition;
-	float velocity = 2;
-	glm::vec2 targetPos;
+	glm::vec2 m_currentPosition, m_targetPos, m_direction;
+	const float m_velocity = 2;
 	
-	std::uint32_t ID;
+	std::uint32_t m_id;
 };
 
 class Unit : public Entity

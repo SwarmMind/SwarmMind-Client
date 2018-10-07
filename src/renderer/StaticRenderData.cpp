@@ -3,7 +3,7 @@
 
 const int StaticRenderData::defaultBufferVertexSize = 8192;
 
-StaticRenderData::StaticRenderData(class Texture* texture)
+StaticRenderData::StaticRenderData(std::shared_ptr<Texture> texture)
     : m_texture{texture}
     , m_bufferVertexSize{defaultBufferVertexSize}
 {
@@ -81,7 +81,7 @@ void StaticRenderData::draw()
     glDrawArrays(GL_TRIANGLES, 0, vertexCount);
 }
 
-class Texture* StaticRenderData::texture()
+std::shared_ptr<Texture> StaticRenderData::texture()
 {
     return m_texture;
 }
@@ -91,10 +91,9 @@ void StaticRenderData::increaseBufferSize(int minimumVertexCount)
     int newBufferSize = std::max(m_bufferVertexSize * 2, m_bufferVertexSize + 2 * minimumVertexCount);
     glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
 
-    GLfloat *oldData = new GLfloat[newBufferSize * vertexSize()];
-    glGetBufferSubData(GL_ARRAY_BUFFER, 0, m_bufferVertexSize * vertexSize(), oldData);
-    glBufferData(GL_ARRAY_BUFFER, newBufferSize * vertexSize(), oldData, GL_STATIC_DRAW);
-    delete[] oldData;
+	std::vector<GLfloat> oldData (newBufferSize * vertexSize());
+    glGetBufferSubData(GL_ARRAY_BUFFER, 0, m_bufferVertexSize * vertexSize(), oldData.data());
+    glBufferData(GL_ARRAY_BUFFER, newBufferSize * vertexSize(), oldData.data(), GL_STATIC_DRAW);
 
     m_bufferVertexSize = newBufferSize;
 }
