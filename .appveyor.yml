@@ -14,11 +14,9 @@ cache:
   - C:\projects\glfw
   - C:\projects\glbinding
   - C:\projects\glm
-  - C:\projects\sioclient
   - C:\projects\build-glfw -> appveyor.yml
   - C:\projects\build-glbinding -> appveyor.yml
   - C:\projects\build-glm -> appveyor.yml
-  - C:\projects\build-sioclient -> appveyor.yml
 install:
   - call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat"
 
