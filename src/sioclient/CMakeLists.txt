@@ -8,12 +8,8 @@ include(CMakePackageConfigHelpers)
 set(CMAKE_DEBUG_POSTFIX d)
 
 option(BUILD_SHARED_LIBS "Build the shared library" OFF)
-option(Boost_USE_STATIC_LIBS "Use Boost static version" ON)
-
-set(BOOST_VER "1.55.0" CACHE STRING "boost version" )
 
 set(Boost_USE_MULTITHREADED ON) 
-set(Boost_USE_STATIC_RUNTIME OFF) 
 find_package(Boost ${BOOST_VER} REQUIRED COMPONENTS system date_time random exception)
 
 aux_source_directory(${CMAKE_CURRENT_LIST_DIR}/src ALL_SRC)
