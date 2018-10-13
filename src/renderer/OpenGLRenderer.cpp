@@ -1,17 +1,24 @@
-#include <renderer/OpenGLRenderer.h>
-#include <glbinding/gl41core/gl.h>
-#define GLFW_INCLUDE_NONE
-#include <GLFW/glfw3.h>
 #include <vector>
 #include <iostream>
 #include <fstream>
 #include <algorithm>
+
+#include <glbinding/gl41core/gl.h>
+#define GLFW_INCLUDE_NONE
+#include <GLFW/glfw3.h>
+#include <imgui/imgui.h>
 #include <lodepng/lodepng.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/matrix_transform_2d.hpp>
+#include <glm/gtx/vector_angle.hpp>
+
+#include <game/Camera.h>
 #include <renderer/Sprite.h>
 #include <renderer/Texture.h>
-#include <imgui/imgui.h>
 #include <renderer/OpenGLHelpers.h>
-#include <game/Camera.h>
+#include <renderer/OpenGLRenderer.h>
 
 using namespace std;
 
@@ -19,10 +26,11 @@ using namespace std;
 
 void OpenGLRenderer::findUniformLocations()
 {
-	xLocation = glGetUniformLocation(program, "camX");
-	yLocation = glGetUniformLocation(program, "camY");
+	cameraPositionLocation = glGetUniformLocation(program, "camPosition");
 	widthLocation = glGetUniformLocation(program, "camWidth");
 	heightLocation = glGetUniformLocation(program, "camHeight");
+	modelLocation = glGetUniformLocation(program, "model");
+	viewLocation = glGetUniformLocation(program, "view");
 }
 
 OpenGLRenderer::OpenGLRenderer(GLFWwindow* _window, Camera& _camera)
@@ -57,34 +65,87 @@ void OpenGLRenderer::uploadCamera()
 {
 	glUseProgram(program);
 	const auto pos = m_camera.position();
-	glUniform1f(xLocation, pos.x);
-	glUniform1f(yLocation, pos.y);
+	glUniform2f(cameraPositionLocation, pos.x, pos.y);
 
 	glUniform1f(widthLocation, m_camera.width());
 	glUniform1f(heightLocation, m_camera.height());
+
+	glm::mat3 view = glm::mat3(1.0f);
+	//view = glm::translate(view, m_camera.position());
+	view = glm::scale(view, glm::vec2{ 1/m_camera.width(), 1/m_camera.height() });
+	glUniformMatrix3fv(viewLocation, 1, false, glm::value_ptr(view));
+	glUniformMatrix3fv(modelLocation, 1, false, glm::value_ptr(view));
 }
 
-std::array<GLfloat, 6*5> spriteVertices(glm::vec3 pos, float width, float height, std::shared_ptr<Sprite> sprite) {
-	GLfloat u = sprite->u;
-	GLfloat v = sprite->v;
-	GLfloat u2 = sprite->u2;
-	GLfloat v2 = sprite->v2;
+static std::array<GLfloat, 6*5> spriteVertices(glm::vec3 pos, float width, float height, std::shared_ptr<Sprite> sprite, glm::vec2 direction = glm::vec2(0.0, 1.0)) {
+	const GLfloat u = sprite->u;
+	const GLfloat v = sprite->v;
+	const GLfloat u2 = sprite->u2;
+	const GLfloat v2 = sprite->v2;
 
-	return std::array<GLfloat, 6*5> {
-		pos.x,			pos.y,			pos.z,			u,	v,
-		pos.x,			pos.y + height, pos.z,			u,	v2,
-		pos.x + width,	pos.y,			pos.z,			u2,	v,
-		pos.x,			pos.y + height, pos.z,			u,	v2,
-		pos.x + width,	pos.y + height,	pos.z,			u2, v2,
-		pos.x + width,	pos.y,			pos.z,			u2, v
-    };
+	const bool trivial = direction == glm::vec2{ 0.0,1.0 };
+	const glm::vec2 center{ 0.5, 0.5 };
+	const glm::vec2 center2{ width/2.0f, height/2.0f };
+	const glm::vec2 extent{ width, height };
+	const auto angle = glm::angle(glm::normalize(direction), glm::vec2(0.0, 1.0));
+	//const glm::mat3 transform = glm::translate(glm::rotate(glm::translate(glm::mat3(1.0f), center), angle), -center);
+	//const glm::mat3 transform = glm::translate(glm::scale(glm::rotate(glm::mat3(1.0f), angle), glm::vec2{ width, height }), glm::vec2{ pos });
+	glm::mat3 transform(1.0f);
+	transform = glm::scale(transform, extent);
+	//transform = glm::translate(transform, center2);
+	//transform = glm::rotate(transform, glm::pi<float>()); // angle);
+	transform = glm::rotate(transform, angle);
+	transform = glm::translate(transform, center2);
+	//transform = glm::translate(transform, glm::vec2{ pos });
+	std::array<GLfloat, 6*5> vertexData;
+
+	struct Vertex {
+		glm::vec2 p;
+		glm::vec2 uv;
+	};
+	const float p = 0.5f, m = -0.5f;
+	std::array<Vertex, 6> vertices{
+		
+		Vertex { glm::vec2{	m, m },	glm::vec2{ u,  v   } },
+		Vertex { glm::vec2{ m, p },	glm::vec2{ u,  v2  } },
+		Vertex { glm::vec2{	p, m },	glm::vec2{ u2, v   } },
+		Vertex { glm::vec2{ m, p },	glm::vec2{ u,  v2  } },
+		Vertex { glm::vec2{	p, p },	glm::vec2{ u2, v2  } },
+		Vertex { glm::vec2{	p, m },	glm::vec2{ u2, v   } },
+		
+		/*
+		Vertex { glm::vec2{	0.0f,	0.0f	},	glm::vec2{ u,  v   } },
+		Vertex { glm::vec2{	0.0f,	height	},	glm::vec2{ u,  v2  } },
+		Vertex { glm::vec2{	width,	0.0f	},	glm::vec2{ u2, v   } },
+		Vertex { glm::vec2{	0.0f,	height	},	glm::vec2{ u,  v2  } },
+		Vertex { glm::vec2{	width,	height	},	glm::vec2{ u2, v2  } },
+		Vertex { glm::vec2{	width,	0.0f	},	glm::vec2{ u2, v   } },
+		/*
+		Vertex { glm::vec3{	pos.x,			pos.y,			pos.z}, glm::vec2{ u,  v   } },
+		Vertex { glm::vec3{	pos.x,			pos.y + height, pos.z}, glm::vec2{ u,  v2  } },
+		Vertex { glm::vec3{	pos.x + width,	pos.y,			pos.z}, glm::vec2{ u2, v   } },
+		Vertex { glm::vec3{	pos.x,			pos.y + height, pos.z}, glm::vec2{ u,  v2  } },
+		Vertex { glm::vec3{	pos.x + width,	pos.y + height,	pos.z}, glm::vec2{ u2, v2  } },
+		Vertex { glm::vec3{	pos.x + width,	pos.y,			pos.z}, glm::vec2{ u2, v   } },
+		*/
+	};
+	auto i = 0;
+	for (auto& vertex: vertices) {
+		vertex.p = pos + transform * glm::vec3{ vertex.p, 1.0f };
+		vertexData[i++] = vertex.p.x;
+		vertexData[i++] = vertex.p.y;
+		vertexData[i++] = pos.z;
+		vertexData[i++] = vertex.uv.x;
+		vertexData[i++] = vertex.uv.y;
+	}
+	return vertexData;
 }
 
 /**
 *	\brief draws a sprite at the specified position
 *	\param z has to be between 0 and 1, where 1 is the most "in front" and 0 is the most "in back"
 */
-void OpenGLRenderer::drawSprite(glm::vec3 pos, float width, float height, std::shared_ptr<Sprite> sprite)
+void OpenGLRenderer::drawSprite(glm::vec3 pos, float width, float height, std::shared_ptr<Sprite> sprite, glm::vec2 direction)
 {
 	unsigned int vertsPerSprite = 6;
 	unsigned int floatsPerVert = 5;
@@ -92,7 +153,7 @@ void OpenGLRenderer::drawSprite(glm::vec3 pos, float width, float height, std::s
 
 	TextureRenderData& textureData = renderData[sprite->texture->ID()];
 	
-    const auto data = spriteVertices(pos, width, height, sprite);
+    const auto data = spriteVertices(pos, width, height, sprite, direction);
 
 	if (!textureData.addData(floatsPerSprite, data.data()))
 	{
@@ -103,7 +164,12 @@ void OpenGLRenderer::drawSprite(glm::vec3 pos, float width, float height, std::s
 
 void OpenGLRenderer::drawSprite(glm::vec3 pos, float width, float height, SpriteEnum sprite)
 {
-	drawSprite(pos, width, height, sprites.get(sprite));
+	drawSprite(pos, width, height, sprites.get(sprite), glm::vec2{ 0.0f, 1.0f });
+}
+
+void OpenGLRenderer::drawSprite(glm::vec3 pos, float width, float height, SpriteEnum sprite, glm::vec2 direction)
+{
+	drawSprite(pos, width, height, sprites.get(sprite), direction);
 }
 
 Camera& OpenGLRenderer::camera()
@@ -156,7 +222,7 @@ void OpenGLRenderer::drawTexture(TextureID textureID)
 
 void OpenGLRenderer::preDraw()
 {
-	this->uploadCamera();
+	uploadCamera();
 	glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
 	glClearDepth(0.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

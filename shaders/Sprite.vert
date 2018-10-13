@@ -5,17 +5,16 @@ layout (location = 1) in vec2 uv;
 
 out vec2 v_uv;
 
-uniform float camX;
-uniform float camY;
+uniform vec2 camPosition;
 uniform float camWidth;
 uniform float camHeight;
+uniform mat3 model, view;
 
 void main(void)
 {
     v_uv = uv;
-
-    vec3 screenPosition = vec3((position.x - camX)/camWidth, 
-                                (position.y - camY)/camHeight, 
-                                position.z);
-    gl_Position = vec4(screenPosition, 1.0);
+	
+	vec3 pos = view * (position - vec3(camPosition, 0.0));
+	
+    gl_Position = vec4(pos, 1.0);
 }

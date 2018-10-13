@@ -25,18 +25,20 @@ public:
 	void preDraw();
 
 	virtual void drawSprite(glm::vec3 pos, float width, float height, SpriteEnum sprite) override;
-	virtual void drawSprite(glm::vec3 pos, float width, float height, std::shared_ptr<Sprite> sprite) override;
+	virtual void drawSprite(glm::vec3 pos, float width, float height, SpriteEnum sprite, glm::vec2 direction) override;
 	virtual void drawCommandVisualizer(glm::vec3 pos, CommandVisualizer& visualizer) override;
 	void draw(double deltaTime);
 
     virtual Camera& camera() override;
 
-    virtual void addStaticSprite(glm::vec3 pos, float width, float height, std::shared_ptr<Sprite> sprite) override;
     virtual void addStaticSprite(glm::vec3 pos, float width, float height, SpriteEnum sprite) override;
     virtual void clearStaticData() override;
 
 private:
-	virtual void uploadCamera();
+	void drawSprite(glm::vec3 pos, float width, float height, std::shared_ptr<Sprite> sprite, glm::vec2 direction);
+	void addStaticSprite(glm::vec3 pos, float width, float height, std::shared_ptr<Sprite> sprite);
+
+	void uploadCamera();
 
 	void findUniformLocations();
 
@@ -51,10 +53,10 @@ private:
 
 	//Camera
 	GLFWwindow* window = nullptr;
-	GLint xLocation;
-	GLint yLocation;
+	GLint cameraPositionLocation;
 	GLint widthLocation;
 	GLint heightLocation;
+	GLint modelLocation, viewLocation;
 	class Camera& m_camera;
     
 
