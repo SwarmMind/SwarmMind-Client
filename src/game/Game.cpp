@@ -55,7 +55,7 @@ GLFWwindow * Game::createWindow() {
 		};
 	}
     glfwMakeContextCurrent(window);
-	glfwSwapInterval(0);
+	glfwSwapInterval(1);
 
     initializeOpenGL();
 

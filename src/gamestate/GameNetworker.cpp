@@ -154,7 +154,7 @@ std::shared_ptr<Command> GameNetworker::parseCommand(const nlohmann::json& jsonC
     std::string type = jsonCommand["type"];
     if (type == "move")
     {
-        nlohmann::json direction = jsonCommand["direction"];
+        nlohmann::json direction = jsonCommand["executedMovement"];
         auto command = std::make_shared<MoveCommand>(jsonCommand["ID"], glm::vec2(direction["x"], direction["y"]));
         return command;
     }
