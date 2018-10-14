@@ -41,15 +41,15 @@ public:
 	void playRandom(SoundEnum soundName);
     void update();
 
-	void receiveEvent(CommandEvent* event);
-	void receiveEvent(SoundEvent* event);
+	void receiveEvent(CommandEvent* event) override;
+	void receiveEvent(SoundEvent* event) override;
 
 	void inMainMenu(bool in_menu);
 
 protected:
 	EventSystem& m_event_system;
     list<sf::Sound> m_sounds;
-    multimap<SoundEnum, sf::SoundBuffer> m_buffers;
+    multimap<SoundEnum, std::unique_ptr<sf::SoundBuffer>> m_buffers;
 
 	std::vector<std::shared_ptr<sf::Music>> menu_music;
 	std::vector<std::shared_ptr<sf::Music>> game_music;

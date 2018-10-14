@@ -11,7 +11,7 @@ Sounds::Sounds(EventSystem& event_system)
 {
 	const size_t filecount = soundFiles.size();
 	uint32_t current_file = 1;
-    for (const auto pair: soundFiles) {
+    for (const auto& pair: soundFiles) {
 		bool success;
 
 		std::cout << "[" << current_file++ << "/" << filecount << "] Loading \"" << pair.second << "\"... ";
@@ -26,13 +26,12 @@ Sounds::Sounds(EventSystem& event_system)
 			success = menu_music.back()->openFromFile(pair.second);
 			break;
 		default:
-			const auto it = m_buffers.emplace(pair.first, sf::SoundBuffer{});
-			success = it->second.loadFromFile(pair.second);
+			const auto it = m_buffers.emplace(pair.first, new sf::SoundBuffer{});
+			success = it->second->loadFromFile(pair.second);
 			break;
 		};
 		if (success) std::cout << "[done]" << std::endl;
     }
-	playBackground();
 }
 
 Sounds::~Sounds()
@@ -41,7 +40,7 @@ Sounds::~Sounds()
 
 
 void Sounds::update() {
-    std::remove_if(m_sounds.begin(), m_sounds.end(), [](sf::Sound& sound) {return sound.getStatus() == sf::Sound::Stopped;});
+    m_sounds.remove_if([](sf::Sound& sound) {return sound.getStatus() == sf::Sound::Stopped;});
 	if (current_music->getStatus() == sf::Sound::Stopped) {
 		playBackground();
 	}
@@ -73,7 +72,7 @@ void Sounds::receiveEvent(CommandEvent * event)
 }
 
 void Sounds::play(SoundEnum soundName) {
-	m_sounds.emplace_back(m_buffers.find(soundName)->second);
+	m_sounds.emplace_back(*m_buffers.find(soundName)->second);
 	m_sounds.back().play();
 }
 
@@ -81,13 +80,13 @@ sf::SoundBuffer& Sounds::selectRandom(SoundEnum soundName) {
 	const auto range = m_buffers.equal_range(soundName);
 	const auto sound_count = std::distance(range.first, range.second);
 	if (sound_count == 1) {
-		return range.first->second;
+		return *range.first->second;
 	} else {
 		std::uniform_int_distribution<std::multimap<SoundEnum, sf::SoundBuffer>::iterator::difference_type> dist{ 0, sound_count - 1 };
 		auto advance = dist(random);
 		auto it = range.first;
 		while (advance--) it++;
-		return it->second;
+		return *it->second;
 	}
 }
 
