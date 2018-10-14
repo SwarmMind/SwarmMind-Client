@@ -63,19 +63,13 @@ void ParticleSystem::spawnShootParticles(glm::vec2 position, glm::vec2 direction
 	direction = glm::normalize(direction);
 	Particles particles;
 
-	//Bullet
-	float bulletSpeed = 20;
-	float bulletLifeTime = 1;
-	glm::vec4 bulletColor(0.1f, 0.1f, 0.1f, 1.0f);
-	particles.addParticle(position, direction * bulletSpeed, bulletLifeTime, bulletColor);
-
 	//Muzzle flash
 	for (size_t i = 0; i < 200; i++)
 	{
 		float angle = randomFloatBetween(-10.0f, 10.0f);
 		glm::vec2 randomizedDirection = glm::rotate(direction, glm::radians(angle));
 		glm::vec2 velocity = randomizedDirection * randomFloatBetween(0.2f, 1.f);
-		glm::vec2 offset = randomOffset(0.2f) + randomizedDirection * randomFloatBetween(0.f, 0.3f);
+		glm::vec2 offset = randomOffset(0.1f) + randomizedDirection * randomFloatBetween(0.1f, 0.3f);
 
 		GLfloat lifeTime = randomFloatBetween(0.2f, 0.7f);
 
@@ -83,6 +77,19 @@ void ParticleSystem::spawnShootParticles(glm::vec2 position, glm::vec2 direction
 		particles.addParticle(position + offset, velocity, lifeTime, color);
 	}
 
+    //Smoke
+    for (size_t i = 0; i < 200; i++)
+    {
+        float angle = randomFloatBetween(-50.0f, 50.0f);
+        glm::vec2 randomizedDirection = glm::rotate(direction, glm::radians(angle));
+        glm::vec2 velocity = randomizedDirection * randomFloatBetween(0.1f, 0.5f);
+        glm::vec2 offset = randomOffset(0.05f) + randomizedDirection * randomFloatBetween(0.f, 0.2f);
+
+        GLfloat lifeTime = randomFloatBetween(0.5f, 1.2f);
+
+        const glm::vec4 color = randomizeColor(glm::vec4{ 0.6f, 0.6f, 0.6f, 0.5f }, 0.05f, true);
+        particles.addParticle(position + offset, velocity, lifeTime, color);
+    }
 
 	addParticles(particles);
 }
