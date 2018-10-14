@@ -24,15 +24,15 @@ public:
 	
 	void preDraw();
 
-	virtual void drawSprite(glm::vec3 pos, float width, float height, SpriteEnum sprite) override;
-	virtual void drawSprite(glm::vec3 pos, float width, float height, std::shared_ptr<Sprite> sprite) override;
+	virtual void drawSprite(glm::vec3 pos, float width, float height, SpriteEnum sprite, float rotation = 0) override;
+	virtual void drawSprite(glm::vec3 pos, float width, float height, std::shared_ptr<Sprite> sprite, float rotation = 0) override;
 	virtual void drawCommandVisualizer(glm::vec3 pos, CommandVisualizer& visualizer) override;
 	void draw(double deltaTime);
 
     virtual Camera& camera() override;
 
-    virtual void addStaticSprite(glm::vec3 pos, float width, float height, std::shared_ptr<Sprite> sprite) override;
-    virtual void addStaticSprite(glm::vec3 pos, float width, float height, SpriteEnum sprite) override;
+    virtual void addStaticSprite(glm::vec3 pos, float width, float height, std::shared_ptr<Sprite> sprite, float rotation = 0) override;
+    virtual void addStaticSprite(glm::vec3 pos, float width, float height, SpriteEnum sprite, float rotation = 0) override;
     virtual void clearStaticData() override;
 
 private:
@@ -72,5 +72,6 @@ private:
 	Textures textures;
 	Sprites sprites;
 
-	void mapBuffer();
+    std::array<GLfloat, 6 * 5> spriteVertices(glm::vec3 pos, float rotation, float width, float height, std::shared_ptr<Sprite> sprite);
+    glm::vec2 rotatePoint(glm::vec2 point, glm::vec2 around, float angle);
 };

@@ -1,6 +1,8 @@
 #include <gamestate/Entity.h>
 #include <renderer/Renderer.h>
 #include <nlohmann/json.hpp>
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/vector_angle.hpp>
 
 Entity::Entity(std::uint32_t id, glm::vec2 position)
 	: m_id{id}
@@ -32,7 +34,12 @@ void Entity::moveTo(glm::vec2 position)
 
 void Entity::rotate(glm::vec2 direction)
 {
-	m_direction = direction;
+	m_direction = glm::normalize(direction);
+}
+
+glm::vec2 Entity::rotation() const
+{
+    return glm::normalize(m_direction);
 }
 
 void Entity::update(double deltaTime)
@@ -51,7 +58,7 @@ void Entity::update(double deltaTime)
 
 void Entity::draw(class Renderer& renderer)
 {
-	renderer.drawSprite(glm::vec3(position() - glm::vec2(0.5f, 0.5f), 1), 1, 1, sprite());
+	renderer.drawSprite(glm::vec3(position() - glm::vec2(0.5f, 0.5f), 1), 1, 1, sprite(), glm::orientedAngle(m_direction, glm::vec2(0.f, 1.f)));
 }
 
 
@@ -68,6 +75,7 @@ Unit::Unit(std::uint32_t _id, glm::vec2 _position)
 Unit::Unit(const nlohmann::json& json)
 	: Unit(json["ID"], glm::vec2(json["x"], json["y"]))
 {}
+
 
 void Unit::setAttackCommands(std::vector<glm::vec2> directions)
 {

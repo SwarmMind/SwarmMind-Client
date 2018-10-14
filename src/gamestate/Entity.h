@@ -19,9 +19,12 @@ public:
 	void moveTo(glm::vec2 position);
 	void rotate(glm::vec2 direction);
 
+    glm::vec2 rotation() const;
+
 	void update(double deltaTime);
 	virtual void draw(class Renderer& renderer);
 protected:
+    Entity() = default;
 	Entity(std::uint32_t _id, glm::vec2 _position);
 	virtual SpriteEnum sprite() = 0;
 
@@ -36,6 +39,7 @@ private:
 class Unit : public Entity
 {
 public:
+    Unit() = default;
 	Unit(const nlohmann::json& json);
 	Unit(std::uint32_t _id, glm::vec2 _position);
 	virtual ~Unit() = default;
@@ -53,6 +57,7 @@ private:
 class Monster : public Entity
 {
 public:
+    Monster() = default;
 	Monster(const nlohmann::json& json);
 	Monster(std::uint32_t _id, glm::vec2 _position);
 	virtual ~Monster() = default;

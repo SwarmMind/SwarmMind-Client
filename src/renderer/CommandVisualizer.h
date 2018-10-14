@@ -9,6 +9,7 @@ using namespace gl41core;
 class CommandVisualizer
 {
 public:
+    CommandVisualizer() = default;
 	CommandVisualizer(GLubyte r, GLubyte g, GLubyte b, float _radius = 0.5);
 
 	~CommandVisualizer();

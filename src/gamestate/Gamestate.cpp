@@ -23,6 +23,25 @@ Gamestate::~Gamestate()
 
 }
 
+void Gamestate::copyRotationsFrom(Gamestate& other)
+{
+    for (auto& unit : other.units)
+    {
+        if (units.find(unit.first) != units.end())
+        {
+            units[unit.first].rotate(unit.second.rotation());
+        }
+    }
+
+    for (auto& monster : other.monsters)
+    {
+        if (monsters.find(monster.first) != monsters.end())
+        {
+            monsters[monster.first].rotate(monster.second.rotation());
+        }
+    }
+}
+
 void Gamestate::update(double deltaTime)
 {
 	for (auto& unit : units)

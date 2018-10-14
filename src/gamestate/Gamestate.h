@@ -32,6 +32,7 @@ public:
 	Gamestate(class EventSystem& eventSystem, std::map<uint32_t, Unit>& _units, const std::map<uint32_t, Monster>& _monsters);
 	~Gamestate();
 
+    void copyRotationsFrom(Gamestate& other);
 	void update(double deltaTime);
 	void draw(class Renderer& renderer);
 

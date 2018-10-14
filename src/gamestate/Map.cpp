@@ -40,6 +40,7 @@ Map::~Map()
 
 void Map::updateGameState(std::shared_ptr<Gamestate> newState)
 {
+    newState->copyRotationsFrom(*m_gamestate);
 	m_gamestate = newState;
 
 	m_lastUpdate = glfwGetTime();
