@@ -1,7 +1,9 @@
 find_package(glfw3 REQUIRED)
 find_package(glbinding REQUIRED)
 find_package(glm REQUIRED)
+set(SFML_STATIC_LIBRARIES TRUE)
 find_package(SFML COMPONENTS audio REQUIRED)
+find_package(sioclient 1.6.0 REQUIRED)
 
 set(sources "main.cpp")
 
@@ -15,8 +17,6 @@ add_subdirectory(game)
 add_subdirectory(menu)
 add_subdirectory(events)
 add_subdirectory(sound)
-
-add_subdirectory(sioclient)
 
 #Replicate the directory structure in Visual Studio filters
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${sources})
