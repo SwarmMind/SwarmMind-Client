@@ -11,67 +11,33 @@ environment:
 matrix:
   fast_finish: true
 cache:
-  - C:\projects\glfw
-  - C:\projects\glbinding
-  - C:\projects\glm
-  - C:\projects\sioclient
-  - C:\projects\build-glfw -> appveyor.yml
-  - C:\projects\build-glbinding -> appveyor.yml
-  - C:\projects\build-glm -> appveyor.yml
-  - C:\projects\build-sioclient -> appveyor.yml
+  - c:\projects\glbinding
+  - c:\projects\build-glbinding -> appveyor.yml
+  - c:\tools\vcpkg\installed\
 install:
   - call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat"
 
+  - vcpkg --triplet x64-windows install glm glfw3 sfml boost-system boost-exception boost-date-time boost-random boost-asio
+
+  - cd c:\tools\vcpkg
+  - vcpkg integrate install
+
   - cd C:\projects
-  - if not exist build-glfw mkdir build-glfw
-  - if not exist build-glm mkdir build-glm
   - if not exist build-glbinding mkdir build-glbinding
-  - if not exist build-sioclient mkdir build-sioclient
-
-  - if not exist "C:\projects\glfw" git clone --depth 1 --no-checkout https://github.com/glfw/glfw.git C:\projects\glfw
-  - cd C:\projects\glfw
-  - git fetch --depth 1 --tags
-  - git checkout %GLFW_VER%
-  - cd ../build-glfw
-  - cmake -DCMAKE_INSTALL_PREFIX=C:\deps\glfw -DGLFW_BUILD_EXAMPLES=OFF -DGLFW_BUILD_TESTS=OFF -G "Visual Studio 15 2017 Win64" ../glfw
-  - cmake --build . --config %CONFIGURATION%
-  - cmake --build . --config %CONFIGURATION% --target install
-
-  - if not exist "C:\projects\glm" git clone --depth 1 --no-checkout https://github.com/g-truc/glm.git C:\projects\glm
-  - cd C:\projects\glm
-  - git fetch --depth 1 --tags
-  - git checkout %GLM_VER%
-  - cd ../build-glm
-  - cmake -DCMAKE_INSTALL_PREFIX=C:\deps\glm -DGLM_INSTALL_ENABLE=true -G "Visual Studio 15 2017 Win64" ../glm
-  - cmake --build . --config %CONFIGURATION%
-  - cmake --build . --config %CONFIGURATION% --target install
 
   - if not exist "C:\projects\glbinding" git clone --depth 1 --no-checkout https://github.com/cginternals/glbinding C:\projects\glbinding
   - cd C:\projects\glbinding
   - git fetch --depth 1 --tags
   - git checkout v%GLBINDING_VER%
   - cd ../build-glbinding
-  - cmake -DCMAKE_BUILD_TYPE=%CONFIGURATION% -DCMAKE_INSTALL_PREFIX=C:\deps\glbinding -DCMAKE_CXX_FLAGS="/D_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING /EHsc" -DCMAKE_PREFIX_PATH=C:\deps\glfw -DBUILD_SHARED_LIBS=OFF -DOPTION_BUILD_TESTS=OFF -DOPTION_BUILD_GPU_TESTS=OFF -DOPTION_BUILD_TOOLS=OFF -G "Visual Studio 15 2017 Win64" ../glbinding
+  - cmake -DCMAKE_INSTALL_PREFIX=C:\deps\glbinding -DCMAKE_CXX_FLAGS="/D_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING /EHsc" -DBUILD_SHARED_LIBS=OFF -DOPTION_BUILD_TESTS=OFF -DOPTION_BUILD_GPU_TESTS=OFF -DOPTION_BUILD_TOOLS=OFF -G "Visual Studio 15 2017 Win64" ../glbinding
   - cmake --build . --config %CONFIGURATION%
   - cmake --build . --config %CONFIGURATION% --target install
-
-  - if not exist "C:\projects\sioclient" git clone --depth 1 --branch fixes https://github.com/SwarmMind/socket.io-client-cpp.git C:\projects\sioclient
-  - cd C:\projects\sioclient
-  - git fetch --depth 1 --tags
-  - cd ../build-sioclient
-  - cmake -DCMAKE_BUILD_TYPE=%CONFIGURATION% -DCMAKE_INSTALL_PREFIX=C:\deps\sioclient -DCMAKE_CXX_FLAGS="/D_SCL_SECURE_NO_WARNINGS /EHsc" -DBOOST_ROOT=C:\Libraries\boost_1_67_0 -DBOOST_VER=1.67.0 -G "Visual Studio 15 2017 Win64" ../sioclient
-  - cmake --build . --config %CONFIGURATION%
-  - cmake --build . --config %CONFIGURATION% --target install
-  
-  - if not exist "C:\deps\sfml" mkdir "C:\deps\sfml"
-  - ps: appveyor DownloadFile "https://www.sfml-dev.org/files/SFML-$env:SFML_VER-windows-vc15-64-bit.zip" -FileName "C:\deps\sfml\sfml.zip"
-  - cd "C:\deps\sfml"
-  - 7z x sfml.zip
 
 before_build:
   - cd C:\projects\swarmmind-client
   - mkdir build && cd build
-  - cmake -DCMAKE_BUILD_TYPE=%CONFIGURATION% -DCMAKE_PREFIX_PATH=C:\deps\glfw;C:\deps\glbinding;C:\deps\sioclient;C:\deps\sfml\SFML-%SFML_VER% -G "Visual Studio 15 2017 Win64" ..
+  - cmake -DCMAKE_TOOLCHAIN_FILE=c:/tools/vcpkg/scripts/buildsystems/vcpkg.cmake -DCMAKE_PREFIX_PATH=C:\deps\glbinding -DBOOST_ROOT=C:\Libraries\boost_1_67_0 -G "Visual Studio 15 2017 Win64" ..
 build:
   project: build\SwarmMind-Client.sln
   verbosity: minimal
@@ -85,7 +51,7 @@ after_build:
   - ps: cp -r -v shaders package
   - ps: cp -r -v sound package
   - ps: cp -r -v res package
-  - ps: cp C:\deps\sfml\SFML-$env:SFML_VER\bin\openal32.dll package
+  - ps: cp -r -v build\src\$env:CONFIGURATION\*.dll package
 
 artifacts:
   - path: package
