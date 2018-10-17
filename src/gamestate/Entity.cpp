@@ -1,6 +1,5 @@
 #include <gamestate/Entity.h>
 #include <renderer/Renderer.h>
-#include <nlohmann/json.hpp>
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/vector_angle.hpp>
 
@@ -44,8 +43,10 @@ glm::vec2 Entity::rotation() const
 
 void Entity::update(double deltaTime)
 {
+	static const float velocity = 2.0f;
+
 	glm::vec2 difference = m_targetPos - m_currentPosition;
-	float distanceToMove = m_velocity * static_cast<float>(deltaTime);
+	float distanceToMove = velocity * static_cast<float>(deltaTime);
 	if (glm::length(difference) <= distanceToMove)
 	{
 		m_currentPosition = m_targetPos;
@@ -71,11 +72,6 @@ Unit::Unit(std::uint32_t id, glm::vec2 position)
 	, m_attackVisualizer(255, 30, 30)
 	, m_moveVisualizer(30, 255, 30, 0.7f)
 {}
-
-Unit::Unit(const nlohmann::json& json)
-	: Unit(json["ID"], glm::vec2(json["x"], json["y"]))
-{}
-
 
 void Unit::setAttackCommands(std::vector<glm::vec2> directions)
 {
@@ -112,12 +108,6 @@ SpriteEnum Unit::sprite()
 Monster::Monster(std::uint32_t id, glm::vec2 position)
 	: Entity{id, position}
 {}
-
-Monster::Monster(const nlohmann::json& json)
-	: Monster(json["ID"], glm::vec2(json["x"], json["y"]))
-{
-
-}
 
 SpriteEnum Monster::sprite()
 {
