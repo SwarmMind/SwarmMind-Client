@@ -198,7 +198,7 @@ std::shared_ptr<Command> GameNetworker::parseCommand(const nlohmann::json& jsonC
 	std::shared_ptr<Command> command;
 	switch (stringToCommand.at(jsonCommand.at("type"))) {
 	case CommandType::Move:
-        command = std::make_shared<MoveCommand>(id, jsonCommand.at("direction"));
+        command = std::make_shared<MoveCommand>(id, jsonCommand.at("executedMovement"));
 		break;
 	case CommandType::Attack:
         command = std::make_shared<AttackCommand>(id, jsonCommand.at("direction"));
