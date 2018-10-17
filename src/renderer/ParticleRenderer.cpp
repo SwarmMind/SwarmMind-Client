@@ -12,18 +12,18 @@
 #include <glbinding/Version.h>
 #include <iostream>
 
-ParticleRenderer::ParticleRenderer(GLFWwindow* _window, Camera& _camera)
-	: window{_window}
-	, camera{_camera}
+ParticleRenderer::ParticleRenderer(GLFWwindow* window, Camera& camera)
+	: m_window{window}
+	, camera{camera}
 {
-	particleUpdateProgram = loadProgram("shaders/Passthrough.vert", "shaders/UpdateParticles.frag");
-	particleDrawingProgram = loadProgram("shaders/ParticleRendering.vert", "shaders/ParticleRendering.frag");
+	m_particleUpdateProgram = loadProgram("shaders/Passthrough.vert", "shaders/UpdateParticles.frag");
+	m_particleDrawingProgram = loadProgram("shaders/ParticleRendering.vert", "shaders/ParticleRendering.frag");
 	intializeUniforms();
 
-	glGenTextures(2, dynamicParticleData);
-	glGenFramebuffers(2, frameBuffers);
-	initializeDynamicData(front);
-	initializeDynamicData(back);
+	glGenTextures(2, m_dynamicParticleData);
+	glGenFramebuffers(2, m_frameBufers);
+	initializeDynamicData(m_front);
+	initializeDynamicData(m_back);
 	initializeStaticData();
 
 	initializeUpdateVertexArray();
@@ -32,43 +32,43 @@ ParticleRenderer::ParticleRenderer(GLFWwindow* _window, Camera& _camera)
 
 ParticleRenderer::~ParticleRenderer()
 {
-	glDeleteFramebuffers(2, frameBuffers);
-	glDeleteTextures(2, dynamicParticleData);
-	glDeleteTextures(1, &particleColor);
-	glDeleteTextures(1, &staticParticleData);
+	glDeleteFramebuffers(2, m_frameBufers);
+	glDeleteTextures(2, m_dynamicParticleData);
+	glDeleteTextures(1, &m_particleColor);
+	glDeleteTextures(1, &m_staticParticleData);
 
-	glDeleteProgram(particleUpdateProgram);
-	glDeleteProgram(particleDrawingProgram);
+	glDeleteProgram(m_particleUpdateProgram);
+	glDeleteProgram(m_particleDrawingProgram);
 
-	glDeleteVertexArrays(1, &updateVao);
-	glDeleteBuffers(1, &updateVbo);
-	glDeleteVertexArrays(1, &drawVao);
-	glDeleteBuffers(1, &drawVbo);
+	glDeleteVertexArrays(1, &m_updateVao);
+	glDeleteBuffers(1, &m_updateVbo);
+	glDeleteVertexArrays(1, &m_drawVao);
+	glDeleteBuffers(1, &m_drawVbo);
 }
 
 void ParticleRenderer::initializeStaticData()
 {
-	glGenTextures(1, &staticParticleData);
-	glBindTexture(GL_TEXTURE_2D, staticParticleData);
+	glGenTextures(1, &m_staticParticleData);
+	glBindTexture(GL_TEXTURE_2D, m_staticParticleData);
 
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, (GLsizei)textureSize, (GLsizei)textureSize, 0, GL_RGBA, GL_FLOAT, nullptr);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, (GLsizei)m_textureSize, (GLsizei)m_textureSize, 0, GL_RGBA, GL_FLOAT, nullptr);
 	setTextureParameters();
 
 	
-	glGenTextures(1, &particleColor);
-	glBindTexture(GL_TEXTURE_2D, particleColor);
+	glGenTextures(1, &m_particleColor);
+	glBindTexture(GL_TEXTURE_2D, m_particleColor);
 	
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, (GLsizei)textureSize, (GLsizei)textureSize, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, (GLsizei)m_textureSize, (GLsizei)m_textureSize, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
 	setTextureParameters();
 }
 
 void ParticleRenderer::initializeDynamicData(unsigned int index)
 {
-	glBindTexture(GL_TEXTURE_2D, dynamicParticleData[index]);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, (GLsizei)textureSize, (GLsizei)textureSize, 0, GL_RGBA, GL_FLOAT, nullptr);
+	glBindTexture(GL_TEXTURE_2D, m_dynamicParticleData[index]);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, (GLsizei)m_textureSize, (GLsizei)m_textureSize, 0, GL_RGBA, GL_FLOAT, nullptr);
 	setTextureParameters();
 
-	glBindFramebuffer(GL_FRAMEBUFFER, frameBuffers[index]);
+	glBindFramebuffer(GL_FRAMEBUFFER, m_frameBufers[index]);
 	setFrameBufferTextures(index);
 
 	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
@@ -81,11 +81,11 @@ void ParticleRenderer::initializeDynamicData(unsigned int index)
 
 void ParticleRenderer::initializeUpdateVertexArray()
 {
-	glGenVertexArrays(1, &updateVao);
-	glBindVertexArray(updateVao);
+	glGenVertexArrays(1, &m_updateVao);
+	glBindVertexArray(m_updateVao);
 
-	glGenBuffers(1, &updateVbo);
-	glBindBuffer(GL_ARRAY_BUFFER, updateVbo);
+	glGenBuffers(1, &m_updateVbo);
+	glBindBuffer(GL_ARRAY_BUFFER, m_updateVbo);
 
 	glVertexAttribPointer(0, 2, GL_FLOAT, false, 2 * sizeof(GLfloat), 0);
 	glEnableVertexAttribArray(0);
@@ -107,19 +107,19 @@ void ParticleRenderer::initializeUpdateVertexArray()
 
 void ParticleRenderer::initializeDrawVertexArray()
 {
-	glGenVertexArrays(1, &drawVao);
-	glBindVertexArray(drawVao);
+	glGenVertexArrays(1, &m_drawVao);
+	glBindVertexArray(m_drawVao);
 
-	glGenBuffers(1, &drawVbo);
-	glBindBuffer(GL_ARRAY_BUFFER, drawVbo);
+	glGenBuffers(1, &m_drawVbo);
+	glBindBuffer(GL_ARRAY_BUFFER, m_drawVbo);
 	
 	std::vector<GLfloat> drawVertexData({
-		-particleSize,	-particleSize,		-1, -1,
-		particleSize,	-particleSize,		1, -1,
-		particleSize,	particleSize,		1, 1,
-		-particleSize,	-particleSize,		-1, -1,
-		particleSize,	particleSize,		1, 1,
-		-particleSize,	particleSize,		-1, 1
+		-m_particleSize,	-m_particleSize,		-1, -1,
+		m_particleSize,	-m_particleSize,		1, -1,
+		m_particleSize,	m_particleSize,		1, 1,
+		-m_particleSize,	-m_particleSize,		-1, -1,
+		m_particleSize,	m_particleSize,		1, 1,
+		-m_particleSize,	m_particleSize,		-1, 1
 	});
 
 	glVertexAttribPointer(0, 2, GL_FLOAT, false, 4 * sizeof(GLfloat), 0);
@@ -135,20 +135,20 @@ void ParticleRenderer::initializeDrawVertexArray()
 
 void ParticleRenderer::intializeUniforms()
 {
-	deltaTimeUniform = glGetUniformLocation(particleUpdateProgram, "deltaTime");
+	m_deltaTimeUniform = glGetUniformLocation(m_particleUpdateProgram, "deltaTime");
 	
-	glUseProgram(particleUpdateProgram);
-	GLuint staticDataSampler = glGetUniformLocation(particleUpdateProgram, "staticDataSampler");
+	glUseProgram(m_particleUpdateProgram);
+	GLuint staticDataSampler = glGetUniformLocation(m_particleUpdateProgram, "staticDataSampler");
 	glUniform1i(staticDataSampler, 1);
 
-	glUseProgram(particleDrawingProgram);
-	GLuint textureSizeUniform = glGetUniformLocation(particleDrawingProgram, "particleTextureSize");
-	glUniform1ui(textureSizeUniform, (GLuint)textureSize);
-	GLuint particleColorSampler = glGetUniformLocation(particleDrawingProgram, "particleColorSampler");
+	glUseProgram(m_particleDrawingProgram);
+	GLuint textureSizeUniform = glGetUniformLocation(m_particleDrawingProgram, "particleTextureSize");
+	glUniform1ui(textureSizeUniform, (GLuint)m_textureSize);
+	GLuint particleColorSampler = glGetUniformLocation(m_particleDrawingProgram, "particleColorSampler");
 	glUniform1i(particleColorSampler, 1);
 
-	cameraPositionUniform = glGetUniformLocation(particleDrawingProgram, "cameraPosition");
-	cameraSizeUniform = glGetUniformLocation(particleDrawingProgram, "cameraSize");
+	m_cameraPositionUniform = glGetUniformLocation(m_particleDrawingProgram, "cameraPosition");
+	m_cameraSizeUniform = glGetUniformLocation(m_particleDrawingProgram, "cameraSize");
 }
 
 void ParticleRenderer::setTextureParameters()
@@ -169,7 +169,7 @@ void ParticleRenderer::clearTexture()
 
 void ParticleRenderer::setFrameBufferTextures(int index)
 {
-	glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, dynamicParticleData[index], 0);
+	glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, m_dynamicParticleData[index], 0);
 
 	std::array<GLenum, 1> drawBuffers = { GL_COLOR_ATTACHMENT0 };
 	glDrawBuffers((GLsizei)drawBuffers.size(), drawBuffers.data());
@@ -189,22 +189,22 @@ void ParticleRenderer::updateParticles(double deltaTime)
 {
 	glDisable(GL_BLEND);
 	glDisable(GL_DEPTH_TEST);
-	glViewport(0, 0, (GLsizei)textureSize, (GLsizei)textureSize);
-	glUseProgram(particleUpdateProgram);
-	glBindVertexArray(updateVao);
+	glViewport(0, 0, (GLsizei)m_textureSize, (GLsizei)m_textureSize);
+	glUseProgram(m_particleUpdateProgram);
+	glBindVertexArray(m_updateVao);
 
-	glUniform1f(deltaTimeUniform, static_cast<GLfloat>(deltaTime));
+	glUniform1f(m_deltaTimeUniform, static_cast<GLfloat>(deltaTime));
 
-	glBindFramebuffer(GL_FRAMEBUFFER, frameBuffers[back]);
+	glBindFramebuffer(GL_FRAMEBUFFER, m_frameBufers[m_back]);
 	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, staticParticleData);
+	glBindTexture(GL_TEXTURE_2D, m_staticParticleData);
 
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, dynamicParticleData[front]); 
+	glBindTexture(GL_TEXTURE_2D, m_dynamicParticleData[m_front]); 
 
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 
-	std::swap(front, back);
+	std::swap(m_front, m_back);
 }
 
 void ParticleRenderer::drawParticles()
@@ -215,31 +215,31 @@ void ParticleRenderer::drawParticles()
 	glDepthMask(GL_FALSE); //only read from the depth buffer, do not write
 
 	int width, height;
-	glfwGetFramebufferSize(window, &width, &height);
+	glfwGetFramebufferSize(m_window, &width, &height);
 	uploadCamera(width, height);
 
 	glViewport(0, 0, width, height);
-	glUseProgram(particleDrawingProgram);
-	glBindVertexArray(drawVao);
+	glUseProgram(m_particleDrawingProgram);
+	glBindVertexArray(m_drawVao);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, particleColor);
+	glBindTexture(GL_TEXTURE_2D, m_particleColor);
 
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, dynamicParticleData[front]);
+	glBindTexture(GL_TEXTURE_2D, m_dynamicParticleData[m_front]);
 
-	glDrawArraysInstanced(GL_TRIANGLES, 0, 6, (GLsizei)(textureSize * textureSize));
+	glDrawArraysInstanced(GL_TRIANGLES, 0, 6, (GLsizei)(m_textureSize * m_textureSize));
 
 	glDepthMask(GL_TRUE);
 }
 
 void ParticleRenderer::uploadCamera(int frameBufferWidth, int frameBufferHeight)
 {
-	glUseProgram(particleDrawingProgram);
+	glUseProgram(m_particleDrawingProgram);
 	const auto pos = camera.position(), extent = camera.extent();
-	glUniform2f(cameraPositionUniform, pos.x, pos.y);
-	glUniform2f(cameraSizeUniform, extent.x, extent.y);
+	glUniform2f(m_cameraPositionUniform, pos.x, pos.y);
+	glUniform2f(m_cameraSizeUniform, extent.x, extent.y);
 }
 
 void ParticleRenderer::draw(double deltaTime)
@@ -253,20 +253,20 @@ void ParticleRenderer::draw(double deltaTime)
 
 void ParticleRenderer::addParticles(Particles particles)
 {
-	assert(particles.dynamicData.size() % 4 == 0);
-	assert(particles.dynamicData.size() == particles.staticData.size());
-	assert(particles.dynamicData.size() == particles.color.size());
+	assert(particles.m_dynamicData.size() % 4 == 0);
+	assert(particles.m_dynamicData.size() == particles.m_staticData.size());
+	assert(particles.m_dynamicData.size() == particles.m_color.size());
 
 	size_t dataOffset = 0;
-	size_t dataSize = particles.dynamicData.size() / 4;
+	size_t dataSize = particles.m_dynamicData.size() / 4;
 	while (dataOffset < dataSize)
 	{
 		//write the particle data, one row at a time
-		size_t xOffset = textureOffset % textureSize;
-		size_t yOffset = textureOffset / textureSize	;
-		size_t remainingWidth = std::min(textureSize - xOffset, dataSize - dataOffset);
+		size_t xOffset = m_textureOffset % m_textureSize;
+		size_t yOffset = m_textureOffset / m_textureSize	;
+		size_t remainingWidth = std::min(m_textureSize - xOffset, dataSize - dataOffset);
 
-		glBindTexture(GL_TEXTURE_2D, dynamicParticleData[front]);
+		glBindTexture(GL_TEXTURE_2D, m_dynamicParticleData[m_front]);
 		glTexSubImage2D(GL_TEXTURE_2D, 
 			0, 
 			(GLint)xOffset, 
@@ -274,9 +274,9 @@ void ParticleRenderer::addParticles(Particles particles)
 			(GLsizei)remainingWidth, 
 			1, 
 			GL_RGBA, GL_FLOAT, 
-			particles.dynamicData.data() + dataOffset * 4);
+			particles.m_dynamicData.data() + dataOffset * 4);
 
-		glBindTexture(GL_TEXTURE_2D, staticParticleData);
+		glBindTexture(GL_TEXTURE_2D, m_staticParticleData);
 		glTexSubImage2D(GL_TEXTURE_2D,
 			0,
 			(GLint)xOffset,
@@ -285,9 +285,9 @@ void ParticleRenderer::addParticles(Particles particles)
 			1,
 			GL_RGBA,
 			GL_FLOAT,
-			particles.staticData.data() + dataOffset * 4);
+			particles.m_staticData.data() + dataOffset * 4);
 
-		glBindTexture(GL_TEXTURE_2D, particleColor);
+		glBindTexture(GL_TEXTURE_2D, m_particleColor);
 		glTexSubImage2D(GL_TEXTURE_2D,
 			0,
 			(GLint)xOffset,
@@ -296,13 +296,13 @@ void ParticleRenderer::addParticles(Particles particles)
 			1,
 			GL_RGBA,
 			GL_UNSIGNED_BYTE,
-			particles.color.data() + dataOffset * 4);
+			particles.m_color.data() + dataOffset * 4);
 		
-		textureOffset += remainingWidth;
-		if (textureOffset >= textureSize * textureSize)
+		m_textureOffset += remainingWidth;
+		if (m_textureOffset >= m_textureSize * m_textureSize)
 		{
 			//Start writing to the texture again, if it is full.
-			textureOffset = 0;
+			m_textureOffset = 0;
 		}
 		dataOffset += remainingWidth;
 	}

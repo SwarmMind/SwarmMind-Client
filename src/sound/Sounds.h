@@ -47,22 +47,22 @@ public:
 	void inMainMenu(bool in_menu);
 
 protected:
-	EventSystem& m_event_system;
+	EventSystem& m_eventSystem;
     list<sf::Sound> m_sounds;
     multimap<SoundEnum, std::unique_ptr<sf::SoundBuffer>> m_buffers;
 
-	std::vector<std::shared_ptr<sf::Music>> menu_music;
-	std::vector<std::shared_ptr<sf::Music>> game_music;
-	std::shared_ptr<sf::Music> current_music;
+	std::vector<std::shared_ptr<sf::Music>> m_menuMusic;
+	std::vector<std::shared_ptr<sf::Music>> m_gameMusic;
+	std::shared_ptr<sf::Music> m_currentMusic;
 
 	void playBackground();
 
 	sf::SoundBuffer& selectRandom(SoundEnum soundName);
 
 private:
-	bool m_main_menu = true;
+	bool m_mainMenu = true;
 
-	std::mt19937_64 random;
+	std::mt19937_64 m_random;
 
-	static const multimap<SoundEnum, std::string> soundFiles;
+	static const multimap<SoundEnum, std::string> m_soundFiles;
 };

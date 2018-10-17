@@ -12,12 +12,12 @@ Sprites::Sprites(class Textures& textures)
 	for (auto& spriteInit : spriteList)
 	{
 		SpriteInitList initList = spriteInit.second;
-		sprites[spriteInit.first] = std::make_shared<Sprite>(
-			textures[initList.texture],
-			initList.u,
-			initList.v,
-			initList.width,
-			initList.height
+		m_sprites[spriteInit.first] = std::make_shared<Sprite>(
+			textures[initList.m_texture],
+			initList.m_u,
+			initList.m_v,
+			initList.m_width,
+			initList.m_height
 		);
 	}
 }
@@ -28,8 +28,8 @@ Sprites::~Sprites()
 
 std::shared_ptr<Sprite> Sprites::get(SpriteEnum sprite)
 {
-	auto iterator = sprites.find(sprite);
-	if (iterator == sprites.end())
+	auto iterator = m_sprites.find(sprite);
+	if (iterator == m_sprites.end())
 	{
 		throw out_of_range("Sprite is not loaded!");
 	}

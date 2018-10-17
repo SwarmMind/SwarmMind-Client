@@ -66,10 +66,10 @@ void Entity::draw(class Renderer& renderer)
 //////////////////////////////////////////////////////////////////////////
 //							Unit
 //////////////////////////////////////////////////////////////////////////
-Unit::Unit(std::uint32_t _id, glm::vec2 _position)
-	: Entity(_id, _position)
-	, attackVisualizer(255, 30, 30)
-	, moveVisualizer(30, 255, 30, 0.7f)
+Unit::Unit(std::uint32_t id, glm::vec2 position)
+	: Entity(id, position)
+	, m_attackVisualizer(255, 30, 30)
+	, m_moveVisualizer(30, 255, 30, 0.7f)
 {}
 
 Unit::Unit(const nlohmann::json& json)
@@ -79,20 +79,20 @@ Unit::Unit(const nlohmann::json& json)
 
 void Unit::setAttackCommands(std::vector<glm::vec2> directions)
 {
-	attackVisualizer.setCommands(directions);
+	m_attackVisualizer.setCommands(directions);
 }
 
 void Unit::setMoveCommands(std::vector<glm::vec2> directions)
 {
-	moveVisualizer.setCommands(directions);
+	m_moveVisualizer.setCommands(directions);
 }
 
 void Unit::draw(Renderer& renderer)
 {
 	Entity::draw(renderer);
 
-	renderer.drawCommandVisualizer(glm::vec3(position(), 1.f), attackVisualizer);
-	renderer.drawCommandVisualizer(glm::vec3(position(), 1.f), moveVisualizer);
+	renderer.drawCommandVisualizer(glm::vec3(position(), 1.f), m_attackVisualizer);
+	renderer.drawCommandVisualizer(glm::vec3(position(), 1.f), m_moveVisualizer);
 }
 
 SpriteEnum Unit::sprite()
@@ -109,8 +109,8 @@ SpriteEnum Unit::sprite()
 //////////////////////////////////////////////////////////////////////////
 //						Monster
 //////////////////////////////////////////////////////////////////////////
-Monster::Monster(std::uint32_t _id, glm::vec2 _position)
-	: Entity{_id, _position}
+Monster::Monster(std::uint32_t id, glm::vec2 position)
+	: Entity{id, position}
 {}
 
 Monster::Monster(const nlohmann::json& json)

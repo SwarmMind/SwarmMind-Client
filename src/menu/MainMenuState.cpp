@@ -9,8 +9,8 @@
 #include <game/Game.h>
 #include <gamestate/Map.h>
 
-MainMenuState::MainMenuState(Game* _game, EventSystem& eventSystem, Input& input, Renderer& renderer, Settings& settings)
-	: game{_game}
+MainMenuState::MainMenuState(Game* game, EventSystem& eventSystem, Input& input, Renderer& renderer, Settings& settings)
+	: m_game{game}
     , m_input{input}
     , m_renderer{renderer}
     , m_eventSystem{eventSystem}
@@ -18,7 +18,7 @@ MainMenuState::MainMenuState(Game* _game, EventSystem& eventSystem, Input& input
     , EventListener<InitStateEvent>(eventSystem)
 	, m_settings{settings}
 {
-	port_input = m_settings.port;
+	port_input = m_settings.m_port;
     m_networker.begin(m_renderer);
 }
 
@@ -55,16 +55,16 @@ void MainMenuState::draw(Renderer& renderer)
 		| ImGuiWindowFlags_AlwaysAutoResize
 		| ImGuiWindowFlags_NoMove))
 	{
-		if (ImGui::InputText("Address", &m_settings.hostname, ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_AutoSelectAll))
+		if (ImGui::InputText("Address", &m_settings.m_hostname, ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_AutoSelectAll))
 		{
-			game->connectTo(m_settings.hostname, m_settings.port);
+			m_game->connectTo(m_settings.m_hostname, m_settings.m_port);
             ImGui::End();
             return;
 		}
 
 		if (ImGui::Button("Connect!"))
 		{
-			game->connectTo(m_settings.hostname, m_settings.port);
+			m_game->connectTo(m_settings.m_hostname, m_settings.m_port);
             ImGui::End();
             return;
 		}
@@ -78,13 +78,13 @@ void MainMenuState::draw(Renderer& renderer)
 			{
 				if (ImGui::Button("Reset"))
 				{
-					m_settings.port = port_input = default_port;
+					m_settings.m_port = port_input = default_port;
 				}
 				ImGui::SameLine();
 				if (ImGui::InputInt("Port", &port_input, 1, 100))
 				{
 					port_input = std::min(std::max(port_input, 0), USHRT_MAX);
-					m_settings.port = static_cast<uint16_t>(port_input);
+					m_settings.m_port = static_cast<uint16_t>(port_input);
 				}
 			}
 			ImGui::EndChild();
@@ -96,7 +96,7 @@ void MainMenuState::draw(Renderer& renderer)
 void MainMenuState::receiveEvent(InitStateEvent* event)
 {
     m_renderer.clearStaticData();
-    m_map = std::make_unique<Map>(m_input, m_networker, m_eventSystem, event->m_config, m_settings.username);
+    m_map = std::make_unique<Map>(m_input, m_networker, m_eventSystem, event->m_config, m_settings.m_username);
     m_map->drawGridStatic(m_renderer);
     m_map->updateGameState(event->m_state);
     m_map->m_lastUpdate -= event->m_timeSinceLastRound;

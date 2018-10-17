@@ -5,12 +5,12 @@
 
 using namespace std;
 
-Gamestate::Gamestate(class EventSystem& eventSystem, std::map<uint32_t, Unit>& _units, const std::map<uint32_t, Monster>& _monsters)
+Gamestate::Gamestate(class EventSystem& eventSystem, std::map<uint32_t, Unit>& units, const std::map<uint32_t, Monster>& monsters)
 	: EventListener<CommandEvent>(eventSystem)
 	, EventListener<AccumulatedCommandsEvent>(eventSystem)
-	, units{ _units }
+	, m_units{ units }
     , m_map{nullptr}
-	, monsters{ _monsters }
+	, m_monsters{ monsters }
 {}
 
 Gamestate::Gamestate(EventSystem& eventSystem)
@@ -25,31 +25,31 @@ Gamestate::~Gamestate()
 
 void Gamestate::copyRotationsFrom(Gamestate& other)
 {
-    for (auto& unit : other.units)
+    for (auto& unit : other.m_units)
     {
-        if (units.find(unit.first) != units.end())
+        if (m_units.find(unit.first) != m_units.end())
         {
-            units[unit.first].rotate(unit.second.rotation());
+            m_units[unit.first].rotate(unit.second.rotation());
         }
     }
 
-    for (auto& monster : other.monsters)
+    for (auto& monster : other.m_monsters)
     {
-        if (monsters.find(monster.first) != monsters.end())
+        if (m_monsters.find(monster.first) != m_monsters.end())
         {
-            monsters[monster.first].rotate(monster.second.rotation());
+            m_monsters[monster.first].rotate(monster.second.rotation());
         }
     }
 }
 
 void Gamestate::update(double deltaTime)
 {
-	for (auto& unit : units)
+	for (auto& unit : m_units)
 	{
 		unit.second.update(deltaTime);
 	}
 
-	for (auto& monster : monsters)
+	for (auto& monster : m_monsters)
 	{
 		monster.second.update(deltaTime);
 	}
@@ -61,12 +61,12 @@ void Gamestate::setMap(Map* map) {
 
 void Gamestate::draw(class Renderer& renderer)
 {
-	for (auto& unit : units)
+	for (auto& unit : m_units)
 	{
 		unit.second.draw(renderer);
 	}
 
-	for (auto& monster : monsters)
+	for (auto& monster : m_monsters)
 	{
 		monster.second.draw(renderer);
 	}
@@ -74,37 +74,37 @@ void Gamestate::draw(class Renderer& renderer)
 
 Entity* Gamestate::getEntityByID(uint32_t ID)
 {
-	if (units.find(ID) != units.end())
+	if (m_units.find(ID) != m_units.end())
 	{
-		return &units.at(ID);
+		return &m_units.at(ID);
 	}
-	if (monsters.find(ID) != monsters.end())
+	if (m_monsters.find(ID) != m_monsters.end())
 	{
-		return &monsters.at(ID);
+		return &m_monsters.at(ID);
 	}
 	return nullptr;
 }
 
 void Gamestate::deleteEntity(uint32_t ID)
 {
-	units.erase(ID);
-	monsters.erase(ID);
+	m_units.erase(ID);
+	m_monsters.erase(ID);
 }
 
 void Gamestate::receiveEvent(CommandEvent* event)
 {
-	event->command->executeOn(*this);
+	event->m_command->executeOn(*this);
 }
 
 void Gamestate::receiveEvent(AccumulatedCommandsEvent* event)
 {
 	for (AccumulatedCommands commands : event->m_commands)
 	{
-		Unit* unit = dynamic_cast<Unit*>(getEntityByID(commands.ID));
+		Unit* unit = dynamic_cast<Unit*>(getEntityByID(commands.m_ID));
 		if (unit != nullptr)
 		{
-			unit->setAttackCommands(commands.attackDirections);
-			unit->setMoveCommands(commands.moveDirections);
+			unit->setAttackCommands(commands.m_attackDirections);
+			unit->setMoveCommands(commands.m_moveDirections);
 		}
 	}
 }

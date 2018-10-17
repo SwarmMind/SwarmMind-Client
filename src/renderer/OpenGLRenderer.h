@@ -40,37 +40,29 @@ private:
 
 	void findUniformLocations();
 
-	GLint program;
+	GLint m_program;
 
     //static renderData
     std::vector<StaticRenderData> m_staticRenderData;
 
 	//Texture render data
-	std::unordered_map<TextureID, TextureRenderData> renderData;
+	std::unordered_map<TextureID, TextureRenderData> m_renderData;
 	void drawTexture(TextureID texture);
 
 	//Camera
-	GLFWwindow* window = nullptr;
-	GLint xLocation;
-	GLint yLocation;
-	GLint widthLocation;
-	GLint heightLocation;
+	GLFWwindow* m_window = nullptr;
+	GLint m_xLocation;
+	GLint m_yLocation;
+	GLint m_widthLocation;
+	GLint m_heightLocation;
 	class Camera& m_camera;
     
 
-	ParticleRenderer particleRenderer;
-	CommandVisualizationRenderer commandRenderer;
+	ParticleRenderer m_particleRenderer;
+	CommandVisualizationRenderer m_commandRenderer;
 
-	//////////////////////////////////////////////////////////////////////////
-	//					command visualization
-	//////////////////////////////////////////////////////////////////////////
-	GLuint commandVisualizationVertexArray;
-	GLuint positionVertexBuffer, colorVertexBuffer;
-	GLfloat* mappedPositionBuffer = nullptr;
-	GLubyte* mappedColorBuffer = nullptr;
-
-	Textures textures;
-	Sprites sprites;
+	Textures m_textures;
+	Sprites m_sprites;
 
     std::array<GLfloat, 6 * 5> spriteVertices(glm::vec3 pos, float rotation, float width, float height, std::shared_ptr<Sprite> sprite);
     glm::vec2 rotatePoint(glm::vec2 point, glm::vec2 around, float angle);

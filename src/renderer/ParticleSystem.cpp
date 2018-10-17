@@ -145,20 +145,20 @@ float ParticleSystem::randomFloatBetween(float minimum, float maximum)
 
 void Particles::addParticle(GLfloat x, GLfloat y, GLfloat xVelocity, GLfloat yVelocity, GLfloat lifetime, GLubyte r, GLubyte g, GLubyte b, GLubyte alpha)
 {
-	dynamicData.push_back(x);
-	dynamicData.push_back(y);
-	dynamicData.push_back(lifetime);
-	dynamicData.push_back(0.0f);
+	m_dynamicData.push_back(x);
+	m_dynamicData.push_back(y);
+	m_dynamicData.push_back(lifetime);
+	m_dynamicData.push_back(0.0f);
 
-	staticData.push_back(xVelocity);
-	staticData.push_back(yVelocity);
-	staticData.push_back(0.0f);
-	staticData.push_back(0);
+	m_staticData.push_back(xVelocity);
+	m_staticData.push_back(yVelocity);
+	m_staticData.push_back(0.0f);
+	m_staticData.push_back(0);
 
-	color.push_back(r);
-	color.push_back(g);
-	color.push_back(b);
-	color.push_back(alpha);
+	m_color.push_back(r);
+	m_color.push_back(g);
+	m_color.push_back(b);
+	m_color.push_back(alpha);
 }
 
 void Particles::addParticle(glm::vec2 position, glm::vec2 velocity, float lifeTime, glm::vec4 color)

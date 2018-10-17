@@ -72,8 +72,8 @@ public:
 
 	void processEvent(std::shared_ptr<Event> _event);
 protected:
-	std::vector<ListenerFunction*> listeners;
+	std::vector<ListenerFunction*> m_listeners;
 
-	std::mutex queueLock;
-	std::priority_queue<TimedEvent, std::deque<TimedEvent>, std::greater<TimedEvent>> eventQueue;
+	std::mutex m_queueLock;
+	std::priority_queue<TimedEvent, std::deque<TimedEvent>, std::greater<TimedEvent>> m_eventQueue;
 };

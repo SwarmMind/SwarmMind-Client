@@ -63,13 +63,13 @@ GLFWwindow * Game::createWindow() {
 }
 
 Game::Game()
-	: sounds{ eventSystem }
-    , window { createWindow() }
-    , camera { window, 10, 10, 11 }
-    , renderer { window, camera }
-    , imguiRenderer{ window }
-    , input { window, &camera }
-    , sprites { textures }
+	: m_sounds{ m_eventSystem }
+    , m_window { createWindow() }
+    , m_camera { m_window, 10, 10, 11 }
+    , m_renderer { m_window, m_camera }
+    , m_imguiRenderer{ m_window }
+    , m_input { m_window, &m_camera }
+    , m_sprites { m_textures }
 {
 	initializeImGui();
 
@@ -78,24 +78,24 @@ Game::Game()
 
 void Game::connectTo(std::string address, unsigned int port)
 {
-	settings.hostname = address;
-	settings.port = port;
-	settings.save();
+	m_settings.m_hostname = address;
+	m_settings.m_port = port;
+	m_settings.save();
 
-    renderer.clearStaticData();
-	menu = std::make_unique<ConnectedState>(*this, renderer, input, eventSystem, settings);
+    m_renderer.clearStaticData();
+	m_menu = std::make_unique<ConnectedState>(*this, m_renderer, m_input, m_eventSystem, m_settings);
 
-	sounds.inMainMenu(false);
+	m_sounds.inMainMenu(false);
 }
 
 void Game::openMainMenu()
 {
-	settings.read();
+	m_settings.read();
 
-    menu = nullptr; //Delete the ConnectedState first!
+    m_menu = nullptr; //Delete the ConnectedState first!
                     //Important, because otherwise it is still registered as an EventListener
-	menu = std::make_unique<MainMenuState>(this, eventSystem, input, renderer, settings);
-	sounds.inMainMenu(true);
+	m_menu = std::make_unique<MainMenuState>(this, m_eventSystem, m_input, m_renderer, m_settings);
+	m_sounds.inMainMenu(true);
 }
 
 void Game::initializeImGui()
@@ -139,25 +139,25 @@ void Game::processInputs(double deltaTime)
 {
     /* Poll for and process events */
     glfwPollEvents();
-	input.update(deltaTime);
+	m_input.update(deltaTime);
 }
 
 void Game::update(double time, double timeStamp)
 {
-    imguiRenderer.preRender(); // required before any update in order for popups to work!
-	eventSystem.update(time, timeStamp);
-    menu->update(time, timeStamp);
-	sounds.update();
+    m_imguiRenderer.preRender(); // required before any update in order for popups to work!
+	m_eventSystem.update(time, timeStamp);
+    m_menu->update(time, timeStamp);
+	m_sounds.update();
 }
 
 void Game::render(double timeElapsed)
 {
-    renderer.preDraw();
-	menu->draw(renderer);
+    m_renderer.preDraw();
+	m_menu->draw(m_renderer);
 	drawDebug(timeElapsed);
-    renderer.draw(timeElapsed);
-    imguiRenderer.render();
-    glfwSwapBuffers(window);
+    m_renderer.draw(timeElapsed);
+    m_imguiRenderer.render();
+    glfwSwapBuffers(m_window);
 }
 
 void Game::drawDebug(double timeElapsed)
@@ -168,7 +168,7 @@ void Game::drawDebug(double timeElapsed)
 	while (frameTimes.size() > 60)
 		frameTimes.pop_front();
 
-	if (input.isActionPressed(Debug))
+	if (m_input.isActionPressed(Debug))
 	{
 		double timeSum = 0;
 		for (double frameTime : frameTimes)
@@ -201,7 +201,7 @@ void Game::drawDebug(double timeElapsed)
 
 	}
 
-	if (input.isActionJustPressed(Debug))
+	if (m_input.isActionJustPressed(Debug))
 	{
 		ParticleSystem::spawnShootParticles(glm::vec2(5, 5), glm::vec2(0.5, 0.5));
 	}
@@ -210,7 +210,7 @@ void Game::drawDebug(double timeElapsed)
 void Game::loop() {
     /* Loop until the user closes the window */
     double lastTime = glfwGetTime(); 
-    while (!glfwWindowShouldClose(window))
+    while (!glfwWindowShouldClose(m_window))
     {
         const double current = glfwGetTime();
         const double elapsed = current - lastTime;

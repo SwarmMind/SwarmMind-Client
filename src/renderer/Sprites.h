@@ -19,8 +19,8 @@ enum class SpriteEnum
 };
 
 struct SpriteInitList {
-	TextureEnum texture;
-	float u, v, width, height;
+	TextureEnum m_texture;
+	float m_u, m_v, m_width, m_height;
 };
 
 class Sprites
@@ -34,5 +34,5 @@ public:
 
 private:
 	map<SpriteEnum, SpriteInitList> spriteTextures();
-	map<SpriteEnum, std::shared_ptr<Sprite>> sprites;
+	map<SpriteEnum, std::shared_ptr<Sprite>> m_sprites;
 };

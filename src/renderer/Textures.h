@@ -27,7 +27,6 @@ public:
 	std::shared_ptr<Texture> get(TextureEnum texture);
 
 private:
-	map<TextureEnum, std::shared_ptr<Texture>> textures;
-	static const map<TextureEnum, string> texturePaths;
-
+	map<TextureEnum, std::shared_ptr<Texture>> m_textures;
+	static const map<TextureEnum, string> m_texturePaths;
 };

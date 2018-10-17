@@ -12,14 +12,14 @@ TutorialNetworker::TutorialNetworker(class EventSystem& eventSystem)
 void TutorialNetworker::sendCommand(uint32_t unitID, std::string action, glm::vec2 direction)
 {
     AccumulatedCommands commands;
-    commands.ID = unitID;
+    commands.m_ID = unitID;
     if (action == "move")
     {
-        commands.moveDirections = { direction };
+        commands.m_moveDirections = { direction };
     }
     else
     {
-        commands.attackDirections = { direction };
+        commands.m_attackDirections = { direction };
     }
 	
 	m_eventSystem.processEvent(std::make_shared<AccumulatedCommandsEvent>(std::vector<AccumulatedCommands>{ commands }, 0, 1));

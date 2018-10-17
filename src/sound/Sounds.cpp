@@ -2,28 +2,28 @@
 #include <cstdint>
 #include <sound/Sounds.h>
 
-Sounds::Sounds(EventSystem& event_system)
-	: m_event_system{event_system}
-	, EventListener<CommandEvent>(event_system)
-	, EventListener<SoundEvent>(event_system)
-	, random{ std::random_device{}() }
-	, current_music{ nullptr }
+Sounds::Sounds(EventSystem& eventSystem)
+	: m_eventSystem{eventSystem}
+	, EventListener<CommandEvent>(eventSystem)
+	, EventListener<SoundEvent>(eventSystem)
+	, m_random{ std::random_device{}() }
+	, m_currentMusic{ nullptr }
 {
-	const size_t filecount = soundFiles.size();
+	const size_t filecount = m_soundFiles.size();
 	uint32_t current_file = 1;
-    for (const auto& pair: soundFiles) {
+    for (const auto& pair: m_soundFiles) {
 		bool success;
 
 		std::cout << "[" << current_file++ << "/" << filecount << "] Loading \"" << pair.second << "\"... ";
 		std::cout.flush();
 		switch (pair.first) {
 		case SoundEnum::Background:
-			game_music.emplace_back(std::make_shared<sf::Music>());
-			success = game_music.back()->openFromFile(pair.second);
+			m_gameMusic.emplace_back(std::make_shared<sf::Music>());
+			success = m_gameMusic.back()->openFromFile(pair.second);
 			break;
 		case SoundEnum::Menu:
-			menu_music.emplace_back(std::make_shared<sf::Music>());
-			success = menu_music.back()->openFromFile(pair.second);
+			m_menuMusic.emplace_back(std::make_shared<sf::Music>());
+			success = m_menuMusic.back()->openFromFile(pair.second);
 			break;
 		default:
 			const auto it = m_buffers.emplace(pair.first, new sf::SoundBuffer{});
@@ -41,7 +41,7 @@ Sounds::~Sounds()
 
 void Sounds::update() {
     m_sounds.remove_if([](sf::Sound& sound) {return sound.getStatus() == sf::Sound::Stopped;});
-	if (current_music->getStatus() == sf::Sound::Stopped) {
+	if (m_currentMusic->getStatus() == sf::Sound::Stopped) {
 		playBackground();
 	}
 }
@@ -53,7 +53,7 @@ void Sounds::receiveEvent(SoundEvent * event)
 
 void Sounds::receiveEvent(CommandEvent * event)
 {
-	switch (event->command->type()) {
+	switch (event->m_command->type()) {
 	case CommandType::Move:
 		play(SoundEnum::Walk);
 		break;
@@ -83,7 +83,7 @@ sf::SoundBuffer& Sounds::selectRandom(SoundEnum soundName) {
 		return *range.first->second;
 	} else {
 		std::uniform_int_distribution<std::multimap<SoundEnum, sf::SoundBuffer>::iterator::difference_type> dist{ 0, sound_count - 1 };
-		auto advance = dist(random);
+		auto advance = dist(m_random);
 		auto it = range.first;
 		while (advance--) it++;
 		return *it->second;
@@ -97,28 +97,28 @@ void Sounds::playRandom(SoundEnum soundName) {
 
 void Sounds::playBackground() {
 	using dist_type = std::uniform_int_distribution<std::vector<sf::Music>::size_type>;
-	if (current_music) current_music->stop();
+	if (m_currentMusic) m_currentMusic->stop();
 
-	if (m_main_menu) {
-		dist_type dist{ 0, menu_music.size()-1 };
-		current_music = menu_music.at(dist(random));
+	if (m_mainMenu) {
+		dist_type dist{ 0, m_menuMusic.size()-1 };
+		m_currentMusic = m_menuMusic.at(dist(m_random));
 	}
 	else {
-		dist_type dist{ 0, game_music.size()-1 };
-		current_music = game_music.at(dist(random));
+		dist_type dist{ 0, m_gameMusic.size()-1 };
+		m_currentMusic = m_gameMusic.at(dist(m_random));
 	}
-	current_music->setVolume(70.0);
+	m_currentMusic->setVolume(70.0);
 
-	current_music->play();
+	m_currentMusic->play();
 }
 
 void Sounds::inMainMenu(bool in_menu) {
-	m_main_menu = in_menu;
+	m_mainMenu = in_menu;
 	
 	playBackground();
 }
 
-const multimap<SoundEnum, std::string> Sounds::soundFiles {
+const multimap<SoundEnum, std::string> Sounds::m_soundFiles {
 		{ SoundEnum::Background, "sound/background_songs/background_1.flac" },
 		{ SoundEnum::Background, "sound/background_songs/background_2.flac" },
 		{ SoundEnum::Background, "sound/background_songs/background_3.flac" },

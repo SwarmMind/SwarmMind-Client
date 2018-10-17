@@ -21,6 +21,6 @@ public:
 private:
 	vector<unsigned char> loadData(string fileName);
 
-	GLuint textureID;
-	unsigned int width, height;
+	GLuint m_textureID;
+	unsigned int m_width, m_height;
 };

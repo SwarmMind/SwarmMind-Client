@@ -4,24 +4,24 @@
 
 #include <game/Settings.h>
 
-Settings::Settings(const std::string& _filename) :
-	filename{ _filename } {
+Settings::Settings(const std::string& filename) :
+	m_filename{ filename } {
 }
 Settings::~Settings() {
 	save();
 }
 
 void Settings::read() {
-	std::ifstream ifs{ filename, std::ios::binary };
+	std::ifstream ifs{ m_filename, std::ios::binary };
 
 	if (ifs.fail()) return;
 
-	ifs >> hostname;
-	ifs >> port;
-	ifs >> username;
+	ifs >> m_hostname;
+	ifs >> m_port;
+	ifs >> m_username;
 }
 void Settings::save() const {
-	std::ofstream ofs{ filename, std::ios::binary | std::ios::trunc };
+	std::ofstream ofs{ m_filename, std::ios::binary | std::ios::trunc };
 
-	ofs << hostname << '\n' << port << '\n' << username;
+	ofs << m_hostname << '\n' << m_port << '\n' << m_username;
 }

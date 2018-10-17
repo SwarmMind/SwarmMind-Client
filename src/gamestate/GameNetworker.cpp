@@ -16,21 +16,21 @@
 
 using namespace std;
 
-GameNetworker::GameNetworker(EventSystem& _eventSystem)
-    : sioSocket{ nullptr }
-    , eventSystem{ _eventSystem }
+GameNetworker::GameNetworker(EventSystem& eventSystem)
+    : m_sioSocket{ nullptr }
+    , m_eventSystem{ eventSystem }
 {
-    sioClient.set_reconnect_attempts(reconnectAttempts);
-    sioClient.set_reconnect_delay_max(m_reconnectDelay);
+    m_sioClient.set_reconnect_attempts(m_reconnectAttempts);
+    m_sioClient.set_reconnect_delay_max(m_reconnectDelay);
 
-    sioSocket = sioClient.socket();
-    sioSocket->on("initState", bind(&GameNetworker::onInitStateReceive, this, std::placeholders::_1));
-    sioSocket->on("state", bind(&GameNetworker::onStateReceive, this, std::placeholders::_1));
-    sioSocket->on("accumulatedCommands", bind(&GameNetworker::onAccumulatedCommandsReceive, this, std::placeholders::_1));
-    sioSocket->on("chat", bind(&GameNetworker::onChatReceive, this, std::placeholders::_1));
+    m_sioSocket = m_sioClient.socket();
+    m_sioSocket->on("initState", bind(&GameNetworker::onInitStateReceive, this, std::placeholders::_1));
+    m_sioSocket->on("state", bind(&GameNetworker::onStateReceive, this, std::placeholders::_1));
+    m_sioSocket->on("accumulatedCommands", bind(&GameNetworker::onAccumulatedCommandsReceive, this, std::placeholders::_1));
+    m_sioSocket->on("chat", bind(&GameNetworker::onChatReceive, this, std::placeholders::_1));
 
-    sioClient.set_reconnecting_listener([=]() {
-        eventSystem.postEvent(std::make_shared<DisconnectEvent>());
+    m_sioClient.set_reconnecting_listener([=]() {
+        m_eventSystem.postEvent(std::make_shared<DisconnectEvent>());
     });
 }
 
@@ -41,29 +41,29 @@ GameNetworker::~GameNetworker()
 
 void GameNetworker::connect(std::string adress, unsigned int port /*= 3000*/)
 {
-    sioClient.connect(string("http://") + adress + ":" + to_string(port));
+    m_sioClient.connect(string("http://") + adress + ":" + to_string(port));
 
-    sioSocket = sioClient.socket();
+    m_sioSocket = m_sioClient.socket();
 }
 
 void GameNetworker::disconnect()
 {
-    sioSocket->off_all();
+    m_sioSocket->off_all();
 
     //These two lines are a workaround to fix a bug in Socket.IO, which causes this thread to lock forever,
     //if sioClient.sync_close is called while the sioClient is trying to connect
     //The bug seems to be caused, because sioClient.sync_close is waiting for a thread, which is forever
     //trying to reconnect and never notices, that the client should actually close
-    sioClient.set_reconnect_attempts(0);
-    sioClient.connect(""); //This will cause the reconnect timer to be reset and the sio thread to be joined
+    m_sioClient.set_reconnect_attempts(0);
+    m_sioClient.connect(""); //This will cause the reconnect timer to be reset and the sio thread to be joined
 
 
-    sioClient.sync_close();
+    m_sioClient.sync_close();
 }
 
 bool GameNetworker::isConnected() const
 {
-    return sioClient.opened();
+    return m_sioClient.opened();
 }
 
 namespace glm
@@ -94,7 +94,7 @@ void GameNetworker::sendCommand(uint32_t unitID, std::string action, glm::vec2 d
     nlohmann::json directionJSON = direction;
     arguments.push(sio::string_message::create(directionJSON.dump()));
 
-    sioSocket->emit("command", arguments);
+    m_sioSocket->emit("command", arguments);
 }
 
 void GameNetworker::sendChatMessage(struct ChatEntry& chatEntry)
@@ -109,7 +109,7 @@ void GameNetworker::sendChatMessage(struct ChatEntry& chatEntry)
     nlohmann::json position = chatEntry.m_position;
     arguments.push(sio::string_message::create(position.dump()));
 
-    sioSocket->emit("chat", arguments);
+    m_sioSocket->emit("chat", arguments);
 }
 
 void GameNetworker::update(double deltaTime, double timeStamp)
@@ -134,7 +134,7 @@ std::shared_ptr<Gamestate> GameNetworker::parseGamestate(nlohmann::json state)
         Monster monster(jsonMonster);
         monsters.emplace(monster.id(), monster);
     }
-    return std::make_shared<Gamestate>(eventSystem, units, monsters);
+    return std::make_shared<Gamestate>(m_eventSystem, units, monsters);
 }
 
 Configuration GameNetworker::parseConfiguration(std::string jsonString)
@@ -213,9 +213,9 @@ std::vector<std::shared_ptr<Command>> GameNetworker::processCommands(const nlohm
 	return commands;
 }
 
-void GameNetworker::onStateReceive(sio::event _event)
+void GameNetworker::onStateReceive(sio::event event)
 {
-    const string jsonMessage = _event.get_message()->get_string();
+    const string jsonMessage = event.get_message()->get_string();
     const nlohmann::json jsonState = nlohmann::json::parse(jsonMessage);
     const auto state = parseGamestate(jsonState);
 	const auto jsonCommands = jsonState["commands"];
@@ -231,23 +231,23 @@ void GameNetworker::onStateReceive(sio::event _event)
 		}
 	}
 
-	eventSystem.postEvents(events);
+	m_eventSystem.postEvents(events);
 }
 
-void GameNetworker::onInitStateReceive(sio::event _event)
+void GameNetworker::onInitStateReceive(sio::event event)
 {
-    const string jsonMessage = _event.get_message()->get_string();
+    const string jsonMessage = event.get_message()->get_string();
     const nlohmann::json initState = nlohmann::json::parse(jsonMessage);
     const Configuration config = parseConfiguration(initState["config"].dump());
     auto state = parseGamestate(initState["state"]);
     double timeSinceLastRound = initState["config"]["timeSinceLastRound"];
 
-    eventSystem.postEvent(std::make_shared<InitStateEvent>(timeSinceLastRound, config, state));
+    m_eventSystem.postEvent(std::make_shared<InitStateEvent>(timeSinceLastRound, config, state));
 }
 
-void GameNetworker::onAccumulatedCommandsReceive(sio::event _event)
+void GameNetworker::onAccumulatedCommandsReceive(sio::event event)
 {
-    const std::string jsonMessage = _event.get_message()->get_string();
+    const std::string jsonMessage = event.get_message()->get_string();
     nlohmann::json json = nlohmann::json::parse(jsonMessage);
     nlohmann::json playerCommandsJson = json["playerCommands"];
     std::vector<AccumulatedCommands> commandsList;
@@ -255,17 +255,17 @@ void GameNetworker::onAccumulatedCommandsReceive(sio::event _event)
     for (nlohmann::json::iterator it = playerCommandsJson.begin(); it != playerCommandsJson.end(); it++)
     {
         AccumulatedCommands commands;
-        commands.ID = std::stoi(it.key());
+        commands.m_ID = std::stoi(it.key());
         std::vector<nlohmann::json> jsonAttackCommands = it.value()["attack"];
         for (nlohmann::json jsonCommand : jsonAttackCommands)
         {
-            commands.attackDirections.emplace_back(jsonCommand["x"], jsonCommand["y"]);
+            commands.m_attackDirections.emplace_back(jsonCommand["x"], jsonCommand["y"]);
         }
 
         std::vector<nlohmann::json> jsonMoveCommands = it.value()["move"];
         for (nlohmann::json jsonCommand : jsonMoveCommands)
         {
-            commands.moveDirections.emplace_back(jsonCommand["x"], jsonCommand["y"]);
+            commands.m_moveDirections.emplace_back(jsonCommand["x"], jsonCommand["y"]);
         }
 
         commandsList.push_back(commands);
@@ -274,7 +274,7 @@ void GameNetworker::onAccumulatedCommandsReceive(sio::event _event)
     size_t numberOfGivenCommands = json["numberOfGivenCommands"];
     size_t maxNumberOfCommands = json["maxNumberOfCommands"];
 
-    eventSystem.postEvent(std::make_shared<AccumulatedCommandsEvent>(commandsList, numberOfGivenCommands, maxNumberOfCommands));
+    m_eventSystem.postEvent(std::make_shared<AccumulatedCommandsEvent>(commandsList, numberOfGivenCommands, maxNumberOfCommands));
 }
 
 void from_json(const nlohmann::json& json, ChatEntry& chat)
@@ -291,5 +291,5 @@ void GameNetworker::onChatReceive(sio::event event)
     std::string message = event.get_message()->get_string();
     nlohmann::json jsonChat = nlohmann::json::parse(message);
     
-	eventSystem.postEvent(std::make_shared<ChatEvent>(ChatEntry{ jsonChat }));
+	m_eventSystem.postEvent(std::make_shared<ChatEvent>(ChatEntry{ jsonChat }));
 }

@@ -14,15 +14,15 @@ public:
 	void draw();
 
 private:
-	GLuint vertexArrayObject;
-	GLuint secondVAO;
+	GLuint m_vertexArrayObject;
+	GLuint m_secondVAO;
 
-	unsigned int vertexBufferSize;
-	unsigned int floatsPerVert;
-	int bufferOffset;
-	GLfloat* mappedBuffer;
-	GLuint vertexBuffer;
-	GLuint secondBuffer;
+	unsigned int m_vertexBufferSize;
+	unsigned int m_floatsPerVert;
+	int m_bufferOffset;
+	GLfloat* m_mappedBuffer;
+	GLuint m_vertexBuffer;
+	GLuint m_secondBuffer;
 	
 	void swapBuffers();
 	void mapBuffer();

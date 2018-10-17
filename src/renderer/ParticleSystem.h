@@ -10,9 +10,9 @@ using namespace gl41core;
 
 struct Particles
 {
-	std::vector<GLfloat> dynamicData;
-	std::vector<GLfloat> staticData;
-	std::vector<GLubyte> color;
+	std::vector<GLfloat> m_dynamicData;
+	std::vector<GLfloat> m_staticData;
+	std::vector<GLubyte> m_color;
 
 	void addParticle(
 		GLfloat x, GLfloat y,

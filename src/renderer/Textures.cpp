@@ -6,9 +6,9 @@
 
 Textures::Textures()
 {
-	for (auto& path : texturePaths)
+	for (auto& path : m_texturePaths)
 	{
-		textures[path.first] = std::make_shared<Texture>(path.second);
+		m_textures[path.first] = std::make_shared<Texture>(path.second);
 	}
 }
 
@@ -23,15 +23,15 @@ std::shared_ptr<Texture> Textures::operator[](TextureEnum texture)
 
 std::shared_ptr<Texture> Textures::get(TextureEnum texture)
 {
-	auto iterator = textures.find(texture);
-	if (iterator == textures.end())
+	auto iterator = m_textures.find(texture);
+	if (iterator == m_textures.end())
 	{
 		throw out_of_range("Texture is not loaded!");
 	}
 	return iterator->second;
 }
 
-const std::map<TextureEnum, string> Textures::texturePaths = {
+const std::map<TextureEnum, string> Textures::m_texturePaths = {
 		{MonsterTexture, "res/monster.png"},
         {UnitTexture, "res/unit.png"},
         {SelectionTexture, "res/selected.png"},

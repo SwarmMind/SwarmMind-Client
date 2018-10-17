@@ -6,11 +6,11 @@
 #include <renderer/Sprites.h>
 #include <cstring>
 
-ChatSystem::ChatSystem(Input& input, Networker& networker, EventSystem& eventSystem, const std::string& preset_username)
+ChatSystem::ChatSystem(Input& input, Networker& networker, EventSystem& eventSystem, const std::string& presetUsername)
     : EventListener<ChatEvent>{ eventSystem }
     , m_input{input}
     , m_networker{ networker } {
-	strcpy(m_userName, preset_username.c_str());
+	strcpy(m_userName, presetUsername.c_str());
 }
 
 void ChatSystem::update(double deltaTime, double timeStamp)

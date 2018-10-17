@@ -29,7 +29,7 @@ class Gamestate : public EventListener<CommandEvent>, public EventListener<Accum
 public:
     Gamestate(const Gamestate& state) = default;
 	Gamestate(class EventSystem& eventSystem);
-	Gamestate(class EventSystem& eventSystem, std::map<uint32_t, Unit>& _units, const std::map<uint32_t, Monster>& _monsters);
+	Gamestate(class EventSystem& eventSystem, std::map<uint32_t, Unit>& units, const std::map<uint32_t, Monster>& monsters);
 	~Gamestate();
 
     void copyRotationsFrom(Gamestate& other);
@@ -42,8 +42,8 @@ public:
 	virtual void receiveEvent(CommandEvent* event) override;
 	virtual void receiveEvent(AccumulatedCommandsEvent* event) override;
 
-	std::map<uint32_t, Unit> units;
-	std::map<uint32_t, Monster> monsters;
+	std::map<uint32_t, Unit> m_units;
+	std::map<uint32_t, Monster> m_monsters;
     class Map* m_map;
     void setMap(class Map* map);
 };

@@ -7,17 +7,17 @@
 #include <game/Camera.h>
 #include <iostream>
 
-CommandVisualizationRenderer::CommandVisualizationRenderer(Camera& _camera)
-    : camera{ _camera }
+CommandVisualizationRenderer::CommandVisualizationRenderer(Camera& camera)
+    : m_camera{ camera }
 {
-    for (size_t i = 0; i < offsets.size(); i++)
+    for (size_t i = 0; i < m_offsets.size(); i++)
     {
-        offsets.at(i) = static_cast<GLint>(i * (CommandVisualizer::numVertices + 1));
+        m_offsets.at(i) = static_cast<GLint>(i * (CommandVisualizer::m_numVertices + 1));
     }
 
-    for (auto& count : counts)
+    for (auto& count : m_counts)
     {
-        count = CommandVisualizer::numVertices + 1;
+        count = CommandVisualizer::m_numVertices + 1;
     }
 
     m_program = loadProgram("shaders/commandVisualization.vert", "shaders/commandVisualization.frag");
@@ -61,20 +61,20 @@ void CommandVisualizationRenderer::preDraw()
     GLuint positionLocation = glGetUniformLocation(m_program, "camPosition");
     GLuint sizeLocation = glGetUniformLocation(m_program, "camSize");
 
-	const auto pos = camera.position(), extent = camera.extent();
+	const auto pos = m_camera.position(), extent = m_camera.extent();
     glUniform2f(positionLocation, pos.x, pos.y);
     glUniform2f(sizeLocation, extent.x, extent.y);
 }
 
 void CommandVisualizationRenderer::draw()
 {
-    unsigned int previousBufferOffset = bufferOffset;
+    unsigned int previousBufferOffset = m_bufferOffset;
     unmapBuffers();
     glBindVertexArray(m_vertexArrayObject);
     glUseProgram(m_program);
     glDisable(GL_DEPTH_TEST);
 
-    glMultiDrawArrays(GL_TRIANGLE_FAN, offsets.data(), counts.data(), previousBufferOffset / (CommandVisualizer::numVertices + 1));
+    glMultiDrawArrays(GL_TRIANGLE_FAN, m_offsets.data(), m_counts.data(), previousBufferOffset / (CommandVisualizer::m_numVertices + 1));
     //glDrawArrays(GL_TRIANGLE_FAN, 0, previousBufferOffset);
 }
 
@@ -106,30 +106,30 @@ void CommandVisualizationRenderer::addColorData(size_t offset, size_t size, void
 void CommandVisualizationRenderer::drawCommandVisualizer(glm::vec3 pos, CommandVisualizer& visualizer)
 {
 
-    if (bufferOffset >= CommandVisualizationRenderer::bufferSize - CommandVisualizer::numVertices - 1)
+    if (m_bufferOffset >= CommandVisualizationRenderer::bufferSize - CommandVisualizer::m_numVertices - 1)
     {
         draw();
         mapBuffers();
     }
 
-    addPositionData(bufferOffset, glm::vec4(pos, 0.f));
+    addPositionData(m_bufferOffset, glm::vec4(pos, 0.f));
 
 
-    GLubyte color[bytesPerVertex] = { visualizer.baseRed, visualizer.baseGreen, visualizer.baseBlue, 0 };
-    addColorData(bufferOffset, 1, color);
+    GLubyte color[bytesPerVertex] = { visualizer.m_baseRed, visualizer.m_baseGreen, visualizer.m_baseBlue, 0 };
+    addColorData(m_bufferOffset, 1, color);
 
 
-    bufferOffset++;
-    addColorData(bufferOffset, CommandVisualizer::numVertices, visualizer.vertexColors.data());
+    m_bufferOffset++;
+    addColorData(m_bufferOffset, CommandVisualizer::m_numVertices, visualizer.m_vertexColors.data());
 
-    glm::vec2 offset(-visualizer.radius, 0);
-    for (size_t i = 0; i < CommandVisualizer::numVertices; i++)
+    glm::vec2 offset(-visualizer.m_radius, 0);
+    for (size_t i = 0; i < CommandVisualizer::m_numVertices; i++)
     {
         glm::vec4 vertexPosition = glm::vec4(pos + glm::vec3(offset, 0.f), 1);
-        addPositionData(bufferOffset, vertexPosition);
-        bufferOffset++;
+        addPositionData(m_bufferOffset, vertexPosition);
+        m_bufferOffset++;
 
-        offset = glm::rotate(offset, glm::radians(360.f / (CommandVisualizer::numVertices - 1)));
+        offset = glm::rotate(offset, glm::radians(360.f / (CommandVisualizer::m_numVertices - 1)));
     }
 }
 
@@ -146,7 +146,7 @@ void CommandVisualizationRenderer::mapBuffers()
     glBindBuffer(GL_ARRAY_BUFFER, m_positionBuffer);
     m_mappedPositionBuffer = (GLfloat*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
 
-    bufferOffset = 0;
+    m_bufferOffset = 0;
 }
 
 void CommandVisualizationRenderer::unmapBuffers()
@@ -159,5 +159,5 @@ void CommandVisualizationRenderer::unmapBuffers()
 
     m_mappedPositionBuffer = nullptr;
     m_mappedColorBuffer = nullptr;
-    bufferOffset = 0;
+    m_bufferOffset = 0;
 }

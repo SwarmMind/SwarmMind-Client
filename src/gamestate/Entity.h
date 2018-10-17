@@ -51,7 +51,7 @@ public:
 protected:
 	virtual SpriteEnum sprite() override;
 private:
-	CommandVisualizer attackVisualizer, moveVisualizer;
+	CommandVisualizer m_attackVisualizer, m_moveVisualizer;
 };
 
 class Monster : public Entity

@@ -27,11 +27,11 @@ public:
     virtual void update(double deltaTime, double timeStamp) override;
 
 private:
-    class EventSystem& eventSystem;
+    class EventSystem& m_eventSystem;
 
-    sio::client sioClient;
-    std::shared_ptr<sio::socket> sioSocket;
-    unsigned reconnectAttempts = -1;
+    sio::client m_sioClient;
+    std::shared_ptr<sio::socket> m_sioSocket;
+    unsigned m_reconnectAttempts = -1;
     unsigned m_reconnectDelay = 100;
 	
     void onStateReceive(sio::event event);

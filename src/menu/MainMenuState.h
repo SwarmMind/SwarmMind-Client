@@ -15,7 +15,7 @@ class MainMenuState : public MenuState, public EventListener<InitStateEvent>
 	const uint16_t default_port = 3000;
 
 public:
-	MainMenuState(class Game* _game, class EventSystem& eventSystem, class Input& input, class Renderer& renderer, Settings& _settings);
+	MainMenuState(class Game* game, class EventSystem& eventSystem, class Input& input, class Renderer& renderer, Settings& settings);
 	virtual ~MainMenuState() override;
 
 	virtual void update(double deltaTime, double timeStamp) override;
@@ -27,7 +27,7 @@ private:
     TutorialNetworker m_networker;
     std::unique_ptr<class Map> m_map;
 
-	class Game* game;
+	class Game* m_game;
     class Input& m_input;
     class EventSystem& m_eventSystem;
 	Settings& m_settings;

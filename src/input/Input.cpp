@@ -11,24 +11,24 @@ Input::Input(GLFWwindow* window, Camera* camera)
 	: m_window{window} 
 	, m_camera{camera}
 {
-	actionStatus[Move]       =  ActionStatus({ GLFW_MOUSE_BUTTON_LEFT });
-    actionStatus[MoveDirect] =  ActionStatus({ KeyBinding { GLFW_MOUSE_BUTTON_LEFT, GLFW_MOD_SHIFT } });
+	m_actionStatus[Move]       =  ActionStatus({ GLFW_MOUSE_BUTTON_LEFT });
+    m_actionStatus[MoveDirect] =  ActionStatus({ KeyBinding { GLFW_MOUSE_BUTTON_LEFT, GLFW_MOD_SHIFT } });
 
-	actionStatus[Shoot]       = ActionStatus({ GLFW_MOUSE_BUTTON_RIGHT });
-    actionStatus[ShootDirect] = ActionStatus({ KeyBinding { GLFW_MOUSE_BUTTON_RIGHT, GLFW_MOD_SHIFT } });
+	m_actionStatus[Shoot]       = ActionStatus({ GLFW_MOUSE_BUTTON_RIGHT });
+    m_actionStatus[ShootDirect] = ActionStatus({ KeyBinding { GLFW_MOUSE_BUTTON_RIGHT, GLFW_MOD_SHIFT } });
 
-	actionStatus[SelectUnit1] = ActionStatus({ GLFW_KEY_1 });
-	actionStatus[SelectUnit2] = ActionStatus({ GLFW_KEY_2 });
-	actionStatus[SelectUnit3] = ActionStatus({ GLFW_KEY_3 });
-	actionStatus[SelectUnit]  = ActionStatus({ GLFW_MOUSE_BUTTON_LEFT });
+	m_actionStatus[SelectUnit1] = ActionStatus({ GLFW_KEY_1 });
+	m_actionStatus[SelectUnit2] = ActionStatus({ GLFW_KEY_2 });
+	m_actionStatus[SelectUnit3] = ActionStatus({ GLFW_KEY_3 });
+	m_actionStatus[SelectUnit]  = ActionStatus({ GLFW_MOUSE_BUTTON_LEFT });
 
-	actionStatus[MoveCameraRight] = ActionStatus({ GLFW_KEY_D, GLFW_KEY_RIGHT });
-	actionStatus[MoveCameraLeft]  = ActionStatus({ GLFW_KEY_A, GLFW_KEY_LEFT });
-	actionStatus[MoveCameraUp]    = ActionStatus({ GLFW_KEY_W, GLFW_KEY_UP });
-	actionStatus[MoveCameraDown]  = ActionStatus({ GLFW_KEY_S, GLFW_KEY_DOWN });
-    actionStatus[MoveCamera] = ActionStatus({ GLFW_MOUSE_BUTTON_MIDDLE });
+	m_actionStatus[MoveCameraRight] = ActionStatus({ GLFW_KEY_D, GLFW_KEY_RIGHT });
+	m_actionStatus[MoveCameraLeft]  = ActionStatus({ GLFW_KEY_A, GLFW_KEY_LEFT });
+	m_actionStatus[MoveCameraUp]    = ActionStatus({ GLFW_KEY_W, GLFW_KEY_UP });
+	m_actionStatus[MoveCameraDown]  = ActionStatus({ GLFW_KEY_S, GLFW_KEY_DOWN });
+    m_actionStatus[MoveCamera] = ActionStatus({ GLFW_MOUSE_BUTTON_MIDDLE });
 
-	actionStatus[Debug] = ActionStatus({ GLFW_KEY_PERIOD });
+	m_actionStatus[Debug] = ActionStatus({ GLFW_KEY_PERIOD });
 
 	glfwSetWindowUserPointer(m_window, this);
 	auto scrollLambda = [](GLFWwindow* window, double xoffset, double yoffset) {
@@ -49,17 +49,17 @@ bool Input::isActionReleased(Action action)
 
 bool Input::isActionPressed(Action action)
 {
-	return actionStatus[action].isPressed;
+	return m_actionStatus[action].m_isPressed;
 }
 
 bool Input::isActionJustPressed(Action action)
 {
-	return actionStatus[action].isJustPressed;
+	return m_actionStatus[action].m_isJustPressed;
 }
 
 bool Input::isActionJustReleased(Action action)
 {
-	return actionStatus[action].isJustReleased;
+	return m_actionStatus[action].m_isJustReleased;
 }
 
 void Input::update(double deltaTime)
@@ -67,7 +67,7 @@ void Input::update(double deltaTime)
 	setMousePosition();
 	moveCamera(deltaTime);
 	
-	for (auto& actionPair: actionStatus)
+	for (auto& actionPair: m_actionStatus)
 	{
 		this->updateAction(actionPair.first);
 	}
@@ -106,16 +106,16 @@ void Input::moveCamera(double deltaTime)
 
 void Input::updateAction(Action action)
 {
-	ActionStatus& status = actionStatus[action];
+	ActionStatus& status = m_actionStatus[action];
 
-	if (isAnyKeyPressed(status.glfwKeys) || isMousePressed(status.glfwKeys)) {
-		status.isJustPressed = !status.isPressed;
-		status.isPressed = true;
-		status.isJustReleased = false;
+	if (isAnyKeyPressed(status.m_glfwKeys) || isMousePressed(status.m_glfwKeys)) {
+		status.m_isJustPressed = !status.m_isPressed;
+		status.m_isPressed = true;
+		status.m_isJustReleased = false;
 	} else {
-		status.isJustPressed = false;
-		status.isJustReleased = status.isPressed;
-		status.isPressed = false;
+		status.m_isJustPressed = false;
+		status.m_isJustReleased = status.m_isPressed;
+		status.m_isPressed = false;
 	}
 }
 
@@ -183,7 +183,7 @@ glm::vec2 Input::screenToWorldCoordinate(glm::vec2 mousePosition) {
 }
 
 ActionStatus::ActionStatus(vector<KeyBinding> keys) 
-	: glfwKeys{ keys }
+	: m_glfwKeys{ keys }
 {}
 
 ActionStatus::ActionStatus()
