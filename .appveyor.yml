@@ -10,10 +10,13 @@ cache:
 install:
   - call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat"
 
-  - vcpkg --triplet x64-windows install glm glfw3 sfml glbinding
-
   - cd c:\tools\vcpkg
+  - git pull
+  - vcpkg update
+  - vcpkg upgrade --no-dry-run
   - vcpkg integrate install
+
+  - vcpkg --triplet x64-windows install glm glfw3 sfml glbinding
 
 before_build:
   - cd C:\projects\swarmmind-client
