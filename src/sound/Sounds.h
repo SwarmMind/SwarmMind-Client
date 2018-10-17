@@ -11,7 +11,6 @@
 #include <SFML/Audio.hpp>
 
 #include <events/EventListener.h>
-#include <events/CommandEvent.h>
 #include <events/SoundEvent.h>
 
 using namespace std;
@@ -29,7 +28,7 @@ enum class SoundEnum {
     EndingRound 
 };
 
-class Sounds : public EventListener<CommandEvent>, public EventListener<SoundEvent>
+class Sounds : public EventListener<SoundEvent>
 {
 public:
     Sounds() = delete;
@@ -41,7 +40,6 @@ public:
 	void playRandom(SoundEnum soundName);
     void update();
 
-	void receiveEvent(CommandEvent* event) override;
 	void receiveEvent(SoundEvent* event) override;
 
 	void inMainMenu(bool in_menu);

@@ -4,7 +4,6 @@
 
 Sounds::Sounds(EventSystem& eventSystem)
 	: m_eventSystem{eventSystem}
-	, EventListener<CommandEvent>(eventSystem)
 	, EventListener<SoundEvent>(eventSystem)
 	, m_random{ std::random_device{}() }
 	, m_currentMusic{ nullptr }
@@ -49,26 +48,6 @@ void Sounds::update() {
 void Sounds::receiveEvent(SoundEvent * event)
 {
 	playRandom(event->m_sound);
-}
-
-void Sounds::receiveEvent(CommandEvent * event)
-{
-	switch (event->m_command->type()) {
-	case CommandType::Move:
-		play(SoundEnum::Walk);
-		break;
-	case CommandType::Attack:
-		playRandom(SoundEnum::Attack);
-		break;
-	case CommandType::Damage:
-		playRandom(SoundEnum::Hit);
-		break;
-	case CommandType::Die:
-		playRandom(SoundEnum::Die);
-		break;
-	default:
-		break;
-	}
 }
 
 void Sounds::play(SoundEnum soundName) {

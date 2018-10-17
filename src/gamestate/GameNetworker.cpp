@@ -222,12 +222,33 @@ void GameNetworker::onStateReceive(sio::event event)
 
 
 	std::vector<TimedEvent> events;
+	std::set<CommandType> processedCommandTypes;
 	events.reserve(jsonCommands.size() + 1);
 	events.emplace_back(std::make_shared<StateEvent>(state));
 	for (const nlohmann::json& jsonCommand : jsonCommands)
 	{
 		if (std::shared_ptr<Command> command = parseCommand(jsonCommand)) {
+			processedCommandTypes.emplace(command->type());
 			events.emplace_back(std::make_shared<CommandEvent>(command), offset(command->type()));
+		}
+	}
+	events.reserve(events.size() + processedCommandTypes.size());
+	for (const auto& type : processedCommandTypes) {
+		switch (type) {
+		case CommandType::Move:
+			events.emplace_back(std::make_shared<SoundEvent>(SoundEnum::Walk), offset(type));
+			break;
+		case CommandType::Attack:
+			events.emplace_back(std::make_shared<SoundEvent>(SoundEnum::Attack), offset(type));
+			break;
+		case CommandType::Damage:
+			events.emplace_back(std::make_shared<SoundEvent>(SoundEnum::Hit), offset(type));
+			break;
+		case CommandType::Die:
+			events.emplace_back(std::make_shared<SoundEvent>(SoundEnum::Die), offset(type));
+			break;
+		default:
+			break;
 		}
 	}
 
