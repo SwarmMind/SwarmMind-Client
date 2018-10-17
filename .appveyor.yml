@@ -3,36 +3,17 @@ image:
 configuration:
   - Release
   - Debug
-environment:
-  GLFW_VER: 3.2.1
-  GLBINDING_VER: 3.0.2
-  SFML_VER: 2.5.0
-  GLM_VER: 0.9.9.2
 matrix:
   fast_finish: true
 cache:
-  - c:\projects\glbinding
-  - c:\projects\build-glbinding -> appveyor.yml
   - c:\tools\vcpkg\installed\
 install:
   - call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat"
 
-  - vcpkg --triplet x64-windows install glm glfw3 sfml boost-system boost-exception boost-date-time boost-random boost-asio
+  - vcpkg --triplet x64-windows install glm glfw3 sfml glbinding
 
   - cd c:\tools\vcpkg
   - vcpkg integrate install
-
-  - cd C:\projects
-  - if not exist build-glbinding mkdir build-glbinding
-
-  - if not exist "C:\projects\glbinding" git clone --depth 1 --no-checkout https://github.com/cginternals/glbinding C:\projects\glbinding
-  - cd C:\projects\glbinding
-  - git fetch --depth 1 --tags
-  - git checkout v%GLBINDING_VER%
-  - cd ../build-glbinding
-  - cmake -DCMAKE_INSTALL_PREFIX=C:\deps\glbinding -DCMAKE_CXX_FLAGS="/D_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING /EHsc" -DBUILD_SHARED_LIBS=OFF -DOPTION_BUILD_TESTS=OFF -DOPTION_BUILD_GPU_TESTS=OFF -DOPTION_BUILD_TOOLS=OFF -G "Visual Studio 15 2017 Win64" ../glbinding
-  - cmake --build . --config %CONFIGURATION%
-  - cmake --build . --config %CONFIGURATION% --target install
 
 before_build:
   - cd C:\projects\swarmmind-client
