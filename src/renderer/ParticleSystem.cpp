@@ -5,29 +5,36 @@
 #include <glm/gtx/rotate_vector.hpp>
 #include <algorithm>
 
+static std::mt19937_64 random = std::mt19937_64{ std::random_device{}() };
+
 ParticleSystem::ParticleSystem()
 {
-
 }
 
 ParticleSystem::~ParticleSystem()
 {
-
 }
 
-void ParticleSystem::addParticles(ParticleSystem particles)
+void ParticleSystem::addParticles(Particles particles)
 {
 	particleQueue.push(particles);
 }
 
+glm::vec2 ParticleSystem::randomOffset(const float maximum) {
+	const float r = randomFloatBetween(0.0f, maximum), phi = randomFloatBetween(0.0f, glm::pi<float>() * 2.0f);
+	return glm::vec2{ r * cos(phi), r * sin(phi) };
+}
+
 void ParticleSystem::spawnTestParticles(float x, float y, float width, float height)
 {
-	ParticleSystem particles;
+	auto randomColor = [&] { return static_cast<GLubyte>(std::uniform_int_distribution<unsigned int>{ 0, 255 }(random)); };
+
+	Particles particles;
 	for (size_t i = 0; i < 100; i++)
 	{
 		GLfloat directionX = randomFloatBetween(-width, width), directionY = randomFloatBetween(-height, height);
 		GLfloat lifeTime = randomFloatBetween(0.5, 1.5);
-		GLubyte r = randomFloat() * 255, g = randomFloat() * 255, b = randomFloat() * 255, alpha = 255;
+		GLubyte r = randomColor(), g = randomColor(), b = randomColor(), alpha = 255;
 
 		particles.addParticle(x, y, directionX, directionY, lifeTime, r, g, b, alpha);
 	}
@@ -37,21 +44,16 @@ void ParticleSystem::spawnTestParticles(float x, float y, float width, float hei
 void ParticleSystem::spawnBloodParticles(glm::vec2 position, glm::vec2 direction)
 {
 	direction = glm::normalize(direction);
-	ParticleSystem particles;
+	Particles particles;
 	for (size_t i = 0; i < 200; i++)
 	{
-		glm::vec2 offset(randomFloatBetween(-1, 1), randomFloatBetween(-1, 1));
-		offset = glm::normalize(offset);
-		glm::vec2 particleDirection = offset + direction * randomFloatBetween(1.f, 2.f);
-
-		offset *= randomFloatBetween(0, 0.3f);
-		particleDirection *= randomFloatBetween(0.5f, 1.0f);
+		const glm::vec2 offset{ randomOffset(0.3f) };
+		const glm::vec2 particleDirection = randomFloatBetween(0.5f, 1.0f) * (glm::normalize(offset) + direction * randomFloatBetween(1.f, 2.f));
 
 		GLfloat lifeTime = randomFloatBetween(0.2f, 0.7f);
 
-		GLubyte r = 200, g = 10, b = 20;
-		randomizeColor(r, g, b, 30);
-		particles.addParticle(position + offset, particleDirection, lifeTime, glm::vec4((float)r / 255, (float)g/255, (float)b/255, 1.f));
+		const glm::vec4 color = randomizeColor(glm::vec4{ 0.8f, 0.04f, 0.08f, 1.0f }, 0.1f);
+		particles.addParticle(position + offset, particleDirection, lifeTime, color);
 	}
 	addParticles(particles);
 }
@@ -59,13 +61,7 @@ void ParticleSystem::spawnBloodParticles(glm::vec2 position, glm::vec2 direction
 void ParticleSystem::spawnShootParticles(glm::vec2 position, glm::vec2 direction)
 {
 	direction = glm::normalize(direction);
-	ParticleSystem particles;
-
-	//Bullet
-	float bulletSpeed = 20;
-	float bulletLifeTime = 1;
-	glm::vec4 bulletColor(0.1f, 0.1f, 0.1f, 1.0f);
-	particles.addParticle(position, direction * bulletSpeed, bulletLifeTime, bulletColor);
+	Particles particles;
 
 	//Muzzle flash
 	for (size_t i = 0; i < 200; i++)
@@ -73,26 +69,36 @@ void ParticleSystem::spawnShootParticles(glm::vec2 position, glm::vec2 direction
 		float angle = randomFloatBetween(-10.0f, 10.0f);
 		glm::vec2 randomizedDirection = glm::rotate(direction, glm::radians(angle));
 		glm::vec2 velocity = randomizedDirection * randomFloatBetween(0.2f, 1.f);
-		glm::vec2 offset = glm::normalize(glm::vec2(randomFloatBetween(-1.f, -1.f), randomFloatBetween(-1.f, 1.f))) * randomFloatBetween(0, 0.2f);
-		offset += randomizedDirection * randomFloatBetween(0.f, 0.3f);
+		glm::vec2 offset = randomOffset(0.1f) + randomizedDirection * randomFloatBetween(0.1f, 0.3f);
 
 		GLfloat lifeTime = randomFloatBetween(0.2f, 0.7f);
 
-		glm::vec4 color(1.f, 0.64f, 0.f, 0.5f);
-		color = randomizeColor(color, 0.2f, true);
+		const glm::vec4 color = randomizeColor(glm::vec4{ 1.f, 0.64f, 0.f, 0.5f }, 0.2f, true);
 		particles.addParticle(position + offset, velocity, lifeTime, color);
 	}
 
+    //Smoke
+    for (size_t i = 0; i < 200; i++)
+    {
+        float angle = randomFloatBetween(-50.0f, 50.0f);
+        glm::vec2 randomizedDirection = glm::rotate(direction, glm::radians(angle));
+        glm::vec2 velocity = randomizedDirection * randomFloatBetween(0.1f, 0.5f);
+        glm::vec2 offset = randomOffset(0.05f) + randomizedDirection * randomFloatBetween(0.f, 0.2f);
+
+        GLfloat lifeTime = randomFloatBetween(0.5f, 1.2f);
+
+        const glm::vec4 color = randomizeColor(glm::vec4{ 0.6f, 0.6f, 0.6f, 0.5f }, 0.05f, true);
+        particles.addParticle(position + offset, velocity, lifeTime, color);
+    }
 
 	addParticles(particles);
 }
 
 void ParticleSystem::mouseDragParticles(glm::vec2 mousePosition, glm::vec2 target, glm::vec4 color, double deltaTime)
 {
-	ParticleSystem particles;
+	Particles particles;
 	for (size_t i = 0; i <= 100 * deltaTime; i++) {
-		glm::vec2 offset(randomFloatBetween(-1.0f, 1.0f), randomFloatBetween(-1.0f, 1.0f));
-		offset = glm::normalize(offset) * randomFloatBetween(0.f, 0.2f);
+		glm::vec2 offset{ randomOffset(0.2f) };
 
 		glm::vec2 position = offset + mousePosition;
 		glm::vec2 velocity = target - position;
@@ -104,15 +110,11 @@ void ParticleSystem::mouseDragParticles(glm::vec2 mousePosition, glm::vec2 targe
 
 void ParticleSystem::spawnAcknowledgeParticles(glm::vec2 position)
 {
-	ParticleSystem particles;
-	for (size_t i = 0; i <100; i++)
+	Particles particles;
+	for (size_t i = 0; i < 100; i++)
 	{
-		glm::vec2 offset(randomFloatBetween(-1, 1), randomFloatBetween(-1, 1));
-		offset = glm::normalize(offset);
-		glm::vec2 direction = offset;
-
-		offset *= randomFloatBetween(0.0f, 0.1f);
-		direction *= randomFloatBetween(0.5f, 1.0f);
+		const glm::vec2 offset{ randomOffset(0.1f) };
+		const glm::vec2 direction = randomFloatBetween(0.5f, 1.0f) * glm::normalize(offset);
 
 		GLfloat lifeTime = randomFloatBetween(0.1f, 0.5f);
 
@@ -121,69 +123,50 @@ void ParticleSystem::spawnAcknowledgeParticles(glm::vec2 position)
 	addParticles(particles);
 }
 
-std::queue<ParticleSystem>& ParticleSystem::particlesToSpawn()
+std::queue<Particles>& ParticleSystem::particlesToSpawn()
 {
 	return particleQueue;
 }
 
-std::queue<ParticleSystem> ParticleSystem::particleQueue;
-
-float ParticleSystem::randomFloat()
-{
-	return (float) rand() / (float) RAND_MAX;
-}
-
-void ParticleSystem::randomizeColor(GLubyte& r, GLubyte& g, GLubyte b, GLubyte maximumDeviation)
-{
-	const float from = (float)-maximumDeviation;
-	const float to = (float)maximumDeviation;
-	r = (GLubyte)clamp((float)r + randomFloatBetween(from, to), 0.f, 255.f);
-	g = (GLubyte)clamp((float)g + randomFloatBetween(from, to), 0.f, 255.f);
-	b = (GLubyte)clamp((float)b + randomFloatBetween(from, to), 0.f, 255.f);
-}
+std::queue<Particles> ParticleSystem::particleQueue;
 
 glm::vec4 ParticleSystem::randomizeColor(glm::vec4 color, float maximumDeviation, bool randomizeAlpha /*= false*/)
 {
-	return glm::vec4(
-		clamp(color.r + randomFloatBetween(-maximumDeviation, maximumDeviation), 0.f, 1.f),
-		clamp(color.g + randomFloatBetween(-maximumDeviation, maximumDeviation), 0.f, 1.f),
-		clamp(color.b + randomFloatBetween(-maximumDeviation, maximumDeviation), 0.f, 1.f),
-		randomizeAlpha ?
-			clamp(color.a + randomFloatBetween(-maximumDeviation, maximumDeviation), 0.f, 1.f) :
-			color.a
-	);
+	using dist = std::uniform_real_distribution<float>;
+	auto around = [&](float c) { return dist{ std::max(0.0f, c - maximumDeviation), std::min(1.0f, c + maximumDeviation) }(random); };
+
+	return glm::vec4(around(color.r), around(color.g), around(color.b), randomizeAlpha ? around(color.a) : color.a);
 }
 
 float ParticleSystem::randomFloatBetween(float minimum, float maximum)
 {
-	return randomFloat() * (maximum - minimum) + minimum;
+	return std::uniform_real_distribution<float>{ minimum, maximum }(random);
 }
 
-void ParticleSystem::addParticle(GLfloat x, GLfloat y, GLfloat xVelocity, GLfloat yVelocity, GLfloat lifetime, GLubyte r, GLubyte g, GLubyte b, GLubyte alpha)
+void Particles::addParticle(GLfloat x, GLfloat y, GLfloat xVelocity, GLfloat yVelocity, GLfloat lifetime, GLubyte r, GLubyte g, GLubyte b, GLubyte alpha)
 {
-	dynamicData.push_back(x);
-	dynamicData.push_back(y);
-	dynamicData.push_back(lifetime);
-	dynamicData.push_back(0.0f);
+	m_dynamicData.push_back(x);
+	m_dynamicData.push_back(y);
+	m_dynamicData.push_back(lifetime);
+	m_dynamicData.push_back(0.0f);
 
-	staticData.push_back(xVelocity);
-	staticData.push_back(yVelocity);
-	staticData.push_back(0.0f);
-	staticData.push_back(0);
+	m_staticData.push_back(xVelocity);
+	m_staticData.push_back(yVelocity);
+	m_staticData.push_back(0.0f);
+	m_staticData.push_back(0);
 
-	color.push_back(r);
-	color.push_back(g);
-	color.push_back(b);
-	color.push_back(alpha);
+	m_color.push_back(r);
+	m_color.push_back(g);
+	m_color.push_back(b);
+	m_color.push_back(alpha);
 }
 
-void ParticleSystem::addParticle(glm::vec2 position, glm::vec2 velocity, float lifeTime, glm::vec4 color)
+void Particles::addParticle(glm::vec2 position, glm::vec2 velocity, float lifeTime, glm::vec4 color)
 {
-	addParticle(position.x, position.y, velocity.x, velocity.y, lifeTime, color.x * 255, color.y * 255, color.z * 255, color.w * 255);
-}
-
-template<class T>
-T ParticleSystem::clamp(T value, T minimum, T maximum)
-{
-	return std::min(maximum, std::max(minimum, value));
+	const auto as_byte = [](float x) { return static_cast<GLubyte>(x * 255.0f); };
+	addParticle(
+		position.x, position.y,
+		velocity.x, velocity.y,
+		lifeTime,
+		as_byte(color.x), as_byte(color.y), as_byte(color.z), as_byte(color.w));
 }

@@ -17,15 +17,15 @@ EventSystem::~EventSystem()
 
 void EventSystem::registerListener(ListenerFunction* listener)
 {
-	listeners.emplace_back(listener);
+	m_listeners.emplace_back(listener);
 }
 
 void EventSystem::removeListener(ListenerFunction* listener)
 {
-	auto iterator = std::find(listeners.begin(), listeners.end(), listener);
-	if (iterator != listeners.end())
+	auto iterator = std::find(m_listeners.begin(), m_listeners.end(), listener);
+	if (iterator != m_listeners.end())
 	{
-		listeners.erase(iterator);
+		m_listeners.erase(iterator);
 	}
 }
 
@@ -35,36 +35,36 @@ void EventSystem::postEvent(const std::shared_ptr<Event> event) {
 
 void EventSystem::postEvent(const TimedEvent& event)
 {
-	std::lock_guard<std::mutex> queueGuard{ queueLock };
-	eventQueue.emplace(event);
+	std::lock_guard<std::mutex> queueGuard{ m_queueLock };
+	m_eventQueue.emplace(event);
 }
 
 void EventSystem::postEvents(const std::vector<TimedEvent>& events)
 {
-	std::lock_guard<std::mutex> queueGuard{ queueLock };
-	std::for_each(events.cbegin(), events.cend(), [&](const auto& event) { eventQueue.push(event); });
+	std::lock_guard<std::mutex> queueGuard{ m_queueLock };
+	std::for_each(events.cbegin(), events.cend(), [&](const auto& event) { m_eventQueue.push(event); });
 }
 
 void EventSystem::update(double deltaTime, double timeStamp)
 {
-	std::lock_guard<std::mutex> queueGuard{ queueLock };
-	while (!eventQueue.empty() && eventQueue.top().is_due_at(timeStamp)) {
-		processEvent(eventQueue.top().get());
-		eventQueue.pop();
+	std::lock_guard<std::mutex> queueGuard{ m_queueLock };
+	while (!m_eventQueue.empty() && m_eventQueue.top().is_due_at(timeStamp)) {
+		processEvent(m_eventQueue.top().get());
+		m_eventQueue.pop();
 	}
 }
 
-void EventSystem::processEvent(std::shared_ptr<Event> _event)
+void EventSystem::processEvent(std::shared_ptr<Event> event)
 {
     //The loop looks a bit complicated, but a normal for-each loop cannot be used in the case of the deletion of a listener during the loop
     std::vector<ListenerFunction*> finishedListeners;
     std::vector<ListenerFunction*>::iterator found;
-    while ((found = std::find_if(listeners.begin(), listeners.end(), [&](ListenerFunction* listener) {
+    while ((found = std::find_if(m_listeners.begin(), m_listeners.end(), [&](ListenerFunction* listener) {
         return std::find(finishedListeners.begin(), finishedListeners.end(), listener) == finishedListeners.end();
-    })) != listeners.end())
+    })) != m_listeners.end())
     {
         ListenerFunction* listener = *found;
-        (*listener)(_event.get());
+        (*listener)(event.get());
         finishedListeners.push_back(listener);
     }
 }

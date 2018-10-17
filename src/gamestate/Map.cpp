@@ -21,17 +21,17 @@
 
 using namespace std;
 
-Map::Map(Input& _input, Networker& _networker, EventSystem& _eventSystem, const Configuration& _config, const std::string& preset_username)
-	: EventListener<StateEvent>{_eventSystem}
-    , EventListener<AccumulatedCommandsEvent>{_eventSystem}
-    , m_input{ _input }
-	, m_config{_config}
-	, m_networker{_networker}
-    , m_gamestate{ std::make_shared<Gamestate>(_eventSystem) }
+Map::Map(Input& nput, Networker& networker, EventSystem& eventSystem, const Configuration& config, const std::string& presetUsername)
+	: EventListener<StateEvent>{eventSystem}
+    , EventListener<AccumulatedCommandsEvent>{eventSystem}
+    , m_input{ nput }
+	, m_config{config}
+	, m_networker{networker}
+    , m_gamestate{ std::make_shared<Gamestate>(eventSystem) }
 	, m_lastUpdate{glfwGetTime()}
-	, m_eventSystem{_eventSystem}
-    , m_chats{_input, _networker, _eventSystem, preset_username}
-    , m_roundDuration{_config.m_roundTime}
+	, m_eventSystem{eventSystem}
+    , m_chats{nput, networker, eventSystem, presetUsername}
+    , m_roundDuration{config.m_roundTime}
 {}
 
 Map::~Map()
@@ -40,6 +40,7 @@ Map::~Map()
 
 void Map::updateGameState(std::shared_ptr<Gamestate> newState)
 {
+    newState->copyRotationsFrom(*m_gamestate);
 	m_gamestate = newState;
 
 	m_lastUpdate = glfwGetTime();
@@ -60,8 +61,8 @@ void Map::receiveEvent(AccumulatedCommandsEvent* event)
 
 void Map::sendCommand(std::string action, glm::vec2 direction)
 {
-	auto unit = m_gamestate->units.find(m_selectedUnit);
-	if (unit != m_gamestate->units.end()) {
+	auto unit = m_gamestate->m_units.find(m_selectedUnit);
+	if (unit != m_gamestate->m_units.end()) {
 		m_networker.sendCommand(unit->second.id(), action, direction);
 	}
 }
@@ -77,6 +78,8 @@ void Map::updateCommandAction(Action action, std::string command, std::string di
 
 void Map::updateMouseCommand(Action action, std::string command, double deltaTime, bool isDirect = false)
 {
+	const SoundEnum actionSound = (action == Move || action == MoveDirect) ? SoundEnum::WalkCommand : SoundEnum::AttackCommand;
+
 	const float minimumDragDistance = 0.5;
 	if (m_input.isActionJustPressed(action))
 	{
@@ -88,11 +91,12 @@ void Map::updateMouseCommand(Action action, std::string command, double deltaTim
 	}
 	if (!isUnitClicked(m_mouseClickPosition))
 	{
-        const auto unit = m_gamestate->units.find(m_selectedUnit);
-        if (unit != m_gamestate->units.end() && isDirect && m_input.isActionJustReleased(action)) {
+        const auto unit = m_gamestate->m_units.find(m_selectedUnit);
+        if (unit != m_gamestate->m_units.end() && isDirect && m_input.isActionJustReleased(action)) {
             glm::vec2 delta = m_input.mousePositionInWorld() - unit->second.position();
 			sendCommand(command, glm::normalize(delta));
             ParticleSystem::spawnAcknowledgeParticles(m_input.mousePositionInWorld());
+			m_eventSystem.postEvent(std::make_shared<SoundEvent>(actionSound));
         }
 		return;
 	}
@@ -104,6 +108,7 @@ void Map::updateMouseCommand(Action action, std::string command, double deltaTim
 		{
 			sendCommand(command, glm::normalize(delta));
 			ParticleSystem::spawnAcknowledgeParticles(m_input.mousePositionInWorld());
+			m_eventSystem.postEvent(std::make_shared<SoundEvent>(actionSound));
 		}
 	}
 
@@ -143,7 +148,7 @@ bool Map::isUnitClicked(glm::vec2 mousePosition) {
 
 int Map::clickedUnit(glm::vec2 mousePosition)
 {
-	std::map<uint32_t, Unit> units = m_gamestate->units;
+	std::map<uint32_t, Unit> units = m_gamestate->m_units;
 	auto closest = units.cend();
 	float actualDistance = std::numeric_limits<float>::infinity();
 
@@ -207,7 +212,7 @@ void Map::draw(class Renderer& renderer)
     //drawGridStatic(renderer);
     drawEntities(renderer);
 
-	const auto units = m_gamestate->units;
+	const auto units = m_gamestate->m_units;
 	auto it = units.find(m_selectedUnit);
 	if (it != units.cend())
 	{
@@ -232,12 +237,12 @@ void Map::drawRoundProgress()
     {
         ImGui::TextUnformatted("Round Progress");
 
-        ImGui::ProgressBar(static_cast<double>(m_numberOfGivenCommands) / m_maxNumberOfCommands, ImVec2(-1.0f, 0.0f), "");
+        ImGui::ProgressBar(static_cast<float>(m_numberOfGivenCommands) / m_maxNumberOfCommands, ImVec2(-1.0f, 0.0f), "");
         ImGui::SameLine(ImGui::GetTextLineHeightWithSpacing());
         ImGui::TextUnformatted("Commands");
 
 
-        ImGui::ProgressBar((glfwGetTime() - m_lastUpdate) / m_roundDuration, ImVec2(-1.0f, 0.0f), "");
+        ImGui::ProgressBar(static_cast<float>((glfwGetTime() - m_lastUpdate) / m_roundDuration), ImVec2(-1.0f, 0.0f), "");
         ImGui::SameLine(ImGui::GetTextLineHeightWithSpacing());
         ImGui::TextUnformatted("Time");
     }
@@ -246,5 +251,5 @@ void Map::drawRoundProgress()
 
 bool Map::selectedUnitIsValid()
 {
-	return m_gamestate->units.find(m_selectedUnit) != m_gamestate->units.cend();
+	return m_gamestate->m_units.find(m_selectedUnit) != m_gamestate->m_units.cend();
 }

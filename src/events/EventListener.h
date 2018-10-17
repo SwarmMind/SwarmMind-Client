@@ -11,25 +11,25 @@ public:
 	EventListener() = delete;
 
 	EventListener(EventSystem& system)
-		: _eventSystem { system }
+		: m_eventSystem { system }
 	{
-		receiveEventFunction = [this](Event* _event){
-			T* concreteEvent = dynamic_cast<T*>(_event);
+		m_receiveEventFunction = [this](Event* event){
+			T* concreteEvent = dynamic_cast<T*>(event);
 			if (concreteEvent != nullptr)
 			{
 				this->receiveEvent(concreteEvent);
 			}
 		};
-		_eventSystem.registerListener(&receiveEventFunction);
+		m_eventSystem.registerListener(&m_receiveEventFunction);
 	}
 
 	virtual ~EventListener() 
 	{
-		_eventSystem.removeListener(&receiveEventFunction);
+		m_eventSystem.removeListener(&m_receiveEventFunction);
 	}
 
 	virtual void receiveEvent(T* event) = 0;
 private:
-	EventSystem& _eventSystem;
-	std::function<void(Event*)> receiveEventFunction;
+	EventSystem& m_eventSystem;
+	std::function<void(Event*)> m_receiveEventFunction;
 };

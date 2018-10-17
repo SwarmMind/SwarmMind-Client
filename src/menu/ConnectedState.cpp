@@ -1,47 +1,47 @@
-#include <menu/ConnectedState.h>
 #include <functional>
+
 #include <imgui/imgui.h>
 #include <game/Game.h>
 #include <renderer/Sprites.h>
 #include <events/EventSystem.h>
+#include <events/SoundEvent.h>
 #include <sound/Sounds.h>
 
-ConnectedState::ConnectedState(Game& _game, Renderer& renderer, Input& _input, EventSystem& _eventSystem, Settings& _settings)
-	: input{ _input }
-	, game{_game}
-	, map{nullptr}
-    , m_renderer{renderer}
-	, networker{_eventSystem}
-	, eventSystem{_eventSystem}
-    , EventListener<InitStateEvent>(_eventSystem)
-    , EventListener<DisconnectEvent>(_eventSystem)
-	, settings{ _settings }
+#include <menu/ConnectedState.h>
 
+ConnectedState::ConnectedState(Game& game, Renderer& renderer, Input& input, EventSystem& eventSystem, Settings& settings)
+	: m_input{ input }
+	, m_game{game}
+    , m_renderer{renderer}
+	, m_networker{eventSystem}
+	, m_eventSystem{eventSystem}
+    , EventListener<InitStateEvent>(eventSystem)
+    , EventListener<DisconnectEvent>(eventSystem)
+	, m_settings{ settings }
 {
-	networker.connect(settings.hostname, settings.port);
+	m_networker.connect(m_settings.m_hostname, m_settings.m_port);
 }
 
 ConnectedState::~ConnectedState()
 {
-	if (map) {
-		settings.username = map->username();
-		settings.save();
+	if (m_map) {
+		m_settings.m_username = m_map->username();
+		m_settings.save();
 	}
     m_renderer.clearStaticData();
-	delete map;
 }
 
 void ConnectedState::update(double deltaTime, double timeStamp)
 {
-	networker.update(deltaTime, timeStamp);
-	if (map != nullptr)
+	m_networker.update(deltaTime, timeStamp);
+	if (m_map != nullptr)
 	{
-		map->update(deltaTime, timeStamp);
+		m_map->update(deltaTime, timeStamp);
 	}
 }
 
 std::string ConnectedState::statusString() const {
-	if (!networker.isConnected()) {
+	if (!m_networker.isConnected()) {
 		return "Connecting...";
 	}
 	else {
@@ -62,11 +62,11 @@ void ConnectedState::drawStatus() {
 	{
 		if (ImGui::Button("Exit"))
 		{
-			if (map) {
-				settings.username = map->username();
-				settings.save();
+			if (m_map) {
+				m_settings.m_username = m_map->username();
+				m_settings.save();
 			}
-			game.openMainMenu();
+			m_game.openMainMenu();
 		}
 		
 		ImGui::SameLine();
@@ -77,9 +77,8 @@ void ConnectedState::drawStatus() {
 
 void ConnectedState::draw(Renderer& renderer)
 {
-	if (map != nullptr)
-	{
-		map->draw(renderer);
+    if (m_map) {
+        m_map->draw(renderer);
 	}
 	drawStatus();
 }
@@ -87,22 +86,17 @@ void ConnectedState::draw(Renderer& renderer)
 using namespace std::placeholders;
 
 void ConnectedState::receiveEvent(InitStateEvent* event) {
-    map = new Map{ input, networker, eventSystem, event->m_config, settings.username };
+    m_map = std::make_unique<Map>(m_input, m_networker, m_eventSystem, event->m_config, m_settings.m_username);
     m_renderer.clearStaticData();
-    map->drawGridStatic(m_renderer);
-    map->drawWallsStatic(m_renderer, event->m_config.m_blockadePositions);
-    map->updateGameState(event->m_state);
-    map->m_lastUpdate -= event->m_timeSinceLastRound;
+    m_map->drawGridStatic(m_renderer);
+    m_map->drawWallsStatic(m_renderer, event->m_config.m_blockadePositions);
+    m_map->updateGameState(event->m_state);
+    m_map->m_lastUpdate -= event->m_timeSinceLastRound;
 
-    /*
-    if (networker.isConnected()) {
-        map.getSounds()->play(SoundEnum::Background);
-    }
-    */
+	m_eventSystem.processEvent(std::make_shared<SoundEvent>(SoundEnum::NextRound));
 }
 
 void ConnectedState::receiveEvent(DisconnectEvent* event) {
-    delete map;
-    map = nullptr;
+    m_map.release();
     m_renderer.clearStaticData();
 }

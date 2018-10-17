@@ -23,8 +23,7 @@ public:
 	CommandType type() const;
 protected:
 	Command(uint32_t _ID, CommandType _type);
-	uint32_t ID;
-    //class Sound& m_sound;
+	uint32_t m_ID;
 	
 private:
 	const CommandType m_type;
@@ -48,7 +47,7 @@ public:
 	virtual ~DirectionalCommand() = default;
 protected:
 	DirectionalCommand(uint32_t _ID, CommandType _type, glm::vec2 _direction);
-	glm::vec2 direction;
+	glm::vec2 m_direction;
 };
 
 class MoveCommand : public DirectionalCommand

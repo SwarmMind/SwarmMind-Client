@@ -1,12 +1,16 @@
 #pragma once
 
+#include <memory>
+
 #include <glbinding/gl41core/gl.h>
 using namespace gl41core;
+
+#include <renderer/Texture.h>
 
 class StaticRenderData
 {
 public:
-	StaticRenderData(class Texture* texture);
+	StaticRenderData(std::shared_ptr<Texture> texture);
     StaticRenderData(const StaticRenderData& other);
     StaticRenderData() = delete;
 	virtual ~StaticRenderData();
@@ -15,7 +19,7 @@ public:
     void addData(int vertexCount, GLfloat* data);
     void draw();
 
-    class Texture* texture();
+    std::shared_ptr<Texture> texture();
 protected:
     GLuint m_vao;
     GLuint m_vbo;
@@ -27,7 +31,7 @@ protected:
 
     unsigned int vertexSize();
 
-    class Texture* m_texture;
+    std::shared_ptr<Texture> m_texture;
 private:
     void increaseBufferSize(int minimumVertexCount);
 };

@@ -5,13 +5,13 @@
 
 class Settings {
 protected:
-	std::string filename;
+	std::string m_filename;
 public:
-	std::string hostname = "localhost";
-	uint16_t port = 3000;
-	std::string username = "Player";
+	std::string m_hostname = "localhost";
+	uint16_t m_port = 3000;
+	std::string m_username = "Player";
 
-	Settings(const std::string& _filename = "settings.txt");
+	Settings(const std::string& filename = "settings.txt");
 	Settings(const Settings& rhs) = delete;
 	~Settings();
 

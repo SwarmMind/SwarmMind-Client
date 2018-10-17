@@ -43,10 +43,10 @@ typedef struct ActionStatus {
 	ActionStatus(vector<KeyBinding> keys);
 	ActionStatus();
 
-	std::vector<KeyBinding> glfwKeys;
-	bool isPressed = false;
-	bool isJustPressed = false;
-	bool isJustReleased = false;
+	std::vector<KeyBinding> m_glfwKeys;
+	bool m_isPressed = false;
+	bool m_isJustPressed = false;
+	bool m_isJustReleased = false;
 
 } ActionStatus;
 
@@ -67,13 +67,13 @@ public:
 	glm::vec2 mousePositionInWorld();
 
 private:
-	unordered_map<Action, ActionStatus> actionStatus;
-	GLFWwindow* _window;
-	Camera* _camera;
+	unordered_map<Action, ActionStatus> m_actionStatus;
+	GLFWwindow* m_window;
+	Camera* m_camera;
 
     glm::vec2 m_mouseMoveClickPosition;
-	double _xMousePosition, _yMousePosition;
-	glm::vec2 getMousePosition();
+	double m_xMousePosition, m_yMousePosition;
+	glm::vec2 getMousePosition() const;
 	
 	void updateAction(Action action);
 
@@ -83,5 +83,4 @@ private:
 
 	void scrollCallback(GLFWwindow* window, double xoffset, double yoffset);
 	void moveCamera(double deltaTime);
-	float cameraMovementSpeed();
 };

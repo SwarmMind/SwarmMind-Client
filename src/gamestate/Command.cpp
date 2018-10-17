@@ -9,9 +9,9 @@
 #include <time.h>
 
 
-Command::Command(uint32_t _ID, CommandType _type)
-	: m_type{_type}
-	, ID{_ID}
+Command::Command(uint32_t ID, CommandType type)
+	: m_type{type}
+	, m_ID{ID}
 {}
 
 CommandType Command::type() const {
@@ -27,12 +27,12 @@ DieCommand::DieCommand(uint32_t _ID)
 
 void DieCommand::executeOn(Gamestate& state)
 {
-    state.deleteEntity(ID);
+    state.deleteEntity(m_ID);
 }
 
 DirectionalCommand::DirectionalCommand(uint32_t _ID, CommandType _type, glm::vec2 _direction)
 	: Command(_ID, _type)
-	, direction{_direction}
+	, m_direction{_direction}
 {}
 
 //////////////////////////////////////////////////////////////////////////	
@@ -45,10 +45,12 @@ MoveCommand::MoveCommand(uint32_t _ID, glm::vec2 _direction)
 
 void MoveCommand::executeOn(Gamestate& state)
 {
-    Entity* entity = state.getEntityByID(ID);
+    Entity* entity = state.getEntityByID(m_ID);
 	if (!entity) return;
 
-    entity->moveTo(entity->position() + direction);
+    entity->moveTo(entity->position() + m_direction);
+
+	entity->rotate(m_direction);
 }
 
 //////////////////////////////////////////////////////////////////////////	
@@ -60,10 +62,12 @@ AttackCommand::AttackCommand(uint32_t _ID, glm::vec2 _direction)
 
 void AttackCommand::executeOn(Gamestate& state)
 {
-	Unit* unit = dynamic_cast<Unit*>(state.getEntityByID(ID));
+	Unit* unit = dynamic_cast<Unit*>(state.getEntityByID(m_ID));
 	if (!unit) return;
 	
-    ParticleSystem::spawnShootParticles(unit->position() + glm::normalize(direction) * 0.3f, direction);
+    ParticleSystem::spawnShootParticles(unit->position() + glm::normalize(m_direction) * 0.3f, m_direction);
+
+	unit->rotate(m_direction);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -75,10 +79,10 @@ DamageCommand::DamageCommand(uint32_t _ID, glm::vec2 _direction)
 
 void DamageCommand::executeOn(Gamestate& state)
 {
-	Entity* entity = state.getEntityByID(ID);
+	Entity* entity = state.getEntityByID(m_ID);
 	if (!entity) return;
 
-    ParticleSystem::spawnBloodParticles(entity->position(), direction);
+    ParticleSystem::spawnBloodParticles(entity->position(), m_direction);
 }
 
 
@@ -96,10 +100,10 @@ void SpawnCommand::executeOn(Gamestate& state)
 {
     if (m_isUnit)
     {
-        state.units.emplace(ID, Unit(ID, m_position));
+        state.m_units.emplace(m_ID, Unit(m_ID, m_position));
     }
     else
     {
-        state.monsters.emplace(ID, Monster(ID, m_position));
+        state.m_monsters.emplace(m_ID, Monster(m_ID, m_position));
     }
 }

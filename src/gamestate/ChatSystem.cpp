@@ -6,11 +6,11 @@
 #include <renderer/Sprites.h>
 #include <cstring>
 
-ChatSystem::ChatSystem(Input& input, Networker& networker, EventSystem& eventSystem, const std::string& preset_username)
+ChatSystem::ChatSystem(Input& input, Networker& networker, EventSystem& eventSystem, const std::string& presetUsername)
     : EventListener<ChatEvent>{ eventSystem }
     , m_input{input}
     , m_networker{ networker } {
-	strcpy(m_userName, preset_username.c_str());
+	strcpy(m_userName, presetUsername.c_str());
 }
 
 void ChatSystem::update(double deltaTime, double timeStamp)
@@ -134,7 +134,7 @@ void ChatSystem::draw(Renderer& renderer)
 
 float ChatSystem::calculateAlpha(Camera &camera)
 {
-    return 1.0f - glm::smoothstep(8.f, 10.f, camera.getHeight());
+    return 1.0f - glm::smoothstep(8.f, 10.f, camera.height());
 }
 
 void ChatSystem::drawChatIcons(Renderer& renderer)
@@ -153,8 +153,6 @@ void ChatSystem::drawChats(Renderer& renderer)
     glm::vec2 displaySize(imGuiDisplaySize.x, imGuiDisplaySize.y);
 
     Camera& camera = renderer.camera();
-    glm::vec2 cameraPosition = glm::vec2(camera.getX(), camera.getY());
-    glm::vec2 cameraView = glm::vec2(camera.getWidth(), camera.getHeight());
 
     const float alpha = calculateAlpha(renderer.camera());
 
@@ -163,7 +161,7 @@ void ChatSystem::drawChats(Renderer& renderer)
         ChatEntry& chat = m_chats[i];
 
         //transfer position to [-1, 1]
-        glm::vec2 position = (chat.m_position - cameraPosition) / cameraView;
+        glm::vec2 position = (chat.m_position - camera.position()) / camera.extent();
         //transfer position to [0, 1]
         position = (position + 1.f) / 2.f;
         //transfer to pixel coordinates

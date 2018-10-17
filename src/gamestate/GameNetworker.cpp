@@ -1,36 +1,41 @@
-#include <gamestate/GameNetworker.h>
-#include <nlohmann/json.hpp>
 #include <mutex>
 #include <iostream>
-#include <glm/glm.hpp>
-#include <gamestate/Entity.h>
-#include <events/EventSystem.h>
 #include <memory>
-#include <gamestate/Command.h>
+#include <set>
+#include <exception>
+
+#include <nlohmann/json.hpp>
+#include <glm/glm.hpp>
+
+#include <events/EventSystem.h>
 #include <events/AccumulatedCommandsEvent.h>
 #include <events/InitStateEvent.h>
 #include <events/StateEvent.h>
 #include <events/DisconnectEvent.h>
 #include <events/ChatEvent.h>
+#include <events/SoundEvent.h>
+#include <sound/Sounds.h>
+#include <gamestate/Entity.h>
+#include <gamestate/Command.h>
 #include <gamestate/ChatEntry.h>
 
-using namespace std;
+#include <gamestate/GameNetworker.h>
 
-GameNetworker::GameNetworker(EventSystem& _eventSystem)
-    : sioSocket{ nullptr }
-    , eventSystem{ _eventSystem }
+GameNetworker::GameNetworker(EventSystem& eventSystem)
+    : m_sioSocket{ nullptr }
+    , m_eventSystem{ eventSystem }
 {
-    sioClient.set_reconnect_attempts(reconnectAttempts);
-    sioClient.set_reconnect_delay_max(m_reconnectDelay);
+    m_sioClient.set_reconnect_attempts(m_reconnectAttempts);
+    m_sioClient.set_reconnect_delay_max(m_reconnectDelay);
 
-    sioSocket = sioClient.socket();
-    sioSocket->on("initState", bind(&GameNetworker::onInitStateReceive, this, std::placeholders::_1));
-    sioSocket->on("state", bind(&GameNetworker::onStateReceive, this, std::placeholders::_1));
-    sioSocket->on("accumulatedCommands", bind(&GameNetworker::onAccumulatedCommandsReceive, this, std::placeholders::_1));
-    sioSocket->on("chat", bind(&GameNetworker::onChatReceive, this, std::placeholders::_1));
+    m_sioSocket = m_sioClient.socket();
+	m_sioSocket->on("initState", bind(&GameNetworker::receive, this, ExternalEventType::InitState, std::placeholders::_1));
+	m_sioSocket->on("state", bind(&GameNetworker::receive, this, ExternalEventType::State, std::placeholders::_1));
+	m_sioSocket->on("accumulatedCommands", bind(&GameNetworker::receive, this, ExternalEventType::AccumulatedCommands, std::placeholders::_1));
+	m_sioSocket->on("chat", bind(&GameNetworker::receive, this, ExternalEventType::Chat, std::placeholders::_1));
 
-    sioClient.set_reconnecting_listener([=]() {
-        eventSystem.postEvent(std::make_shared<DisconnectEvent>());
+    m_sioClient.set_reconnecting_listener([=]() {
+        m_eventSystem.postEvent(std::make_shared<DisconnectEvent>());
     });
 }
 
@@ -41,29 +46,29 @@ GameNetworker::~GameNetworker()
 
 void GameNetworker::connect(std::string adress, unsigned int port /*= 3000*/)
 {
-    sioClient.connect(string("http://") + adress + ":" + to_string(port));
+    m_sioClient.connect(string("http://") + adress + ":" + to_string(port));
 
-    sioSocket = sioClient.socket();
+    m_sioSocket = m_sioClient.socket();
 }
 
 void GameNetworker::disconnect()
 {
-    sioSocket->off_all();
+    m_sioSocket->off_all();
 
     //These two lines are a workaround to fix a bug in Socket.IO, which causes this thread to lock forever,
     //if sioClient.sync_close is called while the sioClient is trying to connect
     //The bug seems to be caused, because sioClient.sync_close is waiting for a thread, which is forever
     //trying to reconnect and never notices, that the client should actually close
-    sioClient.set_reconnect_attempts(0);
-    sioClient.connect(""); //This will cause the reconnect timer to be reset and the sio thread to be joined
+    m_sioClient.set_reconnect_attempts(0);
+    m_sioClient.connect(""); //This will cause the reconnect timer to be reset and the sio thread to be joined
 
 
-    sioClient.sync_close();
+    m_sioClient.sync_close();
 }
 
 bool GameNetworker::isConnected() const
 {
-    return sioClient.opened();
+    return m_sioClient.opened();
 }
 
 namespace glm
@@ -94,7 +99,7 @@ void GameNetworker::sendCommand(uint32_t unitID, std::string action, glm::vec2 d
     nlohmann::json directionJSON = direction;
     arguments.push(sio::string_message::create(directionJSON.dump()));
 
-    sioSocket->emit("command", arguments);
+    m_sioSocket->emit("command", arguments);
 }
 
 void GameNetworker::sendChatMessage(struct ChatEntry& chatEntry)
@@ -109,80 +114,110 @@ void GameNetworker::sendChatMessage(struct ChatEntry& chatEntry)
     nlohmann::json position = chatEntry.m_position;
     arguments.push(sio::string_message::create(position.dump()));
 
-    sioSocket->emit("chat", arguments);
+    m_sioSocket->emit("chat", arguments);
 }
 
 void GameNetworker::update(double deltaTime, double timeStamp)
 {
 }
 
+void GameNetworker::receive(const ExternalEventType type, const sio::event event) {
+	const std::string jsonMessage = event.get_message()->get_string();
+	const nlohmann::json json = nlohmann::json::parse(jsonMessage);
+
+	try {
+		switch (type) {
+		case ExternalEventType::AccumulatedCommands:
+			onAccumulatedCommandsReceive(json);
+			break;
+		case ExternalEventType::Chat:
+			onChatReceive(json);
+			break;
+		case ExternalEventType::InitState:
+			onInitStateReceive(json);
+			break;
+		case ExternalEventType::State:
+			onStateReceive(json);
+			break;
+		}
+	}
+	catch (nlohmann::json::out_of_range& e) {
+		std::cerr << "Ignoring invalid message: " << e.what() << std::endl;
+		return;
+	}
+}
+
+void from_json(const nlohmann::json& json, Unit& unit) {
+	unit = Unit{ json.at("ID"), glm::vec2(json.at("x"), json.at("y")) };
+}
+
+void from_json(const nlohmann::json& json, Monster& monster) {
+	monster = Monster{ json.at("ID"), glm::vec2(json.at("x"), json.at("y")) };
+}
+
 std::shared_ptr<Gamestate> GameNetworker::parseGamestate(nlohmann::json state)
 {
-    vector<nlohmann::json> jsonMonsters = state["npcs"];
-    vector<nlohmann::json> jsonUnits = state["players"];
+	const vector<Monster> jsonMonsters = state.at("npcs").get<std::vector<Monster>>();
+	const vector<Unit> jsonUnits = state.at("players").get<std::vector<Unit>>();
     std::map<uint32_t, Unit> units;
     std::map<uint32_t, Monster> monsters;
 
-    for (const nlohmann::json& jsonUnit : jsonUnits)
+    for (const auto& unit : jsonUnits)
     {
-        Unit unit(jsonUnit);
         units.emplace(unit.id(), unit);
     }
 
-    for (const nlohmann::json& jsonMonster : jsonMonsters)
+    for (const auto& monster : jsonMonsters)
     {
-        Monster monster(jsonMonster);
         monsters.emplace(monster.id(), monster);
     }
-    return std::make_shared<Gamestate>(eventSystem, units, monsters);
+
+    return std::make_shared<Gamestate>(m_eventSystem, units, monsters);
 }
 
-Configuration GameNetworker::parseConfiguration(std::string jsonString)
+void from_json(const nlohmann::json& jsonConfig, Configuration& config)
 {
-    const nlohmann::json jsonConfig = nlohmann::json::parse(jsonString);
-    Configuration config;
-    config.m_sizeX = jsonConfig["width"];
-    config.m_sizeY = jsonConfig["height"];
-    config.m_roundTime = jsonConfig["roundTime"];
-    std::vector<glm::vec2> blockades = jsonConfig["blockades"];
+    config.m_sizeX = jsonConfig.at("width");
+    config.m_sizeY = jsonConfig.at("height");
+	config.m_roundTime = jsonConfig.at("roundTime");
+    std::vector<glm::vec2> blockades = jsonConfig.at("blockades");
     config.m_blockadePositions = blockades;
-    return config;
 }
 
 std::shared_ptr<Command> GameNetworker::parseCommand(const nlohmann::json& jsonCommand)
 {
-    std::string type = jsonCommand["type"];
-    if (type == "move")
-    {
-        nlohmann::json direction = jsonCommand["direction"];
-        auto command = std::make_shared<MoveCommand>(jsonCommand["ID"], glm::vec2(direction["x"], direction["y"]));
-        return command;
+	static const std::unordered_map<std::string, CommandType> stringToCommand{
+		{"move", CommandType::Move},
+		{"attack", CommandType::Attack},
+		{"damage", CommandType::Damage},
+		{"die", CommandType::Die},
+		{"spawn", CommandType::Spawn}
+	};
+
+	const uint32_t id = jsonCommand.at("ID");
+	std::shared_ptr<Command> command;
+	switch (stringToCommand.at(jsonCommand.at("type"))) {
+	case CommandType::Move:
+        command = std::make_shared<MoveCommand>(id, jsonCommand.at("executedMovement"));
+		break;
+	case CommandType::Attack:
+        command = std::make_shared<AttackCommand>(id, jsonCommand.at("direction"));
+		break;
+    case CommandType::Damage:
+        command = std::make_shared<DamageCommand>(id, jsonCommand.at("direction"));
+		break;
+	case CommandType::Die:
+        command = std::make_shared<DieCommand>(id);
+		break;
+	case CommandType::Spawn:
+        command = std::make_shared<SpawnCommand>(id, 
+            jsonCommand.at("position").get<glm::vec2>(), 
+            jsonCommand.at("isPlayer").get<bool>());
+		break;
+	default:
+		throw nlohmann::json::out_of_range::create(501, "Unknown command type");
     }
-    else if (type == "attack")
-    {
-        nlohmann::json direction = jsonCommand["direction"];
-        auto command = std::make_shared<AttackCommand>(jsonCommand["ID"], glm::vec2(direction["x"], direction["y"]));
-        return command;
-    }
-    else if (type == "damage")
-    {
-        nlohmann::json direction = jsonCommand["direction"];
-        auto command = std::make_shared<DamageCommand>(jsonCommand["ID"], glm::vec2(direction["x"], direction["y"]));
-        return command;
-    }
-    else if (type == "die")
-    {
-        auto command = std::make_shared<DieCommand>(jsonCommand["ID"].get<uint32_t>());
-        return command;
-    }
-    else if (type == "spawn")
-    {
-        auto command = std::make_shared<SpawnCommand>(jsonCommand["ID"].get<uint32_t>(), 
-            jsonCommand["position"].get<glm::vec2>(), 
-            jsonCommand["isPlayer"].get<bool>());
-        return command;
-    }
-    return nullptr;
+	return command;
 }
 
 static const double offset(const CommandType& type) {
@@ -200,96 +235,87 @@ static const double offset(const CommandType& type) {
 	return 0.0;
 }
 
-std::vector<std::shared_ptr<Command>> GameNetworker::processCommands(const nlohmann::json& jsonCommands)
+void GameNetworker::onStateReceive(const nlohmann::json& jsonState)
 {
-	std::vector<std::shared_ptr<Command>> commands;
-    for (const nlohmann::json& jsonCommand : jsonCommands)
-    {
-        std::shared_ptr<Command> command = parseCommand(jsonCommand);
-		if (command) {
-			commands.emplace_back(command);
-        }
-    }
-	return commands;
-}
-
-void GameNetworker::onStateReceive(sio::event _event)
-{
-    const string jsonMessage = _event.get_message()->get_string();
-    const nlohmann::json jsonState = nlohmann::json::parse(jsonMessage);
     const auto state = parseGamestate(jsonState);
-	const auto jsonCommands = jsonState["commands"];
-
+	const auto jsonCommands = jsonState.at("commands");
 
 	std::vector<TimedEvent> events;
+	std::set<CommandType> processedCommandTypes;
 	events.reserve(jsonCommands.size() + 1);
 	events.emplace_back(std::make_shared<StateEvent>(state));
 	for (const nlohmann::json& jsonCommand : jsonCommands)
 	{
 		if (std::shared_ptr<Command> command = parseCommand(jsonCommand)) {
+			processedCommandTypes.emplace(command->type());
 			events.emplace_back(std::make_shared<CommandEvent>(command), offset(command->type()));
 		}
 	}
+	events.reserve(events.size() + processedCommandTypes.size());
+	for (const auto& type : processedCommandTypes) {
+		switch (type) {
+		case CommandType::Move:
+			events.emplace_back(std::make_shared<SoundEvent>(SoundEnum::Walk), offset(type));
+			break;
+		case CommandType::Attack:
+			events.emplace_back(std::make_shared<SoundEvent>(SoundEnum::Attack), offset(type));
+			break;
+		case CommandType::Damage:
+			events.emplace_back(std::make_shared<SoundEvent>(SoundEnum::Hit), offset(type));
+			break;
+		case CommandType::Die:
+			events.emplace_back(std::make_shared<SoundEvent>(SoundEnum::Die), offset(type));
+			break;
+		default:
+			break;
+		}
+	}
 
-	eventSystem.postEvents(events);
+	m_eventSystem.postEvents(events);
 }
 
-void GameNetworker::onInitStateReceive(sio::event _event)
+void GameNetworker::onInitStateReceive(const nlohmann::json& initState)
 {
-    const string jsonMessage = _event.get_message()->get_string();
-    const nlohmann::json initState = nlohmann::json::parse(jsonMessage);
-    const Configuration config = parseConfiguration(initState["config"].dump());
-    auto state = parseGamestate(initState["state"]);
-    double timeSinceLastRound = initState["config"]["timeSinceLastRound"];
+	const nlohmann::json jsonConfig = initState.at("config");
+    const Configuration config = jsonConfig;
+    const auto state = parseGamestate(initState.at("state"));
+	const double timeSinceLastRound = jsonConfig.at("timeSinceLastRound");
 
-    eventSystem.postEvent(std::make_shared<InitStateEvent>(timeSinceLastRound, config, state));
+    m_eventSystem.postEvent(std::make_shared<InitStateEvent>(timeSinceLastRound, config, state));
 }
 
-void GameNetworker::onAccumulatedCommandsReceive(sio::event _event)
+void GameNetworker::onAccumulatedCommandsReceive(const nlohmann::json& json)
 {
-    const std::string jsonMessage = _event.get_message()->get_string();
-    nlohmann::json json = nlohmann::json::parse(jsonMessage);
-    nlohmann::json playerCommandsJson = json["playerCommands"];
+    nlohmann::json playerCommandsJson = json.at("playerCommands");
+
     std::vector<AccumulatedCommands> commandsList;
+	commandsList.reserve(playerCommandsJson.size());
 
     for (nlohmann::json::iterator it = playerCommandsJson.begin(); it != playerCommandsJson.end(); it++)
     {
         AccumulatedCommands commands;
-        commands.ID = std::stoi(it.key());
-        std::vector<nlohmann::json> jsonAttackCommands = it.value()["attack"];
-        for (nlohmann::json jsonCommand : jsonAttackCommands)
-        {
-            commands.attackDirections.emplace_back(jsonCommand["x"], jsonCommand["y"]);
-        }
-
-        std::vector<nlohmann::json> jsonMoveCommands = it.value()["move"];
-        for (nlohmann::json jsonCommand : jsonMoveCommands)
-        {
-            commands.moveDirections.emplace_back(jsonCommand["x"], jsonCommand["y"]);
-        }
-
-        commandsList.push_back(commands);
+        commands.m_ID = std::stoi(it.key());
+		commands.m_attackDirections = it.value().at("attack").get<std::vector<glm::vec2>>();
+		commands.m_moveDirections = it.value().at("move").get<std::vector<glm::vec2>>();
+        commandsList.emplace_back(commands);
     }
 
-    size_t numberOfGivenCommands = json["numberOfGivenCommands"];
-    size_t maxNumberOfCommands = json["maxNumberOfCommands"];
+    const size_t numberOfGivenCommands = json.at("numberOfGivenCommands");
+    const size_t maxNumberOfCommands = json.at("maxNumberOfCommands");
 
-    eventSystem.postEvent(std::make_shared<AccumulatedCommandsEvent>(commandsList, numberOfGivenCommands, maxNumberOfCommands));
+    m_eventSystem.postEvent(std::make_shared<AccumulatedCommandsEvent>(commandsList, numberOfGivenCommands, maxNumberOfCommands));
 }
 
 void from_json(const nlohmann::json& json, ChatEntry& chat)
 {
-    chat.m_user = json["userName"].get<std::string>();
-    chat.m_text = json["text"].get<std::string>();
-    std::string stringPosition = json["position"];
+    chat.m_user = json.at("userName").get<std::string>();
+    chat.m_text = json.at("text").get<std::string>();
+    std::string stringPosition = json.at("position");
     nlohmann::json jsonPosition = nlohmann::json::parse(stringPosition);
     chat.m_position = jsonPosition;
 }
 
-void GameNetworker::onChatReceive(sio::event event)
+void GameNetworker::onChatReceive(const nlohmann::json& json)
 {
-    std::string message = event.get_message()->get_string();
-    nlohmann::json jsonChat = nlohmann::json::parse(message);
-    
-	eventSystem.postEvent(std::make_shared<ChatEvent>(ChatEntry{ jsonChat }));
+	m_eventSystem.postEvent(std::make_shared<ChatEvent>(ChatEntry{ json }));
 }

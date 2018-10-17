@@ -12,14 +12,14 @@ TutorialNetworker::TutorialNetworker(class EventSystem& eventSystem)
 void TutorialNetworker::sendCommand(uint32_t unitID, std::string action, glm::vec2 direction)
 {
     AccumulatedCommands commands;
-    commands.ID = unitID;
+    commands.m_ID = unitID;
     if (action == "move")
     {
-        commands.moveDirections = { direction };
+        commands.m_moveDirections = { direction };
     }
     else
     {
-        commands.attackDirections = { direction };
+        commands.m_attackDirections = { direction };
     }
 	
 	m_eventSystem.processEvent(std::make_shared<AccumulatedCommandsEvent>(std::vector<AccumulatedCommands>{ commands }, 0, 1));
@@ -81,7 +81,8 @@ void TutorialNetworker::begin(Renderer& renderer)
     createMessages();
     m_delayToNextMessage = m_messages.front().m_delay;
 
-    renderer.camera().setCamera(14, 11, 7);
+    renderer.camera().setPosition(14, 11);
+	renderer.camera().setHeight(7);
 }
 
 void TutorialNetworker::createMessages()

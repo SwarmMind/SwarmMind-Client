@@ -5,9 +5,9 @@
 #include <glm/vec2.hpp>
 
 struct AccumulatedCommands {
-	uint32_t ID;
-	std::vector<glm::vec2> attackDirections;
-    std::vector<glm::vec2> moveDirections;
+	uint32_t m_ID;
+	std::vector<glm::vec2> m_attackDirections;
+    std::vector<glm::vec2> m_moveDirections;
 };
 
 class AccumulatedCommandsEvent : public Event

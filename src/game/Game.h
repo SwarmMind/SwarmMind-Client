@@ -24,22 +24,22 @@ class Game {
 	void initializeImGui();
 	
 protected:
-	EventSystem eventSystem;
+	EventSystem m_eventSystem;
 
-	Sounds sounds;
+	Sounds m_sounds;
 	
-	GLFWwindow *window;
- 	Camera camera;   
-    OpenGLRenderer renderer;
-    ImGuiRenderer imguiRenderer;
-    Input input;
+	GLFWwindow *m_window;
+ 	Camera m_camera;   
+    OpenGLRenderer m_renderer;
+    ImGuiRenderer m_imguiRenderer;
+    Input m_input;
 
-    std::unique_ptr<MenuState> menu;
+    std::unique_ptr<MenuState> m_menu;
 
-	Textures textures;
-	Sprites sprites;
+	Textures m_textures;
+	Sprites m_sprites;
 
-	Settings settings;
+	Settings m_settings;
 
 public:
     Game();

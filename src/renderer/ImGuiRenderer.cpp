@@ -1,33 +1,40 @@
 #include <imgui/imgui.h>
-#include <imgui/examples/opengl3_example/imgui_impl_glfw_gl3.h>
-#include <imgui/imgui_internal.h>
+#include <imgui/examples/imgui_impl_glfw.h>
+#include <imgui/examples/imgui_impl_opengl3.h>
+
 #include <renderer/ImGuiRenderer.h>
 
 using namespace std;
 
 ImGuiRenderer::ImGuiRenderer(GLFWwindow* window)
 {
+	const char *glsl_version = "#version 410 core";
+
 	IMGUI_CHECKVERSION();
 
 	ImGui::CreateContext();
-	ImGui_ImplGlfwGL3_Init(window, true);
+	ImGui_ImplGlfw_InitForOpenGL(window, true);
+	ImGui_ImplOpenGL3_Init(glsl_version);
 }
 
 ImGuiRenderer::~ImGuiRenderer()
 {
-	ImGui_ImplGlfwGL3_Shutdown();
+	ImGui_ImplOpenGL3_Shutdown();
+	ImGui_ImplGlfw_Shutdown();
 	ImGui::DestroyContext();
 }
 
 void ImGuiRenderer::preRender()
-{	
-	ImGui_ImplGlfwGL3_NewFrame(); 
+{
+	ImGui_ImplOpenGL3_NewFrame();
+	ImGui_ImplGlfw_NewFrame();
+	ImGui::NewFrame();
 }
 
 void ImGuiRenderer::render()
 {
 	ImGui::Render(); 
-	ImGui_ImplGlfwGL3_RenderDrawData(ImGui::GetDrawData());
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
 

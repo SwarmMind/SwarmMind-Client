@@ -17,7 +17,7 @@ std::string loadShaderFile(string path)
 	ifstream file(path);
 	if (!file.is_open())
 	{
-        throw std::runtime_error(std::string("Could not open file: ") + path);
+		throw std::runtime_error{ "Could not open file: " + path };
 	}
 
     std::ostringstream contents;
@@ -30,9 +30,9 @@ GLint loadShader(string path, GLenum shaderType)
 {
 	string code = loadShaderFile(path);
 	const GLchar* source = code.data();
-	const GLint length = code.length();
+	const size_t length = code.length();
 	GLint shader = glCreateShader(shaderType);
-	glShaderSource(shader, 1, &source, &length);
+	glShaderSource(shader, 1, &source, (const GLint*)&length);
 	glCompileShader(shader);
 
 	GLboolean compileStatus;

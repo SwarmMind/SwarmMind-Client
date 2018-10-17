@@ -19,7 +19,7 @@
 class Map : public EventListener<StateEvent>, public EventListener<AccumulatedCommandsEvent>
 {
 public:
-	Map(class Input& _input, Networker& _networker, class EventSystem& _eventSystem, const class Configuration& config, const std::string& preset_username);
+	Map(class Input& input, Networker& networker, class EventSystem& eventSystem, const class Configuration& config, const std::string& presetUsername);
 
 	~Map();
 
@@ -35,7 +35,7 @@ public:
 
     std::string username() const { return m_chats.username(); }
 
-    const double moveAnimationTime = 3.0;
+    const double m_moveAnimationTime = 3.0;
 	double m_lastUpdate;	 
 
 protected:

@@ -17,36 +17,40 @@ public:
 
 	void draw(double deltaTime);
 
-	void addParticles(ParticleSystem particles);
+	void addParticles(Particles particles);
 
 private:
-	size_t particleCount;
-	size_t textureSize = 256;
-	GLfloat particleSize = 0.04f;
+	size_t m_particleCount;
+	size_t m_textureSize = 256;
+	GLfloat m_particleSize = 0.04f;
 
-	unsigned int front = 0;
-	unsigned int back = 1;
-	GLuint dynamicParticleData[2];
-	GLuint frameBuffers[2];
-	GLuint staticParticleData;
-	GLuint particleColor;
+	unsigned int m_front = 0;
+	unsigned int m_back = 1;
+	GLuint m_dynamicParticleData[2];
+	GLuint m_frameBufers[2];
+	GLuint m_staticParticleData;
+	GLuint m_particleColor;
 
-	GLuint particleUpdateProgram;
-	GLuint particleDrawingProgram;
+	GLuint m_particleUpdateProgram;
+	GLuint m_particleDrawingProgram;
 
-	GLuint updateVao;
-	GLuint updateVbo;
+	GLuint m_updateVao;
+	GLuint m_updateVbo;
 
-	GLuint drawVao;
-	GLuint drawVbo;
+	GLuint m_drawVao;
+	GLuint m_drawVbo;
 
-	GLFWwindow* window;
+	GLFWwindow* m_window;
 
-	GLuint deltaTimeUniform;
+	GLuint m_deltaTimeUniform;
 
-	size_t textureOffset = 0;
+	size_t m_textureOffset = 0;
 
-	//setup
+	GLuint m_cameraPositionUniform, m_cameraSizeUniform;
+
+	class Camera& camera;
+	
+    //setup
 	void initializeStaticData();
 	void initializeDynamicData(unsigned int index);
 	void clearTexture();
@@ -63,8 +67,4 @@ private:
 	void updateParticles(double deltaTime);
 	void drawParticles();
 	void uploadCamera(int frameBufferWidth, int frameBufferHeight);
-
-	GLuint cameraPositionUniform, cameraSizeUniform;
-
-	class Camera& camera;
 };

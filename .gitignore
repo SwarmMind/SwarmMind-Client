@@ -1,4 +1,5 @@
 build/
+build2/
 imgui.ini
 x64/
 glbindingd.dll

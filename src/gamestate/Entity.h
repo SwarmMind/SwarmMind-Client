@@ -3,9 +3,7 @@
 #include <string>
 #include <glm/glm.hpp>
 #include <renderer/Sprites.h>
-#include <nlohmann/json_fwd.hpp>
 #include <renderer/CommandVisualizer.h>
-
 
 class Entity
 {
@@ -14,30 +12,30 @@ public:
 
 	glm::vec2 position() const;
 	uint32_t id() const;
-	uint32_t intid() const;
 	bool operator<(const Entity& rhs) const;
 
 	void moveTo(glm::vec2 position);
+	void rotate(glm::vec2 direction);
 
-	void update(float deltaTime);
+    glm::vec2 rotation() const;
+
+	void update(double deltaTime);
 	virtual void draw(class Renderer& renderer);
 protected:
+    Entity() = default;
 	Entity(std::uint32_t _id, glm::vec2 _position);
 	virtual SpriteEnum sprite() = 0;
 
-
 private:
-	glm::vec2 currentPosition;
-	float velocity = 2;
-	glm::vec2 targetPos;
+	glm::vec2 m_currentPosition, m_targetPos, m_direction;
 	
-	std::uint32_t ID;
+	std::uint32_t m_id;
 };
 
 class Unit : public Entity
 {
 public:
-	Unit(const nlohmann::json& json);
+    Unit() = default;
 	Unit(std::uint32_t _id, glm::vec2 _position);
 	virtual ~Unit() = default;
 
@@ -48,13 +46,13 @@ public:
 protected:
 	virtual SpriteEnum sprite() override;
 private:
-	CommandVisualizer attackVisualizer, moveVisualizer;
+	CommandVisualizer m_attackVisualizer, m_moveVisualizer;
 };
 
 class Monster : public Entity
 {
 public:
-	Monster(const nlohmann::json& json);
+    Monster() = default;
 	Monster(std::uint32_t _id, glm::vec2 _position);
 	virtual ~Monster() = default;
 protected:
