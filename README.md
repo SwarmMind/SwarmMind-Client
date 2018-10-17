@@ -4,7 +4,19 @@
 
 The client for the SwarmMind game, written in OpenGL and C++, connects to the server via Socket.IO
 
-## Build Instructions
+## Build using vcpkg
+Using vcpkg is recommended since it makes building all the dependencies a breeze.
+1. Follow the [vcpkg installation instructions](https://github.com/Microsoft/vcpkg), including user-wide integration
+2. Install the required dependencies for your platform:
+```
+# For x64
+vcpkg --triplet x64-windows install glm glfw3 sfml glbinding boost-random boost-system boost-date-time boost-exception
+# For x86
+vcpkg --triplet x86-windows install glm glfw3 sfml glbinding boost-random boost-system boost-date-time boost-exception
+```
+3. Specify the toolchain file location on the CMake command line: `cmake -DCMAKE_TOOLCHAIN_FILE=path/to/vcpkg/scripts/buildsystems/vcpkg.cmake path/to/source/tree`
+
+## Build instructions for manual build
 The client uses CMake (v3.8 required) as its build system and has the following dependencies:
 1. [GLFW 3.2.1](http://www.glfw.org/)
 2. [glbinding](https://github.com/cginternals/glbinding)
