@@ -6,7 +6,8 @@ configuration:
 matrix:
   fast_finish: true
 cache:
-  - c:\tools\vcpkg\installed\
+  - c:\tools\vcpkg\installed
+  - c:\tools\vcpkg\.git
 install:
   - call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat"
 
@@ -31,11 +32,11 @@ after_build:
   - ps: cd C:\projects\swarmmind-client
   - mkdir package
   - ps: cp build\src\$env:CONFIGURATION\SwarmMind-Client.exe package
-  - ps: cp -r -v fonts package
-  - ps: cp -r -v shaders package
-  - ps: cp -r -v sound package
-  - ps: cp -r -v res package
-  - ps: cp -r -v build\src\$env:CONFIGURATION\*.dll package
+  - ps: cp -r build\src\$env:CONFIGURATION\*.dll package
+  - ps: cp -r fonts package
+  - ps: cp -r shaders package
+  - ps: cp -r sound package
+  - ps: cp -r res package
 
 artifacts:
   - path: package
